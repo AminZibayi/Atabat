@@ -1,0 +1,259 @@
+{
+  "metadata": {
+    "title": "عتبات - مدیریت سفرهای زیارتی",
+    "description": "سفرهای زیارتی خود را به راحتی مدیریت کنید"
+  },
+  "common": {
+    "loading": "در حال بارگذاری...",
+    "error": "خطایی رخ داد",
+    "retry": "تلاش مجدد",
+    "save": "ذخیره",
+    "cancel": "انصراف",
+    "confirm": "تایید",
+    "delete": "حذف",
+    "edit": "ویرایش",
+    "view": "مشاهده",
+    "back": "بازگشت",
+    "next": "بعدی",
+    "previous": "قبلی",
+    "search": "جستجو",
+    "filter": "فیلتر",
+    "clear": "پاک کردن",
+    "submit": "ارسال",
+    "close": "بستن",
+    "yes": "بله",
+    "no": "خیر",
+    "or": "یا",
+    "and": "و",
+    "welcome": "خوش آمدید",
+    "noResults": "نتیجه‌ای یافت نشد",
+    "required": "الزامی"
+  },
+  "nav": {
+    "home": "صفحه اصلی",
+    "trips": "سفرها",
+    "reservations": "رزروهای من",
+    "profile": "پروفایل",
+    "login": "ورود",
+    "logout": "خروج",
+    "register": "ثبت نام",
+    "admin": "پنل مدیریت"
+  },
+  "home": {
+    "hero": {
+      "title": "سفر معنوی به عتبات عالیات",
+      "subtitle": "سفر زیارتی خود به عراق را با اطمینان و آسایش رزرو کنید",
+      "cta": "جستجوی سفر"
+    },
+    "quickActions": {
+      "title": "دسترسی سریع",
+      "searchTrips": "جستجوی سفر",
+      "searchTripsDesc": "سفرهای موجود به عتبات را پیدا کنید",
+      "myReservations": "رزروهای من",
+      "myReservationsDesc": "رزروهای خود را مشاهده و مدیریت کنید",
+      "profile": "پروفایل من",
+      "profileDesc": "اطلاعات شخصی خود را بروزرسانی کنید"
+    },
+    "recentTrips": {
+      "title": "سفرهای موجود",
+      "viewAll": "مشاهده همه سفرها"
+    }
+  },
+  "trips": {
+    "title": "سفر خود را پیدا کنید",
+    "subtitle": "جستجو در سفرهای زیارتی موجود",
+    "search": {
+      "departureFrom": "تاریخ شروع",
+      "departureTo": "تاریخ پایان",
+      "province": "استان",
+      "allProvinces": "همه استان‌ها",
+      "minCapacity": "حداقل ظرفیت",
+      "tripType": "نوع سفر",
+      "allTypes": "همه انواع",
+      "searchBtn": "جستجوی سفر"
+    },
+    "results": {
+      "title": "نتایج جستجو",
+      "count": "{count} سفر یافت شد",
+      "noTrips": "سفری مطابق با معیارهای شما یافت نشد",
+      "tryAgain": "فیلترهای جستجو را تغییر دهید"
+    },
+    "table": {
+      "dayOfWeek": "روز",
+      "departureDate": "تاریخ حرکت",
+      "capacity": "ظرفیت",
+      "tripType": "نوع",
+      "cost": "هزینه",
+      "city": "شهر",
+      "agent": "کارگزار",
+      "hotels": "هتل‌ها",
+      "actions": "عملیات"
+    },
+    "card": {
+      "remaining": "{count} صندلی باقی مانده",
+      "perPerson": "به ازای هر نفر",
+      "reserve": "رزرو کنید",
+      "details": "جزئیات"
+    },
+    "details": {
+      "title": "جزئیات سفر",
+      "overview": "نمای کلی",
+      "itinerary": "برنامه سفر",
+      "hotels": "اقامتگاه‌ها",
+      "najafHotel": "هتل نجف",
+      "karbalaHotel": "هتل کربلا",
+      "kazemainHotel": "هتل کاظمین",
+      "departure": "اطلاعات حرکت",
+      "departureLocation": "مبدا حرکت",
+      "executor": "مجری تور",
+      "groupCode": "کد گروه",
+      "reserveTrip": "رزرو این سفر",
+      "backToSearch": "بازگشت به جستجو"
+    }
+  },
+  "reservations": {
+    "title": "رزروهای من",
+    "subtitle": "مشاهده و مدیریت رزروهای سفر",
+    "empty": {
+      "title": "هنوز رزروی ندارید",
+      "message": "شما هنوز هیچ رزروی انجام نداده‌اید.",
+      "cta": "سفر پیدا کنید"
+    },
+    "filters": {
+      "all": "همه",
+      "pending": "در انتظار",
+      "confirmed": "تایید شده",
+      "paid": "پرداخت شده",
+      "cancelled": "لغو شده"
+    },
+    "card": {
+      "bookingId": "شماره رزرو",
+      "bookedOn": "تاریخ رزرو",
+      "tripDate": "تاریخ سفر",
+      "status": "وضعیت",
+      "viewDetails": "مشاهده جزئیات",
+      "pay": "پرداخت",
+      "receipt": "مشاهده رسید"
+    },
+    "details": {
+      "title": "جزئیات رزرو",
+      "status": "وضعیت رزرو",
+      "timeline": "خط زمانی",
+      "tripInfo": "اطلاعات سفر",
+      "paymentInfo": "اطلاعات پرداخت",
+      "actions": "عملیات",
+      "payNow": "پرداخت",
+      "downloadReceipt": "دانلود رسید",
+      "cancelReservation": "لغو رزرو"
+    },
+    "status": {
+      "pending": "در انتظار",
+      "confirmed": "تایید شده",
+      "paid": "پرداخت شده",
+      "cancelled": "لغو شده"
+    },
+    "new": {
+      "title": "تکمیل رزرو",
+      "subtitle": "لطفا اطلاعات خود را برای رزرو این سفر تایید کنید",
+      "pilgrimInfo": "اطلاعات زائر",
+      "tripSummary": "خلاصه سفر",
+      "terms": "شرایط و قوانین",
+      "termsAccept": "شرایط و قوانین را می‌پذیرم",
+      "confirmReservation": "تایید رزرو",
+      "processing": "در حال پردازش...",
+      "success": {
+        "title": "رزرو با موفقیت انجام شد!",
+        "message": "رزرو شما تایید شده است.",
+        "viewReservation": "مشاهده رزرو"
+      }
+    }
+  },
+  "auth": {
+    "login": {
+      "title": "خوش آمدید",
+      "subtitle": "وارد حساب کاربری خود شوید",
+      "phone": "شماره تلفن",
+      "phonePlaceholder": "۰۹۱۲۳۴۵۶۷۸۹",
+      "password": "رمز عبور",
+      "passwordPlaceholder": "رمز عبور خود را وارد کنید",
+      "rememberMe": "مرا به خاطر بسپار",
+      "forgotPassword": "رمز عبور را فراموش کردید؟",
+      "loginBtn": "ورود",
+      "noAccount": "حساب کاربری ندارید؟",
+      "registerLink": "ثبت نام کنید"
+    },
+    "register": {
+      "title": "ایجاد حساب کاربری",
+      "subtitle": "برای رزرو سفر زیارتی ثبت نام کنید",
+      "firstName": "نام",
+      "lastName": "نام خانوادگی",
+      "phone": "شماره تلفن",
+      "nationalId": "کد ملی",
+      "birthdate": "تاریخ تولد (شمسی)",
+      "birthdatePlaceholder": "۱۳۷۰/۰۱/۰۱",
+      "email": "ایمیل (اختیاری)",
+      "password": "رمز عبور",
+      "confirmPassword": "تکرار رمز عبور",
+      "registerBtn": "ایجاد حساب",
+      "hasAccount": "حساب کاربری دارید؟",
+      "loginLink": "وارد شوید"
+    },
+    "otp": {
+      "title": "تایید شماره تلفن",
+      "subtitle": "کد ارسال شده به {phone} را وارد کنید",
+      "code": "کد تایید",
+      "codePlaceholder": "کد ۶ رقمی را وارد کنید",
+      "verifyBtn": "تایید",
+      "resend": "کد را دریافت نکردید؟",
+      "resendLink": "ارسال مجدد",
+      "countdown": "ارسال مجدد در {seconds} ثانیه"
+    },
+    "errors": {
+      "invalidPhone": "لطفا شماره تلفن معتبر وارد کنید",
+      "invalidNationalId": "لطفا کد ملی معتبر وارد کنید",
+      "invalidBirthdate": "لطفا تاریخ معتبر وارد کنید (YYYY/MM/DD)",
+      "passwordMismatch": "رمز عبور مطابقت ندارد",
+      "invalidCredentials": "شماره تلفن یا رمز عبور نادرست است",
+      "accountExists": "حسابی با این شماره تلفن وجود دارد"
+    }
+  },
+  "profile": {
+    "title": "پروفایل من",
+    "subtitle": "مدیریت اطلاعات شخصی",
+    "personalInfo": "اطلاعات شخصی",
+    "contactInfo": "اطلاعات تماس",
+    "updateBtn": "بروزرسانی پروفایل",
+    "success": "پروفایل با موفقیت بروزرسانی شد"
+  },
+  "footer": {
+    "copyright": "© {year} عتبات. تمامی حقوق محفوظ است.",
+    "links": {
+      "about": "درباره ما",
+      "contact": "تماس با ما",
+      "terms": "شرایط استفاده",
+      "privacy": "حریم خصوصی"
+    }
+  },
+  "errors": {
+    "notFound": {
+      "title": "صفحه یافت نشد",
+      "message": "صفحه مورد نظر شما وجود ندارد.",
+      "backHome": "بازگشت به صفحه اصلی"
+    },
+    "serverError": {
+      "title": "خطای سرور",
+      "message": "مشکلی پیش آمد. لطفا بعدا تلاش کنید."
+    },
+    "networkError": "خطای شبکه. لطفا اتصال خود را بررسی کنید.",
+    "unauthorized": "برای ادامه وارد شوید."
+  },
+  "validation": {
+    "required": "این فیلد الزامی است",
+    "minLength": "حداقل باید {min} کاراکتر باشد",
+    "maxLength": "حداکثر باید {max} کاراکتر باشد",
+    "email": "لطفا ایمیل معتبر وارد کنید",
+    "phone": "لطفا شماره تلفن معتبر ایران وارد کنید",
+    "nationalId": "لطفا کد ملی ۱۰ رقمی معتبر وارد کنید",
+    "date": "لطفا تاریخ معتبر وارد کنید"
+  }
+}

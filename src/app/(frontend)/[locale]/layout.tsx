@@ -1,0 +1,86 @@
+// In the Name of God, the Creative, the Originator
+import { NextIntlClientProvider } from 'next-intl';
+import { getMessages, setRequestLocale } from 'next-intl/server';
+import { notFound } from 'next/navigation';
+import React from 'react';
+import { Toaster } from 'react-hot-toast';
+
+import { routing, Locale } from '@/i18n/routing';
+import './globals.css';
+
+export function generateStaticParams() {
+  return routing.locales.map(locale => ({ locale }));
+}
+
+export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }) {
+  const { locale } = await params;
+  const messages = (await import(`../../../../messages/${locale}.json`)).default;
+
+  return {
+    title: messages.metadata.title,
+    description: messages.metadata.description,
+    icons: [
+      { rel: 'icon', type: 'image/png', url: '/favicon.png' },
+      { rel: 'apple-touch-icon', type: 'image/png', url: '/apple-touch-icon.png' },
+    ],
+  };
+}
+
+export default async function LocaleLayout({
+  children,
+  params,
+}: {
+  children: React.ReactNode;
+  params: Promise<{ locale: string }>;
+}) {
+  const { locale } = await params;
+
+  // Ensure that the incoming locale is valid
+  if (!routing.locales.includes(locale as Locale)) {
+    notFound();
+  }
+
+  // Enable static rendering
+  setRequestLocale(locale);
+
+  const messages = await getMessages();
+  const isRTL = locale === 'fa';
+
+  return (
+    <html lang={locale} dir={isRTL ? 'rtl' : 'ltr'}>
+      <body>
+        <NextIntlClientProvider messages={messages}>
+          <Toaster
+            position="top-center"
+            reverseOrder={false}
+            gutter={8}
+            toastOptions={{
+              duration: 4000,
+              style: {
+                background: 'var(--color-surface, #1a1a2e)',
+                color: 'var(--color-text, #fff)',
+                border: '1px solid var(--color-border, #333)',
+                borderRadius: '12px',
+                padding: '12px 16px',
+                fontFamily: 'inherit',
+              },
+              success: {
+                iconTheme: {
+                  primary: 'var(--color-success, #10b981)',
+                  secondary: '#fff',
+                },
+              },
+              error: {
+                iconTheme: {
+                  primary: 'var(--color-error, #ef4444)',
+                  secondary: '#fff',
+                },
+              },
+            }}
+          />
+          <div className="app-layout">{children}</div>
+        </NextIntlClientProvider>
+      </body>
+    </html>
+  );
+}

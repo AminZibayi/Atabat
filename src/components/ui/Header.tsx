@@ -1,0 +1,72 @@
+'use client';
+
+// In the Name of God, the Creative, the Originator
+import { useLocale, useTranslations } from 'next-intl';
+import React from 'react';
+
+import { Link, usePathname } from '@/i18n/navigation';
+import { LanguageSwitcher } from './LanguageSwitcher';
+import { UserMenu } from './UserMenu';
+import styles from './Header.module.css';
+
+export function Header() {
+  const t = useTranslations('nav');
+  const locale = useLocale();
+  const pathname = usePathname();
+
+  const navItems = [
+    { href: '/', label: t('home') },
+    { href: '/trips', label: t('trips') },
+    { href: '/reservations', label: t('reservations') },
+  ];
+
+  return (
+    <header className={styles.header}>
+      <div className={styles.container}>
+        <Link href="/" className={styles.logo}>
+          <svg
+            className={styles.logoIcon}
+            viewBox="0 0 32 32"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg">
+            <circle cx="16" cy="16" r="14" stroke="currentColor" strokeWidth="2" />
+            <path d="M16 8L20 14H12L16 8Z" fill="currentColor" />
+            <path d="M16 24L12 18H20L16 24Z" fill="currentColor" />
+          </svg>
+          <span className={styles.logoText}>{locale === 'fa' ? 'عتبات' : 'Atabat'}</span>
+        </Link>
+
+        <nav className={styles.nav}>
+          {navItems.map(item => (
+            <Link
+              key={item.href}
+              href={item.href}
+              className={`${styles.navLink} ${pathname === item.href ? styles.active : ''}`}>
+              {item.label}
+            </Link>
+          ))}
+        </nav>
+
+        <div className={styles.actions}>
+          <LanguageSwitcher />
+          <UserMenu />
+        </div>
+
+        {/* Mobile menu button */}
+        <button className={styles.mobileMenuBtn} aria-label="Menu">
+          <svg
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2">
+            <line x1="3" y1="6" x2="21" y2="6" />
+            <line x1="3" y1="12" x2="21" y2="12" />
+            <line x1="3" y1="18" x2="21" y2="18" />
+          </svg>
+        </button>
+      </div>
+    </header>
+  );
+}

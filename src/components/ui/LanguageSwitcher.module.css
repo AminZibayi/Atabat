@@ -1,0 +1,44 @@
+.switcher {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-full);
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.switcher:hover {
+  background-color: var(--color-surface-hover);
+  border-color: var(--color-border-light);
+  color: var(--color-text-primary);
+}
+
+.switcher:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+.switcher.pending {
+  opacity: 0.7;
+  cursor: wait;
+}
+
+.flag {
+  font-size: var(--font-size-base);
+  line-height: 1;
+}
+
+.label {
+  font-family: var(--font-family-en);
+}
+
+/* For Persian label, use Persian font */
+[dir='ltr'] .label {
+  font-family: var(--font-family-fa);
+}

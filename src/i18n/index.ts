@@ -35,6 +35,69 @@ export const i18n = {
         },
       },
     },
+    pilgrims: {
+      labels: {
+        singular: { en: 'Pilgrim', fa: 'زائر' },
+        plural: { en: 'Pilgrims', fa: 'زائران' },
+      },
+      admin: {
+        group: { en: 'Operations', fa: 'عملیات' },
+      },
+      fields: {
+        phone: {
+          label: { en: 'Phone Number', fa: 'شماره تلفن' },
+        },
+        nationalId: {
+          label: { en: 'National ID', fa: 'کد ملی' },
+        },
+        birthdate: {
+          label: { en: 'Birth Date (Jalali)', fa: 'تاریخ تولد (شمسی)' },
+        },
+      },
+    },
+    trips: {
+      labels: {
+        singular: { en: 'Trip', fa: 'سفر' },
+        plural: { en: 'Trips', fa: 'سفرها' },
+      },
+      admin: {
+        group: { en: 'Operations', fa: 'عملیات' },
+      },
+    },
+    reservations: {
+      labels: {
+        singular: { en: 'Reservation', fa: 'رزرو' },
+        plural: { en: 'Reservations', fa: 'رزروها' },
+      },
+      admin: {
+        group: { en: 'Operations', fa: 'عملیات' },
+      },
+      fields: {
+        status: {
+          label: { en: 'Status', fa: 'وضعیت' },
+          options: {
+            pending: { en: 'Pending', fa: 'در انتظار' },
+            confirmed: { en: 'Confirmed', fa: 'تایید شده' },
+            paid: { en: 'Paid', fa: 'پرداخت شده' },
+            cancelled: { en: 'Cancelled', fa: 'لغو شده' },
+          },
+        },
+      },
+    },
+    kargozarConfig: {
+      labels: {
+        singular: { en: 'Kargozar Config', fa: 'تنظیمات کارگزار' },
+        plural: { en: 'Kargozar Configs', fa: 'تنظیمات کارگزار' },
+      },
+      admin: {
+        group: { en: 'Settings', fa: 'تنظیمات' },
+      },
+      fields: {
+        username: { label: { en: 'Username', fa: 'نام کاربری' } },
+        currentOTP: { label: { en: 'Current OTP', fa: 'رمز یکبار مصرف فعلی' } },
+        otpLastUpdated: { label: { en: 'OTP Last Updated', fa: 'آخرین بروزرسانی رمز' } },
+      },
+    },
   },
 } as const;
 

@@ -1,0 +1,259 @@
+{
+  "metadata": {
+    "title": "Atabat - Pilgrim Travel Management",
+    "description": "Manage your pilgrimage trips with ease"
+  },
+  "common": {
+    "loading": "Loading...",
+    "error": "An error occurred",
+    "retry": "Try Again",
+    "save": "Save",
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "delete": "Delete",
+    "edit": "Edit",
+    "view": "View",
+    "back": "Back",
+    "next": "Next",
+    "previous": "Previous",
+    "search": "Search",
+    "filter": "Filter",
+    "clear": "Clear",
+    "submit": "Submit",
+    "close": "Close",
+    "yes": "Yes",
+    "no": "No",
+    "or": "or",
+    "and": "and",
+    "welcome": "Welcome",
+    "noResults": "No results found",
+    "required": "Required"
+  },
+  "nav": {
+    "home": "Home",
+    "trips": "Trips",
+    "reservations": "My Reservations",
+    "profile": "Profile",
+    "login": "Login",
+    "logout": "Logout",
+    "register": "Register",
+    "admin": "Admin Panel"
+  },
+  "home": {
+    "hero": {
+      "title": "Your Journey to the Holy Shrines",
+      "subtitle": "Book your pilgrimage trip to Iraq with confidence and ease",
+      "cta": "Find Trips"
+    },
+    "quickActions": {
+      "title": "Quick Actions",
+      "searchTrips": "Search Trips",
+      "searchTripsDesc": "Find available trips to holy shrines",
+      "myReservations": "My Reservations",
+      "myReservationsDesc": "View and manage your bookings",
+      "profile": "My Profile",
+      "profileDesc": "Update your personal information"
+    },
+    "recentTrips": {
+      "title": "Available Trips",
+      "viewAll": "View All Trips"
+    }
+  },
+  "trips": {
+    "title": "Find Your Trip",
+    "subtitle": "Search for available pilgrimage trips",
+    "search": {
+      "departureFrom": "Departure From",
+      "departureTo": "Departure To",
+      "province": "Province",
+      "allProvinces": "All Provinces",
+      "minCapacity": "Min. Capacity",
+      "tripType": "Trip Type",
+      "allTypes": "All Types",
+      "searchBtn": "Search Trips"
+    },
+    "results": {
+      "title": "Search Results",
+      "count": "{count} trips found",
+      "noTrips": "No trips found matching your criteria",
+      "tryAgain": "Try adjusting your search filters"
+    },
+    "table": {
+      "dayOfWeek": "Day",
+      "departureDate": "Departure",
+      "capacity": "Capacity",
+      "tripType": "Type",
+      "cost": "Cost",
+      "city": "City",
+      "agent": "Agent",
+      "hotels": "Hotels",
+      "actions": "Actions"
+    },
+    "card": {
+      "remaining": "{count} seats left",
+      "perPerson": "per person",
+      "reserve": "Reserve Now",
+      "details": "View Details"
+    },
+    "details": {
+      "title": "Trip Details",
+      "overview": "Overview",
+      "itinerary": "Itinerary",
+      "hotels": "Accommodations",
+      "najafHotel": "Najaf Hotel",
+      "karbalaHotel": "Karbala Hotel",
+      "kazemainHotel": "Kazemain Hotel",
+      "departure": "Departure Information",
+      "departureLocation": "Departure Location",
+      "executor": "Tour Executor",
+      "groupCode": "Group Code",
+      "reserveTrip": "Reserve This Trip",
+      "backToSearch": "Back to Search"
+    }
+  },
+  "reservations": {
+    "title": "My Reservations",
+    "subtitle": "View and manage your trip bookings",
+    "empty": {
+      "title": "No Reservations Yet",
+      "message": "You haven't made any reservations yet.",
+      "cta": "Find a Trip"
+    },
+    "filters": {
+      "all": "All",
+      "pending": "Pending",
+      "confirmed": "Confirmed",
+      "paid": "Paid",
+      "cancelled": "Cancelled"
+    },
+    "card": {
+      "bookingId": "Booking ID",
+      "bookedOn": "Booked on",
+      "tripDate": "Trip Date",
+      "status": "Status",
+      "viewDetails": "View Details",
+      "pay": "Pay Now",
+      "receipt": "View Receipt"
+    },
+    "details": {
+      "title": "Reservation Details",
+      "status": "Reservation Status",
+      "timeline": "Timeline",
+      "tripInfo": "Trip Information",
+      "paymentInfo": "Payment Information",
+      "actions": "Actions",
+      "payNow": "Proceed to Payment",
+      "downloadReceipt": "Download Receipt",
+      "cancelReservation": "Cancel Reservation"
+    },
+    "status": {
+      "pending": "Pending",
+      "confirmed": "Confirmed",
+      "paid": "Paid",
+      "cancelled": "Cancelled"
+    },
+    "new": {
+      "title": "Complete Your Reservation",
+      "subtitle": "Please confirm your details to reserve this trip",
+      "pilgrimInfo": "Pilgrim Information",
+      "tripSummary": "Trip Summary",
+      "terms": "Terms & Conditions",
+      "termsAccept": "I accept the terms and conditions",
+      "confirmReservation": "Confirm Reservation",
+      "processing": "Processing...",
+      "success": {
+        "title": "Reservation Successful!",
+        "message": "Your reservation has been confirmed.",
+        "viewReservation": "View Reservation"
+      }
+    }
+  },
+  "auth": {
+    "login": {
+      "title": "Welcome Back",
+      "subtitle": "Sign in to your account",
+      "phone": "Phone Number",
+      "phonePlaceholder": "09123456789",
+      "password": "Password",
+      "passwordPlaceholder": "Enter your password",
+      "rememberMe": "Remember me",
+      "forgotPassword": "Forgot password?",
+      "loginBtn": "Sign In",
+      "noAccount": "Don't have an account?",
+      "registerLink": "Create one"
+    },
+    "register": {
+      "title": "Create Account",
+      "subtitle": "Join us to book your pilgrimage",
+      "firstName": "First Name",
+      "lastName": "Last Name",
+      "phone": "Phone Number",
+      "nationalId": "National ID",
+      "birthdate": "Birth Date (Jalali)",
+      "birthdatePlaceholder": "1370/01/01",
+      "email": "Email (Optional)",
+      "password": "Password",
+      "confirmPassword": "Confirm Password",
+      "registerBtn": "Create Account",
+      "hasAccount": "Already have an account?",
+      "loginLink": "Sign in"
+    },
+    "otp": {
+      "title": "Verify Your Phone",
+      "subtitle": "Enter the code sent to {phone}",
+      "code": "Verification Code",
+      "codePlaceholder": "Enter 6-digit code",
+      "verifyBtn": "Verify",
+      "resend": "Didn't receive code?",
+      "resendLink": "Resend",
+      "countdown": "Resend in {seconds}s"
+    },
+    "errors": {
+      "invalidPhone": "Please enter a valid phone number",
+      "invalidNationalId": "Please enter a valid national ID",
+      "invalidBirthdate": "Please enter a valid date (YYYY/MM/DD)",
+      "passwordMismatch": "Passwords do not match",
+      "invalidCredentials": "Invalid phone or password",
+      "accountExists": "An account with this phone already exists"
+    }
+  },
+  "profile": {
+    "title": "My Profile",
+    "subtitle": "Manage your personal information",
+    "personalInfo": "Personal Information",
+    "contactInfo": "Contact Information",
+    "updateBtn": "Update Profile",
+    "success": "Profile updated successfully"
+  },
+  "footer": {
+    "copyright": "© {year} Atabat. All rights reserved.",
+    "links": {
+      "about": "About Us",
+      "contact": "Contact",
+      "terms": "Terms of Service",
+      "privacy": "Privacy Policy"
+    }
+  },
+  "errors": {
+    "notFound": {
+      "title": "Page Not Found",
+      "message": "The page you're looking for doesn't exist.",
+      "backHome": "Go Home"
+    },
+    "serverError": {
+      "title": "Server Error",
+      "message": "Something went wrong. Please try again later."
+    },
+    "networkError": "Network error. Please check your connection.",
+    "unauthorized": "Please login to continue."
+  },
+  "validation": {
+    "required": "This field is required",
+    "minLength": "Must be at least {min} characters",
+    "maxLength": "Must be at most {max} characters",
+    "email": "Please enter a valid email",
+    "phone": "Please enter a valid Iranian phone number",
+    "nationalId": "Please enter a valid 10-digit national ID",
+    "date": "Please enter a valid date"
+  }
+}

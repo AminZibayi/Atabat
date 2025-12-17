@@ -1,9 +1,9 @@
+// In the Name of God, the Creative, the Originator
 import React from 'react';
-import './styles.css';
 
 export const metadata = {
-  description: 'A blank starter template using Payload in a Next.js app.',
-  title: 'Plya Template',
+  description: 'Atabat - Pilgrim Travel Management',
+  title: 'Atabat',
   icons: [
     {
       rel: 'icon',
@@ -18,14 +18,8 @@ export const metadata = {
   ],
 };
 
-export default async function RootLayout(props: { children: React.ReactNode }) {
+export default function RootLayout(props: { children: React.ReactNode }) {
   const { children } = props;
 
-  return (
-    <html lang="en">
-      <body>
-        <main>{children}</main>
-      </body>
-    </html>
-  );
+  return children;
 }

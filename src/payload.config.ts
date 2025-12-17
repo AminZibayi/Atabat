@@ -9,6 +9,18 @@ import sharp from 'sharp';
 
 import { Users } from './collections/User';
 import { Media } from './collections/Media';
+import { Pilgrims } from './collections/Pilgrim';
+import { Trips } from './collections/Trip';
+import { Reservations } from './collections/Reservation';
+import { KargozarConfig } from './globals/KargozarConfig';
+
+import { tripSearchHandler } from '@/endpoints/trips';
+import {
+  createReservationHandler,
+  getReservationsHandler,
+  getReceiptHandler,
+} from '@/endpoints/reservations';
+import { initiatePaymentHandler } from '@/endpoints/payments';
 
 const filename = fileURLToPath(import.meta.url);
 const dirname = path.dirname(filename);
@@ -42,7 +54,35 @@ export default buildConfig({
       ],
     },
   },
-  collections: [Users, Media],
+  collections: [Users, Media, Pilgrims, Trips, Reservations],
+  globals: [KargozarConfig],
+  endpoints: [
+    {
+      path: '/trips/search',
+      method: 'get',
+      handler: tripSearchHandler,
+    },
+    {
+      path: '/reservations',
+      method: 'post',
+      handler: createReservationHandler,
+    },
+    {
+      path: '/reservations',
+      method: 'get',
+      handler: getReservationsHandler,
+    },
+    {
+      path: '/reservations/:id/receipt',
+      method: 'get',
+      handler: getReceiptHandler,
+    },
+    {
+      path: '/payments/initiate/:reservationId',
+      method: 'post',
+      handler: initiatePaymentHandler,
+    },
+  ],
   i18n: {
     fallbackLanguage: 'fa',
     supportedLanguages: { en, fa },
