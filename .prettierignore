@@ -1,0 +1,61 @@
+# In the Name of God, the Creative, the Originator
+
+############################
+# Logs and databases
+############################
+
+.tmp
+*.log
+*.sql
+*.sqlite
+*.sqlite3
+
+############################
+# Hugo
+############################
+
+resources/
+public/
+.hugo_build.lock
+assets/**/vendor
+pnpm-lock.yaml
+
+############################
+# Misc.
+############################
+
+*#
+ssl
+.idea
+nbproject
+.netlify
+
+############################
+# Node.js
+############################
+
+lib-cov
+lcov.info
+pids
+logs
+results
+node_modules
+.node_history
+
+############################
+# Tests
+############################
+
+testApp
+coverage
+
+############################
+# PayloadCMS
+############################
+
+src/payload-types.ts
+src/app/(payload)/admin/importMap.js
+
+############################
+# Temp
+############################

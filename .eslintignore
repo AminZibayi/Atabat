@@ -1,0 +1,8 @@
+assets/js/vendor
+node_modules
+.next
+coverage
+dist
+build
+public
+CHANGELOG.md
