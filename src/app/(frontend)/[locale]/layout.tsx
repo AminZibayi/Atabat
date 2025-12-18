@@ -1,10 +1,12 @@
 // In the Name of God, the Creative, the Originator
 import { NextIntlClientProvider } from 'next-intl';
 import { getMessages, setRequestLocale } from 'next-intl/server';
+import { draftMode } from 'next/headers';
 import { notFound } from 'next/navigation';
 import React from 'react';
 import { Toaster } from 'react-hot-toast';
 
+import { AdminBar } from '@/components/ui/AdminBar';
 import { routing, Locale } from '@/i18n/routing';
 import './globals.css';
 
@@ -34,6 +36,7 @@ export default async function LocaleLayout({
   params: Promise<{ locale: string }>;
 }) {
   const { locale } = await params;
+  const { isEnabled: isDraftMode } = await draftMode();
 
   // Ensure that the incoming locale is valid
   if (!routing.locales.includes(locale as Locale)) {
@@ -50,6 +53,11 @@ export default async function LocaleLayout({
     <html lang={locale} dir={isRTL ? 'rtl' : 'ltr'}>
       <body>
         <NextIntlClientProvider messages={messages}>
+          <AdminBar
+            adminBarProps={{
+              preview: isDraftMode,
+            }}
+          />
           <Toaster
             position="top-center"
             reverseOrder={false}

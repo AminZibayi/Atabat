@@ -1,0 +1,54 @@
+// In the Name of God, the Creative, the Originator
+
+.admin-bar {
+  position: relative;
+  z-index: 100;
+  transition: all 0.2s ease-in-out;
+
+  &--visible {
+    display: block;
+  }
+
+  &--hidden {
+    display: none;
+  }
+
+  &__container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 1rem;
+  }
+
+  &__bar {
+    color: #fff;
+  }
+
+  &__controls {
+    font-weight: 500;
+    color: #fff;
+
+    a,
+    button {
+      color: #fff;
+      text-decoration: none;
+
+      &:hover {
+        text-decoration: underline;
+      }
+    }
+  }
+
+  &__logo {
+    color: #fff;
+    font-weight: 600;
+  }
+
+  &__user {
+    color: #fff;
+  }
+
+  // Hide on small screens
+  @media (max-width: 768px) {
+    display: none !important;
+  }
+}

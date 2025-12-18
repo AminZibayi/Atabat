@@ -2,12 +2,25 @@
 import type { GlobalConfig } from 'payload';
 
 import { i18n } from '@/i18n';
+import { generateGlobalPreviewPath } from '@/utils/generatePreviewPath';
 
 export const StaticPages: GlobalConfig = {
   slug: 'static-pages',
   label: i18n.globals.staticPages.labels.singular,
   admin: {
     group: i18n.globals.staticPages.admin.group,
+    livePreview: {
+      url: ({ req }) =>
+        generateGlobalPreviewPath({
+          global: 'static-pages',
+          req,
+        }) || '/',
+    },
+    preview: (_data, { req }) =>
+      generateGlobalPreviewPath({
+        global: 'static-pages',
+        req,
+      }),
   },
   access: {
     read: () => true, // Public pages need to be readable
