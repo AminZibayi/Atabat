@@ -7,7 +7,7 @@ describe('Pilgrim Auth Integration', () => {
   let payload: Awaited<ReturnType<typeof getPayload>>;
   const testPhone = `09${Math.floor(Math.random() * 900000000 + 100000000)}`;
   const testPassword = 'testPass123';
-  let createdPilgrimId: string;
+  let createdPilgrimId: number | string;
 
   beforeAll(async () => {
     const payloadConfig = await config;
@@ -58,7 +58,9 @@ describe('Pilgrim Auth Integration', () => {
             phone: testPhone, // Same phone
             password: 'anotherPass',
             nationalId: '9876543210',
+            username: testPhone,
           },
+          draft: false,
         })
       ).rejects.toThrow();
     });
@@ -71,7 +73,9 @@ describe('Pilgrim Auth Integration', () => {
             phone: '', // Empty phone
             password: testPassword,
             nationalId: '1111111111',
+            username: '',
           },
+          draft: false,
         })
       ).rejects.toThrow();
     });
@@ -82,7 +86,7 @@ describe('Pilgrim Auth Integration', () => {
       const result = await payload.login({
         collection: 'pilgrims',
         data: {
-          email: testPhone, // Using phone as email for auth
+          username: testPhone, // Using phone as username for auth
           password: testPassword,
         },
       });
@@ -96,7 +100,7 @@ describe('Pilgrim Auth Integration', () => {
         payload.login({
           collection: 'pilgrims',
           data: {
-            email: testPhone,
+            username: testPhone,
             password: 'wrongPassword',
           },
         })
@@ -108,7 +112,7 @@ describe('Pilgrim Auth Integration', () => {
         payload.login({
           collection: 'pilgrims',
           data: {
-            email: '09000000000', // Non-existent
+            username: '09000000000', // Non-existent
             password: testPassword,
           },
         })

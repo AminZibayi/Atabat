@@ -3,6 +3,8 @@ import type { CollectionConfig } from 'payload';
 
 import { i18n } from '@/i18n';
 import { validateZod } from '@/utils/validateZod';
+import { isAdmin } from '@/policies/isAdmin';
+import { isPilgrimOwner } from '@/policies/isPilgrimOwner';
 import { birthdateSchema, nationalIdSchema, phoneSchema } from '@/validations/pilgrim';
 
 export const Pilgrims: CollectionConfig = {
@@ -15,17 +17,15 @@ export const Pilgrims: CollectionConfig = {
   },
   access: {
     create: () => true, // Allow public registration
-    read: ({ req: { user } }) => Boolean(user), // Only logged in users can read
-    update: ({ req: { user } }) => {
-      if (user && user.collection === 'pilgrims') {
-        return {
-          id: {
-            equals: user.id,
-          },
-        };
-      }
-      return false;
+    read: args => {
+      if (isAdmin(args)) return true;
+      return isPilgrimOwner(args);
     },
+    update: args => {
+      if (isAdmin(args)) return true;
+      return isPilgrimOwner(args);
+    },
+    delete: isAdmin,
   },
   auth: {
     tokenExpiration: 604800, // 1 week

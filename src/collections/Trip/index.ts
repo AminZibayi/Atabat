@@ -1,6 +1,8 @@
 // In the Name of God, the Creative, the Originator
 import type { CollectionConfig } from 'payload';
 
+import { isAdmin } from '@/policies/isAdmin';
+
 import { i18n } from '@/i18n';
 import { tripSearchHandler } from '@/endpoints/trips';
 
@@ -21,9 +23,9 @@ export const Trips: CollectionConfig = {
   },
   access: {
     read: () => true, // Publicly readable for search
-    create: () => false, // Only created by scraper/system
-    update: () => false,
-    delete: () => false,
+    create: isAdmin,
+    update: isAdmin,
+    delete: isAdmin,
   },
   fields: [
     { name: 'dayOfWeek', type: 'text' },

@@ -1,5 +1,8 @@
 import type { CollectionConfig } from 'payload';
 
+import { isAdmin } from '@/policies/isAdmin';
+import { isUserOwner } from '@/policies/isUserOwner';
+
 import { i18n } from '@/i18n';
 import { validateZod } from '@/utils/validateZod';
 import { userDisplayNameSchema } from '@/validations/user';
@@ -13,6 +16,12 @@ export const Users: CollectionConfig = {
     defaultColumns: ['displayName', 'email', 'createdAt'],
   },
   auth: true,
+  access: {
+    read: isAdmin,
+    create: isAdmin,
+    update: isUserOwner,
+    delete: isUserOwner,
+  },
   fields: [
     {
       name: 'displayName',

@@ -1,6 +1,10 @@
 // In the Name of God, the Creative, the Originator
 import type { CollectionConfig } from 'payload';
 
+import { isAdmin } from '@/policies/isAdmin';
+import { isLoggedIn } from '@/policies/isLoggedIn';
+import { isReservationOwner } from '@/policies/isReservationOwner';
+
 import { i18n } from '@/i18n';
 
 export const Reservations: CollectionConfig = {
@@ -10,6 +14,21 @@ export const Reservations: CollectionConfig = {
     group: i18n.collections.reservations.admin.group,
     useAsTitle: 'externalResId',
     defaultColumns: ['externalResId', 'pilgrim', 'status', 'bookedAt'],
+  },
+  access: {
+    read: args => {
+      if (isAdmin(args)) return true;
+      return isReservationOwner(args);
+    },
+    create: isReservationOwner,
+    update: args => {
+      if (isAdmin(args)) return true;
+      return isReservationOwner(args);
+    },
+    delete: args => {
+      if (isAdmin(args)) return true;
+      return isReservationOwner(args);
+    },
   },
   fields: [
     {

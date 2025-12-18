@@ -1,5 +1,7 @@
 import type { CollectionConfig } from 'payload';
 
+import { isAdmin } from '@/policies/isAdmin';
+
 import { i18n } from '@/i18n';
 import { validateZod } from '@/utils/validateZod';
 import { mediaAltSchema } from '@/validations/media';
@@ -12,6 +14,9 @@ export const Media: CollectionConfig = {
   },
   access: {
     read: () => true,
+    create: isAdmin,
+    update: isAdmin,
+    delete: isAdmin,
   },
   fields: [
     {
