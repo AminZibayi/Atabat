@@ -50,9 +50,12 @@ export default function ReservationsPage() {
 
   const fetchReservations = async () => {
     try {
-      const response = await fetch('/api/reservations');
+      const response = await fetch('/api/reservations/list');
       const data = await response.json();
-      if (data.docs) {
+      if (data.reservations) {
+        setReservations(data.reservations);
+      } else if (data.docs) {
+        // Fallback for direct collection API response
         setReservations(data.docs);
       }
     } catch {

@@ -16,11 +16,6 @@ import { KargozarConfig } from './globals/KargozarConfig';
 import { StaticPages } from './globals/StaticPages';
 
 import { tripSearchHandler } from '@/endpoints/trips';
-import {
-  createReservationHandler,
-  getReservationsHandler,
-  getReceiptHandler,
-} from '@/endpoints/reservations';
 import { initiatePaymentHandler } from '@/endpoints/payments';
 
 const filename = fileURLToPath(import.meta.url);
@@ -84,21 +79,6 @@ export default buildConfig({
       path: '/trips/search',
       method: 'get',
       handler: tripSearchHandler,
-    },
-    {
-      path: '/reservations',
-      method: 'post',
-      handler: createReservationHandler,
-    },
-    {
-      path: '/reservations',
-      method: 'get',
-      handler: getReservationsHandler,
-    },
-    {
-      path: '/reservations/:id/receipt',
-      method: 'get',
-      handler: getReceiptHandler,
     },
     {
       path: '/payments/initiate/:reservationId',

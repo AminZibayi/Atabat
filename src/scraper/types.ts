@@ -1,6 +1,7 @@
 // In the Name of God, the Creative, the Originator
 
 export interface TripData {
+  id: string; // Unique identifier for the trip
   dayOfWeek: string;
   departureDate: string;
   remainingCapacity: number;

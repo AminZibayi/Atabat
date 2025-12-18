@@ -20,5 +20,7 @@ export const tripSearchSchema = z.object({
 // Validation for selecting a trip to reserve
 export const tripSelectionSchema = z.object({
   tripId: z.string().min(1),
-  passengerCount: z.number().int().min(1),
+  passengerCount: z.number().int().min(1).optional().default(1),
+  tripSnapshot: z.record(z.string(), z.unknown()).optional(),
+  passengerInfo: z.record(z.string(), z.unknown()).optional(),
 });

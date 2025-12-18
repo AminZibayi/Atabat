@@ -23,7 +23,7 @@ export const createReservationHandler: PayloadHandler = async req => {
       return Response.json({ error: validation.error }, { status: 400 });
     }
 
-    const { tripId } = validation.data;
+    const { tripId, tripSnapshot: clientSnapshot } = validation.data;
 
     // 24-Hour Rule Check
     const lastReservations = await req.payload.find({
@@ -44,6 +44,7 @@ export const createReservationHandler: PayloadHandler = async req => {
         if (lastRes.status === 'cancelled' && hoursDiff < 24) {
           return Response.json(
             {
+              success: false,
               error: 'You cannot book a new trip within 24 hours of a cancellation.',
             },
             { status: 403 }
@@ -52,6 +53,7 @@ export const createReservationHandler: PayloadHandler = async req => {
         if (['pending', 'confirmed', 'paid'].includes(lastRes.status)) {
           return Response.json(
             {
+              success: false,
               error: 'You already have an active reservation.',
             },
             { status: 403 }
@@ -95,21 +97,24 @@ export const createReservationHandler: PayloadHandler = async req => {
     // MockAdapter returns { reservationId, status: 'pending', ... }
 
     // We need to persist this reservation in Payload "reservations" collection to track it.
+    // Use tripSnapshot from client if provided, otherwise use minimal info
+    const finalSnapshot = clientSnapshot || { id: tripId, ...reservationResult };
+
     const newRes = await req.payload.create({
       collection: 'reservations',
       data: {
         pilgrim: pilgrim.id,
         externalResId: reservationResult.reservationId || 'UNKNOWN',
         status: 'pending', // or map from result
-        tripSnapshot: { id: tripId, ...reservationResult }, // store metadata
+        tripSnapshot: finalSnapshot, // store metadata
         bookedAt: new Date().toISOString(),
       },
     });
 
-    return Response.json({ reservation: newRes });
+    return Response.json({ success: true, reservation: newRes });
   } catch (error) {
     console.error('Reservation creation error:', error);
-    return Response.json({ error: 'Internal Error' }, { status: 500 });
+    return Response.json({ success: false, error: 'Internal Error' }, { status: 500 });
   }
 };
 

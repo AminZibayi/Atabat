@@ -4,12 +4,35 @@ import type { CollectionConfig } from 'payload';
 import { isAdmin } from '@/policies/isAdmin';
 import { isLoggedIn } from '@/policies/isLoggedIn';
 import { isReservationOwner } from '@/policies/isReservationOwner';
+import {
+  createReservationHandler,
+  getReservationsHandler,
+  getReceiptHandler,
+} from '@/endpoints/reservations';
 
 import { i18n } from '@/i18n';
 
 export const Reservations: CollectionConfig = {
   slug: 'reservations',
   labels: i18n.collections.reservations.labels,
+  // Custom endpoints at collection level to avoid conflict with /:id route
+  endpoints: [
+    {
+      path: '/create',
+      method: 'post',
+      handler: createReservationHandler,
+    },
+    {
+      path: '/list',
+      method: 'get',
+      handler: getReservationsHandler,
+    },
+    {
+      path: '/receipt/:id',
+      method: 'get',
+      handler: getReceiptHandler,
+    },
+  ],
   admin: {
     group: i18n.collections.reservations.admin.group,
     useAsTitle: 'externalResId',

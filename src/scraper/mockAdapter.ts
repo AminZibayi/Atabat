@@ -22,6 +22,7 @@ export class MockAdapter implements IAtabatAdapter {
   // Sample trip data for testing
   private sampleTrips: TripData[] = [
     {
+      id: 'trip-684-1404-10-05',
       dayOfWeek: 'جمعه',
       departureDate: '1404/10/05',
       remainingCapacity: 5,
@@ -39,6 +40,7 @@ export class MockAdapter implements IAtabatAdapter {
       selectButtonId: 'mock-trip-1',
     },
     {
+      id: 'trip-126-1404-10-10',
       dayOfWeek: 'پنجشنبه',
       departureDate: '1404/10/10',
       remainingCapacity: 3,
@@ -56,6 +58,7 @@ export class MockAdapter implements IAtabatAdapter {
       selectButtonId: 'mock-trip-2',
     },
     {
+      id: 'trip-3267-1404-10-15',
       dayOfWeek: 'شنبه',
       departureDate: '1404/10/15',
       remainingCapacity: 8,
@@ -73,6 +76,7 @@ export class MockAdapter implements IAtabatAdapter {
       selectButtonId: 'mock-trip-3',
     },
     {
+      id: 'trip-4455-1404-10-20',
       dayOfWeek: 'دوشنبه',
       departureDate: '1404/10/20',
       remainingCapacity: 20,
@@ -90,6 +94,7 @@ export class MockAdapter implements IAtabatAdapter {
       selectButtonId: 'mock-trip-4',
     },
     {
+      id: 'trip-8899-1404-10-25',
       dayOfWeek: 'چهارشنبه',
       departureDate: '1404/10/25',
       remainingCapacity: 2,
