@@ -12,8 +12,8 @@ export const tripSearchSchema = z.object({
     .regex(/^\d{4}\/\d{2}\/\d{2}$/, 'Invalid date format')
     .optional(),
   province: z.string().optional(),
-  adultCount: z.number().int().min(1).optional(),
-  infantCount: z.number().int().min(0).optional(),
+  adultCount: z.coerce.number().int().min(1).optional(),
+  infantCount: z.coerce.number().int().min(0).optional(),
   borderType: z.enum(['1', '2', '128', '129', '1000', 'air', 'land']).optional(),
 });
 

@@ -72,6 +72,40 @@ export class MockAdapter implements IAtabatAdapter {
       address: 'بلوار وکیل آباد، روبروی باغ ملی',
       selectButtonId: 'mock-trip-3',
     },
+    {
+      dayOfWeek: 'دوشنبه',
+      departureDate: '1404/10/20',
+      remainingCapacity: 20,
+      tripType: 'زمینی 7 شب',
+      cost: 12000000,
+      departureLocation: 'قم',
+      city: 'قم',
+      agentName: 'راهیان نور',
+      groupCode: '4455',
+      executorName: 'راهیان نور',
+      najafHotel: 'البراق',
+      karbalaHotel: 'الدرویش',
+      kazemainHotel: '-',
+      address: 'خیابان ارم',
+      selectButtonId: 'mock-trip-4',
+    },
+    {
+      dayOfWeek: 'چهارشنبه',
+      departureDate: '1404/10/25',
+      remainingCapacity: 2,
+      tripType: 'هوایی 4 شب',
+      cost: 31000000,
+      departureLocation: 'شیراز',
+      city: 'شیراز',
+      agentName: 'شاهچراغ',
+      groupCode: '8899',
+      executorName: 'شاهچراغ',
+      najafHotel: 'قصر الدر',
+      karbalaHotel: 'جنه الحسین',
+      kazemainHotel: 'الهدی',
+      address: 'بلوار زند',
+      selectButtonId: 'mock-trip-5',
+    },
   ];
 
   async searchTrips(params: TripSearchParams): Promise<TripData[]> {
@@ -80,7 +114,7 @@ export class MockAdapter implements IAtabatAdapter {
 
     let results = [...this.sampleTrips];
 
-    // Filter by date range (Jalali dates like "1404/10/05" compare correctly as strings)
+    // Filter by date range
     if (params.dateFrom || params.dateTo) {
       results = results.filter(trip => {
         const tripDate = trip.departureDate;
@@ -91,23 +125,43 @@ export class MockAdapter implements IAtabatAdapter {
     }
 
     // Filter by province
-    if (params.provinceCode) {
+    if (params.provinceCode && params.provinceCode !== '-1' && params.provinceCode !== '1000') {
       const provinceMap: Record<string, string> = {
         '17': 'تهران',
         '13': 'اصفهان',
         '19': 'مشهد',
+        '35': 'قم',
+        '24': 'فارس', // Shiraz is in Fars province
+        // Add more default mappings as needed
       };
+
       const targetCity = provinceMap[params.provinceCode];
+
       if (targetCity) {
-        results = results.filter(t => t.city === targetCity);
+        // If we have a mapping, filter match
+        // Note: Real system might map province -> multiple cities, but for mock 1-1 is okay or acceptable
+        // Actually, city field in TripData is usually the city name.
+        // We will do a partial match or exact match depending on valid province mappings.
+        // For 'Fars', city might be 'Shiraz'. This simple map isn't perfect for all cases but good for direct matches if city=province center.
+        // Let's assume city in sample data is the province center for simplicity, or we map code directly to city name.
+
+        // Special case handling for provinces where city name != province name
+        if (params.provinceCode === '24') {
+          results = results.filter(t => t.city === 'شیراز');
+        } else {
+          results = results.filter(t => t.city === targetCity);
+        }
+      } else {
+        // If a province code is given but unknown to us, return NO results (strict filtering)
+        return [];
       }
     }
 
     // Filter by border type (trip type)
-    if (params.borderType) {
-      if (params.borderType === '2') {
+    if (params.borderType && params.borderType !== '1000' && params.borderType !== '-1') {
+      if (params.borderType === '2' || params.borderType === 'air') {
         results = results.filter(t => t.tripType.includes('هوایی'));
-      } else if (params.borderType === '1') {
+      } else if (params.borderType === '1' || params.borderType === 'land') {
         results = results.filter(t => t.tripType.includes('زمینی'));
       }
     }
