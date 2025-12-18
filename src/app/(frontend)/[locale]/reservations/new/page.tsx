@@ -35,6 +35,7 @@ export default function NewReservationPage() {
   const t = useTranslations('reservations.new');
   const tTrips = useTranslations('trips.details');
   const tCommon = useTranslations('common');
+  const tErrors = useTranslations('errors');
   const tAuth = useTranslations('auth.register');
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -146,7 +147,10 @@ export default function NewReservationPage() {
         toast.success(t('success.message'));
         router.push(`/reservations/${data.reservation?.id || ''}`);
       } else {
-        toast.error(data.message || 'خطا در ثبت رزرو');
+        const errorMsg = data.errorCode
+          ? tErrors(data.errorCode)
+          : data.error || data.message || tCommon('error');
+        toast.error(errorMsg);
       }
     } catch (error) {
       console.error('Reservation failed:', error);

@@ -46,6 +46,7 @@ export const createReservationHandler: PayloadHandler = async req => {
             {
               success: false,
               error: 'You cannot book a new trip within 24 hours of a cancellation.',
+              errorCode: 'CANCELLATION_24H_RULE',
             },
             { status: 403 }
           );
@@ -55,6 +56,7 @@ export const createReservationHandler: PayloadHandler = async req => {
             {
               success: false,
               error: 'You already have an active reservation.',
+              errorCode: 'ACTIVE_RESERVATION_EXISTS',
             },
             { status: 403 }
           );

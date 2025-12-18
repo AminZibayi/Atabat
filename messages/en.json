@@ -245,7 +245,9 @@
       "message": "Something went wrong. Please try again later."
     },
     "networkError": "Network error. Please check your connection.",
-    "unauthorized": "Please login to continue."
+    "unauthorized": "Please login to continue.",
+    "ACTIVE_RESERVATION_EXISTS": "You already have an active reservation.",
+    "CANCELLATION_24H_RULE": "You cannot book a new trip within 24 hours of a cancellation."
   },
   "validation": {
     "required": "This field is required",
