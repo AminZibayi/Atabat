@@ -30,8 +30,8 @@ export default buildConfig({
     user: Users.slug,
     components: {
       graphics: {
-        Icon: '@/components/Icon',
-        Logo: '@/components/Logo',
+        Icon: '@/components/admin/Icon',
+        Logo: '@/components/admin/Logo',
       },
     },
     importMap: {
