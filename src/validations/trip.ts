@@ -14,7 +14,7 @@ export const tripSearchSchema = z.object({
   province: z.string().optional(),
   adultCount: z.number().int().min(1).optional(),
   infantCount: z.number().int().min(0).optional(),
-  borderType: z.enum(['air', 'land', 'accommodation_only', 'flight_only', '---']).optional(),
+  borderType: z.enum(['1', '2', '128', '129', '1000', 'air', 'land']).optional(),
 });
 
 // Validation for selecting a trip to reserve

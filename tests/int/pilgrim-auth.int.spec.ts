@@ -1,17 +1,21 @@
-// In the Name of God, the Creative, the Originator
 import { describe, it, expect, beforeAll, afterAll } from 'vitest';
 import { getPayload } from 'payload';
-import config from '../../src/payload.config';
 
 describe('Pilgrim Auth Integration', () => {
   let payload: Awaited<ReturnType<typeof getPayload>>;
-  const testPhone = `09${Math.floor(Math.random() * 900000000 + 100000000)}`;
+  // Use a fixed random phone to avoid potential collisions/issues, but random enough
+  const testPhone = `0912${Math.floor(Math.random() * 8999999 + 1000000)}`;
   const testPassword = 'testPass123';
   let createdPilgrimId: number | string;
 
   beforeAll(async () => {
-    const payloadConfig = await config;
-    payload = await getPayload({ config: payloadConfig });
+    // Set secret before importing config
+    process.env.PAYLOAD_SECRET =
+      'testing-secret-key-must-be-long-enough-for-jose-at-least-32-chars';
+
+    // Dynamic import to pick up env var
+    const config = (await import('../../src/payload.config')).default;
+    payload = await getPayload({ config: await config });
   });
 
   afterAll(async () => {
@@ -30,6 +34,17 @@ describe('Pilgrim Auth Integration', () => {
 
   describe('Registration', () => {
     it('should create a new pilgrim with valid data', async () => {
+      // Ensure it doesn't exist
+      try {
+        const existing = await payload.find({
+          collection: 'pilgrims',
+          where: { phone: { equals: testPhone } },
+        });
+        if (existing.docs.length > 0) {
+          await payload.delete({ collection: 'pilgrims', id: existing.docs[0].id });
+        }
+      } catch (e) {}
+
       const pilgrim = await payload.create({
         collection: 'pilgrims',
         data: {
@@ -59,6 +74,7 @@ describe('Pilgrim Auth Integration', () => {
             password: 'anotherPass',
             nationalId: '9876543210',
             username: testPhone,
+            birthdate: '1380/01/01',
           },
           draft: false,
         })

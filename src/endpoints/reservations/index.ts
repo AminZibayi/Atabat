@@ -137,10 +137,15 @@ export const getReceiptHandler: PayloadHandler = async req => {
 
   const { id } = req.routeParams!;
 
-  const res = await req.payload.findByID({
-    collection: 'reservations',
-    id: parseInt(id as string),
-  });
+  let res;
+  try {
+    res = await req.payload.findByID({
+      collection: 'reservations',
+      id: parseInt(id as string),
+    });
+  } catch (error) {
+    return Response.json({ error: 'Not found' }, { status: 404 });
+  }
 
   if (!res) return Response.json({ error: 'Not found' }, { status: 404 });
 

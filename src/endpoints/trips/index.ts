@@ -1,6 +1,6 @@
 // In the Name of God, the Creative, the Originator
 import type { PayloadHandler } from 'payload';
-import { searchTrips } from '@/scraper/trips';
+import { getAdapter } from '@/scraper';
 import { tripSearchSchema } from '@/validations/trip';
 
 export const tripSearchHandler: PayloadHandler = async req => {
@@ -31,8 +31,6 @@ export const tripSearchHandler: PayloadHandler = async req => {
       adultCount: query.adultCount ? parseInt(query.adultCount, 10) : undefined,
     };
 
-    // Use getAdapter() to support Mock vs Real
-    const { getAdapter } = await import('@/scraper');
     const adapter = getAdapter();
 
     const trips = await adapter.searchTrips(params);
