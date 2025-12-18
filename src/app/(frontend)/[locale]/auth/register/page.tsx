@@ -38,7 +38,7 @@ export default function RegisterPage() {
 
     try {
       // Call register API
-      const response = await fetch('/api/pilgrims/register', {
+      const response = await fetch('/api/pilgrims', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData),
@@ -46,11 +46,13 @@ export default function RegisterPage() {
 
       const data = await response.json();
 
-      if (response.ok && data.success) {
+      if (response.ok && data.doc) {
         toast.success(data.message || 'ثبت نام موفق');
         window.location.href = '/auth/login';
       } else {
-        toast.error(data.message || 'خطا در ثبت نام');
+        // Payload returns 'errors' array usually, or 'message'
+        const msg = data.errors?.[0]?.message || data.message || 'خطا در ثبت نام';
+        toast.error(msg);
       }
     } catch {
       toast.error('خطای شبکه، لطفا دوباره تلاش کنید');

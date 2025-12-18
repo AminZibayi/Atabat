@@ -2,10 +2,18 @@
 import type { CollectionConfig } from 'payload';
 
 import { i18n } from '@/i18n';
+import { tripSearchHandler } from '@/endpoints/trips';
 
 export const Trips: CollectionConfig = {
   slug: 'trips',
   labels: i18n.collections.trips.labels,
+  endpoints: [
+    {
+      path: '/search',
+      method: 'get',
+      handler: tripSearchHandler,
+    },
+  ],
   admin: {
     group: i18n.collections.trips.admin.group,
     useAsTitle: 'departureDate',

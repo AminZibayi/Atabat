@@ -26,7 +26,7 @@ export function useAuth() {
 
   const checkAuth = useCallback(async () => {
     try {
-      const response = await fetch('/api/auth/me', {
+      const response = await fetch('/api/pilgrims/me', {
         credentials: 'include',
       });
 
@@ -58,7 +58,7 @@ export function useAuth() {
 
   const logout = useCallback(async () => {
     try {
-      await fetch('/api/auth/logout', {
+      await fetch('/api/pilgrims/logout', {
         method: 'POST',
         credentials: 'include',
       });

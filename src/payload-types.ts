@@ -134,34 +134,20 @@ export interface UserAuthOperations {
   };
 }
 export interface PilgrimAuthOperations {
-  forgotPassword:
-    | {
-        email: string;
-      }
-    | {
-        username: string;
-      };
-  login:
-    | {
-        email: string;
-        password: string;
-      }
-    | {
-        password: string;
-        username: string;
-      };
+  forgotPassword: {
+    username: string;
+  };
+  login: {
+    password: string;
+    username: string;
+  };
   registerFirstUser: {
     password: string;
     username: string;
-    email?: string;
   };
-  unlock:
-    | {
-        email: string;
-      }
-    | {
-        username: string;
-      };
+  unlock: {
+    username: string;
+  };
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema

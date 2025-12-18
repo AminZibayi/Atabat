@@ -37,8 +37,3 @@
 .label {
   font-family: var(--font-family-en);
 }
-
-/* For Persian label, use Persian font */
-[dir='ltr'] .label {
-  font-family: var(--font-family-fa);
-}

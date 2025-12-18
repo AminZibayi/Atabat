@@ -28,16 +28,19 @@ export default function LoginPage() {
       const response = await fetch('/api/pilgrims/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData),
+        body: JSON.stringify({
+          username: formData.phone,
+          password: formData.password,
+        }),
       });
 
       const data = await response.json();
 
-      if (response.ok && data.success) {
+      if (response.ok && data.user) {
         toast.success(data.message || 'ورود موفق');
         window.location.href = '/';
       } else {
-        toast.error(data.message || 'خطا در ورود');
+        toast.error(data.message || data.error || 'خطا در ورود');
       }
     } catch {
       toast.error('خطای شبکه، لطفا دوباره تلاش کنید');

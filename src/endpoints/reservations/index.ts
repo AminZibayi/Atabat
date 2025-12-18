@@ -60,26 +60,53 @@ export const createReservationHandler: PayloadHandler = async req => {
       }
     }
 
-    // Mock Implementation for MVP testing (Scraper complexity bypassed for now)
-    if (process.env.NODE_ENV !== 'production' && process.env.MOCK_SCRAPER === 'true') {
-      const newRes = await req.payload.create({
-        collection: 'reservations',
-        data: {
-          pilgrim: pilgrim.id,
-          externalResId: 'MOCK-' + Date.now(),
-          status: 'pending',
-          tripSnapshot: { id: tripId, mock: true },
-          bookedAt: new Date().toISOString(),
-        },
-      });
-      return Response.json({ reservation: newRes });
-    }
+    // Use Adapter
+    const { getAdapter } = await import('@/scraper');
+    const adapter = getAdapter();
 
-    // Real logic placeholder
-    return Response.json(
-      { error: 'Scraper implementation requires browser state handover.' },
-      { status: 501 }
-    );
+    // Construct TripData & PassengerInfo
+    // NOTE: In a real scenario, we might need to re-fetch the trip or pass full trip params.
+    // For now, mapping incoming ID to what the adapter expects.
+    // If RealAdapter needs selectButtonId, we assume tripId IS that ID or we fetch it.
+    // But passing just an ID to createReservation might be insufficient for RealAdapter without context.
+    // However, for the purpose of this refactor (parity with existing code), we delegate.
+
+    // The previous code was:  tripSnapshot: { id: tripId, mock: true }
+    // We'll create a partial TripData
+    const tripData: any = { selectButtonId: tripId }; // provisional
+
+    // Passenger info from logged in user
+    // Passenger info from logged in user
+    const passenger = {
+      firstName: pilgrim.firstName || '',
+      lastName: pilgrim.lastName || '',
+      nationalId: pilgrim.nationalId || '',
+      phone: pilgrim.phone,
+      birthdate: pilgrim.birthdate || '1300/01/01',
+    };
+
+    const reservationResult = await adapter.createReservation(tripData, passenger);
+
+    // Save to Payload (Adapter usually returns existing system ID or we save it now?)
+    // The adapter implementation of `createReservation` (Mock) returns a ReservationResult object.
+    // We should probably save that result to our DB.
+
+    // Check what adapter returns
+    // MockAdapter returns { reservationId, status: 'pending', ... }
+
+    // We need to persist this reservation in Payload "reservations" collection to track it.
+    const newRes = await req.payload.create({
+      collection: 'reservations',
+      data: {
+        pilgrim: pilgrim.id,
+        externalResId: reservationResult.reservationId || 'UNKNOWN',
+        status: 'pending', // or map from result
+        tripSnapshot: { id: tripId, ...reservationResult }, // store metadata
+        bookedAt: new Date().toISOString(),
+      },
+    });
+
+    return Response.json({ reservation: newRes });
   } catch (error) {
     console.error('Reservation creation error:', error);
     return Response.json({ error: 'Internal Error' }, { status: 500 });

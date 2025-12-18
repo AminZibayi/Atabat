@@ -55,7 +55,9 @@ export default function ProfilePage() {
     setIsSaving(true);
 
     try {
-      const response = await fetch('/api/pilgrims/profile', {
+      if (!user?.id) return;
+
+      const response = await fetch(`/api/pilgrims/${user.id}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
@@ -64,11 +66,11 @@ export default function ProfilePage() {
 
       const data = await response.json();
 
-      if (response.ok && data.success) {
+      if (response.ok) {
         toast.success(t('success'));
         refetch();
       } else {
-        toast.error(data.message || 'خطا در بروزرسانی پروفایل');
+        toast.error(data.errors?.[0]?.message || data.message || 'خطا در بروزرسانی پروفایل');
       }
     } catch {
       toast.error('خطای شبکه، لطفا دوباره تلاش کنید');

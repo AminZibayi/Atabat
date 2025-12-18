@@ -10,25 +10,36 @@ export const tripSearchHandler: PayloadHandler = async req => {
     // Let's assume public for viewing, but rate limited (not implemented here).
 
     // Parse query params
-    const query = req.query || {};
-    // Should validate
-    const validParams = tripSearchSchema.safeParse(query);
+    const searchParams = new URL(req.url as string, 'http://localhost').searchParams;
+    const query = Object.fromEntries(searchParams.entries());
 
-    // Zod parsing of query params might fail on numbers as strings, so logical conversion needed first
-    // Simplified for now:
+    // Validate with Zod
+    const validation = tripSearchSchema.safeParse(query);
+
+    if (!validation.success) {
+      return Response.json(
+        { success: false, message: 'Invalid search parameters', errors: validation.error.format() },
+        { status: 400 }
+      );
+    }
+
     const params = {
-      dateFrom: query.dateFrom as string | undefined,
-      dateTo: query.dateTo as string | undefined,
-      provinceCode: query.province as string | undefined,
-      borderType: query.borderType as string | undefined,
-      adultCount: query.adultCount ? parseInt(query.adultCount as string) : undefined,
+      dateFrom: query.dateFrom,
+      dateTo: query.dateTo,
+      provinceCode: query.province,
+      borderType: query.borderType,
+      adultCount: query.adultCount ? parseInt(query.adultCount, 10) : undefined,
     };
 
-    const trips = await searchTrips(params);
+    // Use getAdapter() to support Mock vs Real
+    const { getAdapter } = await import('@/scraper');
+    const adapter = getAdapter();
 
-    return Response.json({ trips });
+    const trips = await adapter.searchTrips(params);
+
+    return Response.json({ success: true, trips, count: trips.length });
   } catch (error) {
     console.error('Trip search error:', error);
-    return Response.json({ error: 'Failed to search trips' }, { status: 500 });
+    return Response.json({ success: false, message: 'Failed to search trips' }, { status: 500 });
   }
 };
