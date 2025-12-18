@@ -34,8 +34,10 @@ describe('Pilgrim Auth Integration', () => {
         collection: 'pilgrims',
         data: {
           phone: testPhone,
+          username: testPhone,
           password: testPassword,
           nationalId: '0123456789',
+          birthdate: '1380/01/01',
           firstName: 'تست',
           lastName: 'زائر',
         },
