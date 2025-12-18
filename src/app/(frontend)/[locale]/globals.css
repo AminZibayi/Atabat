@@ -163,6 +163,10 @@ body {
   min-height: 100vh;
 }
 
+body * {
+  font-family: inherit;
+}
+
 /* RTL Support - Persian */
 html[dir='rtl'] body,
 html[lang='fa'] body {
