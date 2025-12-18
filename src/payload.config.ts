@@ -13,6 +13,7 @@ import { Pilgrims } from './collections/Pilgrim';
 import { Trips } from './collections/Trip';
 import { Reservations } from './collections/Reservation';
 import { KargozarConfig } from './globals/KargozarConfig';
+import { StaticPages } from './globals/StaticPages';
 
 import { tripSearchHandler } from '@/endpoints/trips';
 import {
@@ -55,7 +56,7 @@ export default buildConfig({
     },
   },
   collections: [Users, Media, Pilgrims, Trips, Reservations],
-  globals: [KargozarConfig],
+  globals: [KargozarConfig, StaticPages],
   endpoints: [
     {
       path: '/trips/search',
@@ -87,6 +88,11 @@ export default buildConfig({
     fallbackLanguage: 'fa',
     supportedLanguages: { en, fa },
   },
+  localization: {
+    locales: ['fa', 'en'],
+    defaultLocale: 'fa',
+    fallback: true,
+  },
   editor: lexicalEditor(),
   secret: process.env.PAYLOAD_SECRET || '',
   typescript: {
@@ -99,4 +105,10 @@ export default buildConfig({
   }),
   sharp,
   plugins: [],
+  bin: [
+    {
+      key: 'seed-static-pages',
+      scriptPath: path.resolve(dirname, 'scripts/seed-static-pages.ts'),
+    },
+  ],
 });

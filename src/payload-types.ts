@@ -93,14 +93,16 @@ export interface Config {
   db: {
     defaultIDType: number;
   };
-  fallbackLocale: null;
+  fallbackLocale: ('false' | 'none' | 'null') | false | null | ('fa' | 'en') | ('fa' | 'en')[];
   globals: {
     'kargozar-config': KargozarConfig;
+    'static-pages': StaticPage;
   };
   globalsSelect: {
     'kargozar-config': KargozarConfigSelect<false> | KargozarConfigSelect<true>;
+    'static-pages': StaticPagesSelect<false> | StaticPagesSelect<true>;
   };
-  locale: null;
+  locale: 'fa' | 'en';
   user:
     | (User & {
         collection: 'users';
@@ -600,6 +602,90 @@ export interface KargozarConfig {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "static-pages".
+ */
+export interface StaticPage {
+  id: number;
+  aboutTitle?: string | null;
+  aboutContent?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  contactTitle?: string | null;
+  contactContent?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  contactEmail?: string | null;
+  contactPhone?: string | null;
+  contactAddress?: string | null;
+  termsTitle?: string | null;
+  termsContent?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  /**
+   * Last update date shown to users
+   */
+  termsLastUpdated?: string | null;
+  privacyTitle?: string | null;
+  privacyContent?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  /**
+   * Last update date shown to users
+   */
+  privacyLastUpdated?: string | null;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "kargozar-config_select".
  */
 export interface KargozarConfigSelect<T extends boolean = true> {
@@ -610,6 +696,28 @@ export interface KargozarConfigSelect<T extends boolean = true> {
   cookiesData?: T;
   cookiesExpireAt?: T;
   lastAuthAt?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "static-pages_select".
+ */
+export interface StaticPagesSelect<T extends boolean = true> {
+  aboutTitle?: T;
+  aboutContent?: T;
+  contactTitle?: T;
+  contactContent?: T;
+  contactEmail?: T;
+  contactPhone?: T;
+  contactAddress?: T;
+  termsTitle?: T;
+  termsContent?: T;
+  termsLastUpdated?: T;
+  privacyTitle?: T;
+  privacyContent?: T;
+  privacyLastUpdated?: T;
   updatedAt?: T;
   createdAt?: T;
   globalType?: T;

@@ -99,6 +99,30 @@ export const i18n = {
       },
     },
   },
+  globals: {
+    staticPages: {
+      labels: {
+        singular: { en: 'Static Pages', fa: 'صفحات ثابت' },
+      },
+      admin: {
+        group: { en: 'Content', fa: 'محتوا' },
+      },
+      tabs: {
+        about: { en: 'About Us', fa: 'درباره ما' },
+        contact: { en: 'Contact', fa: 'تماس با ما' },
+        terms: { en: 'Terms of Service', fa: 'شرایط استفاده' },
+        privacy: { en: 'Privacy Policy', fa: 'حریم خصوصی' },
+      },
+      fields: {
+        title: { en: 'Title', fa: 'عنوان' },
+        content: { en: 'Content', fa: 'محتوا' },
+        email: { en: 'Email', fa: 'ایمیل' },
+        phone: { en: 'Phone', fa: 'تلفن' },
+        address: { en: 'Address', fa: 'آدرس' },
+        lastUpdated: { en: 'Last Updated', fa: 'آخرین بروزرسانی' },
+      },
+    },
+  },
 } as const;
 
 export type SupportedLanguage = keyof typeof i18n.collections.media.labels.singular;

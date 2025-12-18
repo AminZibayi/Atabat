@@ -4,6 +4,8 @@
 import { useTranslations } from 'next-intl';
 import React, { useState, useEffect } from 'react';
 
+import { useAuth } from '@/hooks/useAuth';
+import { useRouter } from '@/i18n/navigation';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import { StatusBadge, StatusType } from '@/components/ui/StatusBadge';
@@ -26,14 +28,25 @@ interface Reservation {
 export default function ReservationsPage() {
   const t = useTranslations('reservations');
   const tStatus = useTranslations('reservations.status');
+  const router = useRouter();
+  const { isLoading: isAuthLoading, isAuthenticated } = useAuth();
 
   const [reservations, setReservations] = useState<Reservation[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [activeFilter, setActiveFilter] = useState<string>('all');
 
+  // Redirect to login if not authenticated
   useEffect(() => {
-    fetchReservations();
-  }, []);
+    if (!isAuthLoading && !isAuthenticated) {
+      router.push('/auth/login?redirect=/reservations');
+    }
+  }, [isAuthLoading, isAuthenticated, router]);
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      fetchReservations();
+    }
+  }, [isAuthenticated]);
 
   const fetchReservations = async () => {
     try {
