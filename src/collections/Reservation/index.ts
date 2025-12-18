@@ -43,15 +43,10 @@ export const Reservations: CollectionConfig = {
       if (isAdmin(args)) return true;
       return isReservationOwner(args);
     },
-    create: isReservationOwner,
-    update: args => {
-      if (isAdmin(args)) return true;
-      return isReservationOwner(args);
-    },
-    delete: args => {
-      if (isAdmin(args)) return true;
-      return isReservationOwner(args);
-    },
+    // Created by scraper adaptor
+    create: () => false,
+    update: () => false,
+    delete: () => false,
   },
   fields: [
     {
