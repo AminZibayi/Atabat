@@ -54,6 +54,7 @@ export const Reservations: CollectionConfig = {
       type: 'relationship',
       relationTo: 'pilgrims',
       required: true,
+      hasMany: false,
     },
     {
       name: 'externalResId',

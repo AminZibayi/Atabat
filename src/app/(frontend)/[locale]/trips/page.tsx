@@ -11,6 +11,8 @@ import { Input } from '@/components/ui/Input';
 import { Select } from '@/components/ui/Select';
 import { JalaliDatePicker } from '@/components/ui/JalaliDatePicker';
 import { getTodayJalali, addDaysToTodayJalali } from '@/utils/jalaliDate';
+import { convertToEnglishDigits } from '@/utils/digits';
+import { tripSearchSchema } from '@/validations/trip';
 import styles from './page.module.css';
 
 interface SearchFilters {
@@ -36,6 +38,7 @@ interface Trip {
 
 export default function TripsPage() {
   const t = useTranslations('trips');
+  const tErrors = useTranslations('apiErrors');
   const tCommon = useTranslations('common');
 
   // Calculate default dates (today and today+14)
@@ -110,13 +113,30 @@ export default function TripsPage() {
     setHasSearched(true);
 
     try {
-      // Call the API endpoint
+      // Convert Persian digits to English and prepare search input
+      const searchInput = {
+        departureFrom: convertToEnglishDigits(filters.departureFrom),
+        departureTo: convertToEnglishDigits(filters.departureTo),
+        province: filters.province || undefined,
+        minCapacity: filters.minCapacity ? parseInt(filters.minCapacity, 10) : undefined,
+        tripType: (filters.tripType || undefined) as '' | '1' | '2' | '128' | '129' | undefined,
+      };
+
+      // Validate with Zod schema (same schema used on server)
+      const validation = tripSearchSchema.safeParse(searchInput);
+      if (!validation.success) {
+        const firstError = validation.error.issues[0]?.message || 'پارامترهای جستجو نامعتبر است';
+        toast.error(firstError);
+        return;
+      }
+
+      // Build query params with validated and converted data
       const params = new URLSearchParams();
-      if (filters.departureFrom) params.set('departureFrom', filters.departureFrom);
-      if (filters.departureTo) params.set('departureTo', filters.departureTo);
-      if (filters.province) params.set('province', filters.province);
-      if (filters.minCapacity) params.set('minCapacity', filters.minCapacity);
-      if (filters.tripType) params.set('tripType', filters.tripType);
+      if (searchInput.departureFrom) params.set('departureFrom', searchInput.departureFrom);
+      if (searchInput.departureTo) params.set('departureTo', searchInput.departureTo);
+      if (searchInput.province) params.set('province', searchInput.province);
+      if (searchInput.minCapacity) params.set('minCapacity', searchInput.minCapacity.toString());
+      if (searchInput.tripType) params.set('tripType', searchInput.tripType);
 
       const response = await fetch(`/api/trips/search?${params.toString()}`);
       const data = await response.json();
@@ -127,7 +147,8 @@ export default function TripsPage() {
           toast(t('results.noTrips'), { icon: '🔍' });
         }
       } else {
-        toast.error(data.message || 'خطا در جستجو');
+        const errorMsg = data.code ? tErrors(data.code) : data.message || 'خطا در جستجو';
+        toast.error(errorMsg);
       }
     } catch {
       toast.error('خطای شبکه، لطفا دوباره تلاش کنید');

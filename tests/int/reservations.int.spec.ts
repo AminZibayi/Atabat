@@ -38,11 +38,7 @@ describe('Reservation API Integration', () => {
   afterAll(async () => {
     // Cleanup
     if (pilgrim) {
-      await payload.delete({
-        collection: 'pilgrims',
-        id: pilgrim.id,
-      });
-      // Cleanup reservations for this pilgrim
+      // Cleanup reservations first
       try {
         await payload.delete({
           collection: 'reservations',
@@ -50,7 +46,19 @@ describe('Reservation API Integration', () => {
             pilgrim: { equals: pilgrim.id },
           },
         });
-      } catch (e) {}
+      } catch (e) {
+        console.error('Error cleaning up reservations:', e);
+      }
+
+      // Then delete pilgrim
+      try {
+        await payload.delete({
+          collection: 'pilgrims',
+          id: pilgrim.id,
+        });
+      } catch (e) {
+        console.error('Error cleaning up pilgrim:', e);
+      }
     }
   });
 
@@ -101,13 +109,13 @@ describe('Reservation API Integration', () => {
       if (response.status !== 200) console.error('Reservation creation failed:', data);
 
       expect(response.status).toBe(200);
-      expect(data.reservation).toBeDefined();
-      expect(data.reservation.status).toBe('pending');
+      expect(data.data.reservation).toBeDefined();
+      expect(data.data.reservation.status).toBe('pending');
 
       const resPilgrimId =
-        typeof data.reservation.pilgrim === 'object'
-          ? data.reservation.pilgrim.id
-          : data.reservation.pilgrim;
+        typeof data.data.reservation.pilgrim === 'object'
+          ? data.data.reservation.pilgrim.id
+          : data.data.reservation.pilgrim;
       expect(resPilgrimId).toBe(pilgrim.id);
     });
 
@@ -124,7 +132,7 @@ describe('Reservation API Integration', () => {
       const data = await response.json();
 
       expect(response.status).toBe(403);
-      expect(data.error).toContain('active reservation');
+      expect(data.code).toBe('ACTIVE_RESERVATION_EXISTS');
     });
 
     it('should enforce 24-hour rule for cancelled reservations', async () => {
@@ -159,7 +167,7 @@ describe('Reservation API Integration', () => {
       const data = await response.json();
 
       expect(response.status).toBe(403);
-      expect(data.error).toContain('24 hours');
+      expect(data.code).toBe('CANCELLATION_24H_RULE');
     });
   });
 
@@ -192,8 +200,8 @@ describe('Reservation API Integration', () => {
       const response = await getReceiptHandler(req as any);
       const data = await response.json();
 
-      expect(data.receipt).toBeDefined();
-      expect(data.receipt.resId).toBe('receipt-test-id');
+      expect(data.data.receipt).toBeDefined();
+      expect(data.data.receipt.resId).toBe('receipt-test-id');
 
       // cleanup
       await payload.delete({ collection: 'reservations', id: res.id });

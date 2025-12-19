@@ -2,6 +2,9 @@
 import type { PayloadHandler } from 'payload';
 import { getAdapter } from '@/scraper';
 import { tripSearchSchema } from '@/validations/trip';
+import { convertToEnglishDigits } from '@/utils/digits';
+import { AppError, ErrorCodes } from '@/utils/AppError';
+import { successResponse, errorResponse } from '@/utils/apiResponse';
 
 export const tripSearchHandler: PayloadHandler = async req => {
   try {
@@ -17,27 +20,36 @@ export const tripSearchHandler: PayloadHandler = async req => {
     const validation = tripSearchSchema.safeParse(query);
 
     if (!validation.success) {
-      return Response.json(
-        { success: false, message: 'Invalid search parameters', errors: validation.error.format() },
-        { status: 400 }
-      );
+      return errorResponse(validation.error);
     }
 
+    // Use validated data from Zod - these are now the correct client-friendly field names
+    const validatedInput = validation.data;
+
+    // Map client-friendly names to scraper's expected parameter names
     const params = {
-      dateFrom: query.dateFrom,
-      dateTo: query.dateTo,
-      provinceCode: query.province,
-      borderType: query.borderType,
-      adultCount: query.adultCount ? parseInt(query.adultCount, 10) : undefined,
+      dateFrom: validatedInput.departureFrom
+        ? convertToEnglishDigits(validatedInput.departureFrom)
+        : undefined,
+      dateTo: validatedInput.departureTo
+        ? convertToEnglishDigits(validatedInput.departureTo)
+        : undefined,
+      provinceCode: validatedInput.province,
+      borderType: validatedInput.tripType || undefined,
+      adultCount: validatedInput.minCapacity,
     };
 
     const adapter = getAdapter();
 
-    const trips = await adapter.searchTrips(params);
-
-    return Response.json({ success: true, trips, count: trips.length });
+    try {
+      const trips = await adapter.searchTrips(params);
+      return successResponse({ trips, count: trips.length });
+    } catch (adapterError) {
+      console.error('Adapter search error:', adapterError);
+      throw new AppError('Trip search failed', ErrorCodes.TRIP_SEARCH_FAILED, 500, adapterError);
+    }
   } catch (error) {
     console.error('Trip search error:', error);
-    return Response.json({ success: false, message: 'Failed to search trips' }, { status: 500 });
+    return errorResponse(error);
   }
 };

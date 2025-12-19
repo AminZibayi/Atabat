@@ -26,8 +26,8 @@ describe('Trip Search API Integration', () => {
 
     expect(response.status).toBe(200);
     expect(data.success).toBe(true);
-    expect(Array.isArray(data.trips)).toBe(true);
-    expect(data.trips.length).toBeGreaterThan(0);
+    expect(Array.isArray(data.data.trips)).toBe(true);
+    expect(data.data.trips.length).toBeGreaterThan(0);
   });
 
   it('should filter by province', async () => {
@@ -42,14 +42,14 @@ describe('Trip Search API Integration', () => {
 
     expect(data.success).toBe(true);
     // Mock adapter returns trips for Tehran (17)
-    data.trips.forEach((trip: TripData) => {
+    data.data.trips.forEach((trip: TripData) => {
       expect(trip.city).toContain('تهران');
     });
   });
 
   it('should filter by border type', async () => {
     const { tripSearchHandler } = await import('../../src/endpoints/trips');
-    const req = new Request('http://localhost:3000/api/trips/search?borderType=2', {
+    const req = new Request('http://localhost:3000/api/trips/search?tripType=2', {
       // 2 = Air
       method: 'GET',
     });
@@ -59,7 +59,7 @@ describe('Trip Search API Integration', () => {
     const data = await response.json();
 
     expect(data.success).toBe(true);
-    data.trips.forEach((trip: TripData) => {
+    data.data.trips.forEach((trip: TripData) => {
       expect(trip.tripType).toContain('هوایی');
     });
   });
@@ -68,7 +68,7 @@ describe('Trip Search API Integration', () => {
     const { tripSearchHandler } = await import('../../src/endpoints/trips');
     // Using a wide range to ensure we get results from the mock
     const req = new Request(
-      'http://localhost:3000/api/trips/search?dateFrom=1403/01/01&dateTo=1405/01/01',
+      'http://localhost:3000/api/trips/search?departureFrom=1403/01/01&departureTo=1405/01/01',
       {
         method: 'GET',
       }
@@ -82,12 +82,12 @@ describe('Trip Search API Integration', () => {
 
     expect(data.success).toBe(true);
     // Depending on logic, it might return empty or full list, but success should be true
-    expect(Array.isArray(data.trips)).toBe(true);
+    expect(Array.isArray(data.data.trips)).toBe(true);
   });
 
   it('should validate date format', async () => {
     const { tripSearchHandler } = await import('../../src/endpoints/trips');
-    const req = new Request('http://localhost:3000/api/trips/search?dateFrom=invalid-date', {
+    const req = new Request('http://localhost:3000/api/trips/search?departureFrom=invalid-date', {
       method: 'GET',
     });
     (req as any).payload = payload;
@@ -97,7 +97,7 @@ describe('Trip Search API Integration', () => {
 
     expect(response.status).toBe(400);
     expect(data.success).toBe(false);
-    expect(data.message).toContain('Invalid search parameters');
+    expect(data.code).toBe('INVALID_PARAMS');
   });
 
   it('should validate response structure', async () => {
@@ -111,7 +111,7 @@ describe('Trip Search API Integration', () => {
     const data = await response.json();
 
     expect(data.success).toBe(true);
-    const trip = data.trips[0];
+    const trip = data.data.trips[0];
 
     expect(trip).toHaveProperty('dayOfWeek');
     expect(trip).toHaveProperty('departureDate');

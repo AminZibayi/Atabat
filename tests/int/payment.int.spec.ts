@@ -82,12 +82,12 @@ describe('Payment API Integration', () => {
     const response = await initiatePaymentHandler(req as any);
     const data = await response.json();
 
-    if (!data.paymentUrl)
+    if (!data.data?.paymentUrl)
       console.error('Payment URL generation failed:', JSON.stringify(data, null, 2));
 
     expect(response.status).toBe(200);
-    expect(data.paymentUrl).toBeDefined();
-    expect(data.paymentUrl).toContain('atabatorg.haj.ir');
-    expect(data.paymentUrl).toContain('test-external-guid-123'); // Should use external ID
+    expect(data.data.paymentUrl).toBeDefined();
+    expect(data.data.paymentUrl).toContain('atabatorg.haj.ir');
+    expect(data.data.paymentUrl).toContain('test-external-guid-123'); // Should use external ID
   });
 });
