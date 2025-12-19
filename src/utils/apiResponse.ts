@@ -1,8 +1,15 @@
 // In the Name of God, the Creative, the Originator
 import { ZodError } from 'zod';
-import { AppError, ErrorCode } from './AppError';
+import { AppError, ErrorCode, ResultCode, ResultCodes } from './AppError';
 
-export function successResponse<T>(data: T, code: string = 'SUCCESS', statusCode: number = 200) {
+/**
+ * Creates a successful JSON response with consistent structure
+ */
+export function successResponse<T>(
+  data: T,
+  code: ResultCode = ResultCodes.OK,
+  statusCode: number = 200
+) {
   return Response.json(
     {
       success: true,
@@ -13,6 +20,9 @@ export function successResponse<T>(data: T, code: string = 'SUCCESS', statusCode
   );
 }
 
+/**
+ * Creates an error JSON response with consistent structure
+ */
 export function errorResponse(error: unknown) {
   let statusCode = 500;
   let code: ErrorCode = 'INTERNAL_SERVER_ERROR';
@@ -21,7 +31,7 @@ export function errorResponse(error: unknown) {
 
   if (error instanceof AppError) {
     statusCode = error.statusCode;
-    code = error.code as ErrorCode;
+    code = error.code;
     message = error.message;
     details = error.details;
   } else if (error instanceof ZodError) {

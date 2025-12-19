@@ -269,36 +269,68 @@
       "message": "Something went wrong. Please try again later."
     },
     "networkError": "Network error. Please check your connection.",
-    "unauthorized": "Please login to continue.",
-    "ACTIVE_RESERVATION_EXISTS": "You already have an active reservation.",
-    "CANCELLATION_24H_RULE": "You cannot book a new trip within 24 hours of a cancellation."
+    "unauthorized": "Please login to continue."
   },
   "validation": {
-    "required": "This field is required",
-    "minLength": "Must be at least {min} characters",
-    "maxLength": "Must be at most {max} characters",
-    "email": "Please enter a valid email",
-    "phone": "Please enter a valid Iranian phone number",
-    "nationalId": "Please enter a valid 10-digit national ID",
-    "date": "Please enter a valid date"
+    "common": {
+      "required": "This field is required",
+      "minLength": "Must be at least {min} characters",
+      "maxLength": "Must be at most {max} characters",
+      "minValue": "Value must be at least {minimum}",
+      "maxValue": "Value must be at most {maximum}",
+      "minItems": "At least {minimum} item(s) required",
+      "maxItems": "At most {maximum} item(s) allowed",
+      "email": "Please enter a valid email",
+      "url": "Please enter a valid URL",
+      "invalidFormat": "Invalid format",
+      "invalidString": "Invalid text value",
+      "invalidOption": "Invalid selection",
+      "invalidDate": "Please enter a valid date",
+      "invalid": "Invalid value",
+      "tooSmall": "Value is too small",
+      "tooBig": "Value is too big"
+    },
+    "schema": {
+      "phone": "Please enter a valid Iranian phone number (e.g., 09123456789)",
+      "nationalId": "Please enter a valid 10-digit national ID",
+      "birthdate": "Please enter a valid Jalali date (YYYY/MM/DD)"
+    },
+    "invalidType": {
+      "string": "Expected text",
+      "number": "Expected a number",
+      "date": "Expected a date",
+      "boolean": "Expected true or false",
+      "array": "Expected a list",
+      "object": "Expected an object"
+    }
   },
-  "apiErrors": {
-    "INTERNAL_SERVER_ERROR": "An internal server error occurred. Please try again in a few minutes.",
-    "INVALID_PARAMS": "Invalid parameters provided. Please check your inputs.",
-    "UNAUTHORIZED": "Please log in to perform this action.",
-    "FORBIDDEN": "You do not have permission to perform this action.",
-    "NOT_FOUND": "The requested item was not found.",
-    "BAD_REQUEST": "Invalid request.",
-    "TRIP_SEARCH_FAILED": "Trip search failed. Please try again.",
-    "TRIP_NOT_FOUND": "The requested trip was not found or is fully booked.",
-    "RESERVATION_NOT_FOUND": "The requested reservation was not found.",
-    "CREATE_RESERVATION_FAILED": "Failed to create reservation. Please try again.",
-    "ALREADY_RESERVED": "You have already made a reservation for this trip.",
-    "PASSENGER_ALREADY_RESERVED": "This National ID is already registered for this trip.",
-    "PASSENGER_VALIDATION_FAILED": "Information for one of the passengers is invalid.",
-    "RESERVATION_CANCEL_FAILED": "Failed to cancel reservation.",
-    "CANCELLATION_24H_RULE": "You cannot book a new trip within 24 hours of a cancellation.",
-    "ACTIVE_RESERVATION_EXISTS": "You currently have an active reservation.",
-    "PAYMENT_INIT_FAILED": "Failed to initialize payment process. Please try again."
+  "api": {
+    "result": {
+      "success": {
+        "OK": "Operation completed successfully.",
+        "CREATED": "Created successfully.",
+        "UPDATED": "Updated successfully.",
+        "DELETED": "Deleted successfully."
+      },
+      "error": {
+        "INTERNAL_SERVER_ERROR": "An internal server error occurred. Please try again later.",
+        "INVALID_PARAMS": "Invalid parameters provided. Please check your inputs.",
+        "UNAUTHORIZED": "Please log in to perform this action.",
+        "FORBIDDEN": "You do not have permission to perform this action.",
+        "NOT_FOUND": "The requested resource was not found.",
+        "BAD_REQUEST": "Invalid request.",
+        "TRIP_SEARCH_FAILED": "Trip search failed. Please try again.",
+        "TRIP_NOT_FOUND": "The requested trip was not found or is fully booked.",
+        "RESERVATION_NOT_FOUND": "The requested reservation was not found.",
+        "RESERVATION_CREATE_FAILED": "Failed to create reservation. Please try again.",
+        "RESERVATION_CANCEL_FAILED": "Failed to cancel reservation.",
+        "RESERVATION_ALREADY_EXISTS": "You have already made a reservation for this trip.",
+        "RESERVATION_PASSENGER_DUPLICATE": "This National ID is already registered for this trip.",
+        "RESERVATION_PASSENGER_INVALID": "Information for one of the passengers is invalid.",
+        "RESERVATION_CANCELLATION_COOLDOWN": "You cannot book a new trip within 24 hours of a cancellation.",
+        "RESERVATION_ACTIVE_EXISTS": "You currently have an active reservation.",
+        "PAYMENT_INIT_FAILED": "Failed to initialize payment. Please try again."
+      }
+    }
   }
 }

@@ -1,21 +1,31 @@
 // In the Name of God, the Creative, the Originator
 import { z } from 'zod';
+import { zodErrorMap } from '@/utils/zodErrorMap';
+
+// Configure global error map for this module using Zod 4 API
+z.config({ customError: zodErrorMap });
 
 export const phoneSchema = z
   .string()
   .trim()
-  .regex(/^09\d{9}$/, 'Invalid Iranian phone number format (e.g., 09123456789)');
+  .refine(val => /^09\d{9}$/.test(val), {
+    message: 'validation.schema.phone',
+  });
 
 export const nationalIdSchema = z
   .string()
   .trim()
-  .regex(/^\d{10}$/, 'National ID must be exactly 10 digits');
+  .refine(val => /^\d{10}$/.test(val), {
+    message: 'validation.schema.nationalId',
+  });
 
 // Simple format check YYYY/MM/DD, further logic validation might be needed elsewhere
 export const birthdateSchema = z
   .string()
   .trim()
-  .regex(/^\d{4}\/\d{2}\/\d{2}$/, 'Invalid Jalali date format (YYYY/MM/DD)');
+  .refine(val => /^\d{4}\/\d{2}\/\d{2}$/.test(val), {
+    message: 'validation.schema.birthdate',
+  });
 
 export const pilgrimSchema = z.object({
   phone: phoneSchema,

@@ -35,7 +35,7 @@ export default function NewReservationPage() {
   const t = useTranslations('reservations.new');
   const tTrips = useTranslations('trips.details');
   const tCommon = useTranslations('common');
-  const tErrors = useTranslations('apiErrors');
+  const tApiErrors = useTranslations('api.result.error');
   const tAuth = useTranslations('auth.register');
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -82,10 +82,10 @@ export default function NewReservationPage() {
     try {
       // Fetch trips and find the one with matching ID
       const response = await fetch('/api/trips/search');
-      const data = await response.json();
+      const result = await response.json();
 
-      if (data.success && data.trips) {
-        const foundTrip = data.trips.find((t: TripData) => t.id === tripId);
+      if (result.success && result.data?.trips) {
+        const foundTrip = result.data.trips.find((t: TripData) => t.id === tripId);
         if (foundTrip) {
           setTrip(foundTrip);
         }
@@ -141,13 +141,13 @@ export default function NewReservationPage() {
         }),
       });
 
-      const data = await response.json();
+      const result = await response.json();
 
-      if (response.ok && data.success) {
+      if (response.ok && result.success) {
         toast.success(t('success.message'));
-        router.push(`/reservations/${data.reservation?.id || ''}`);
-      } else {
-        const errorMsg = data.code ? tErrors(data.code) : data.message || tCommon('error');
+        router.push(`/reservations/${result.data?.reservation?.id || ''}`);
+      } else if (!result.success) {
+        const errorMsg = result.code ? tApiErrors(result.code) : result.message || tCommon('error');
         toast.error(errorMsg);
       }
     } catch (error) {

@@ -38,7 +38,7 @@ interface Trip {
 
 export default function TripsPage() {
   const t = useTranslations('trips');
-  const tErrors = useTranslations('apiErrors');
+  const tApiErrors = useTranslations('api.result.error');
   const tCommon = useTranslations('common');
 
   // Calculate default dates (today and today+14)
@@ -139,15 +139,15 @@ export default function TripsPage() {
       if (searchInput.tripType) params.set('tripType', searchInput.tripType);
 
       const response = await fetch(`/api/trips/search?${params.toString()}`);
-      const data = await response.json();
+      const result = await response.json();
 
-      if (data.success && data.trips) {
-        setTrips(data.trips);
-        if (data.trips.length === 0) {
+      if (result.success && result.data?.trips) {
+        setTrips(result.data.trips);
+        if (result.data.trips.length === 0) {
           toast(t('results.noTrips'), { icon: '🔍' });
         }
-      } else {
-        const errorMsg = data.code ? tErrors(data.code) : data.message || 'خطا در جستجو';
+      } else if (!result.success) {
+        const errorMsg = result.code ? tApiErrors(result.code) : result.message || 'خطا در جستجو';
         toast.error(errorMsg);
       }
     } catch {

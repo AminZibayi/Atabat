@@ -45,12 +45,12 @@ export const createReservationHandler: PayloadHandler = async req => {
 
         if (lastRes.status === 'cancelled' && hoursDiff < 24) {
           return errorResponse(
-            new AppError('Cancellation 24h rule', ErrorCodes.CANCELLATION_24H_RULE, 403)
+            new AppError('Cancellation 24h rule', ErrorCodes.RESERVATION_CANCELLATION_COOLDOWN, 403)
           );
         }
         if (['pending', 'confirmed', 'paid'].includes(lastRes.status)) {
           return errorResponse(
-            new AppError('Active reservation exists', ErrorCodes.ACTIVE_RESERVATION_EXISTS, 403)
+            new AppError('Active reservation exists', ErrorCodes.RESERVATION_ACTIVE_EXISTS, 403)
           );
         }
       }
@@ -94,7 +94,7 @@ export const createReservationHandler: PayloadHandler = async req => {
       console.error('Adapter reservation error:', adapterError);
       throw new AppError(
         'Create reservation failed',
-        ErrorCodes.CREATE_RESERVATION_FAILED,
+        ErrorCodes.RESERVATION_CREATE_FAILED,
         500,
         adapterError
       );
