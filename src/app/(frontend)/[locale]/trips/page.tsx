@@ -56,14 +56,14 @@ export default function TripsPage() {
   const [filters, setFilters] = useState<SearchFilters>({
     departureFrom: defaultDates.from,
     departureTo: defaultDates.to,
-    province: '',
-    minCapacity: '',
+    province: '-1',
+    minCapacity: '1',
     tripType: '',
   });
 
   // All provinces from the functional spec
   const provinces = [
-    { value: '', label: 'همه استان‌ها' },
+    { value: '-1', label: 'همه استان‌ها' },
     { value: '10', label: 'اردبیل' },
     { value: '11', label: 'آذربایجان شرقی' },
     { value: '12', label: 'آذربایجان غربی' },
