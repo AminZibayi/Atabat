@@ -7,7 +7,6 @@ describe('Trip Search API Integration', () => {
   let payload: Awaited<ReturnType<typeof getPayload>>;
 
   beforeAll(async () => {
-    process.env.USE_MOCK_SCRAPER = 'true';
     const payloadConfig = await config;
     payload = await getPayload({ config: payloadConfig });
   });

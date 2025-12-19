@@ -4,33 +4,10 @@ import fs from 'fs/promises';
 import path from 'path';
 import sharp from 'sharp';
 import { spawn } from 'child_process';
+import { convertToEnglishDigits } from '../utils/digits';
 
 const TEMP_CAPTCHA_DIR = path.resolve(process.cwd(), 'data/temp_captcha');
 const OCR_SCRIPT_PATH = path.resolve(process.cwd(), 'scripts/ocr_captcha.py');
-
-// Persian numerals mapping to Arabic numerals (fallback for post-processing)
-const PERSIAN_TO_ARABIC: Record<string, string> = {
-  '۰': '0',
-  '۱': '1',
-  '۲': '2',
-  '۳': '3',
-  '۴': '4',
-  '۵': '5',
-  '۶': '6',
-  '۷': '7',
-  '۸': '8',
-  '۹': '9',
-  '٠': '0',
-  '١': '1',
-  '٢': '2',
-  '٣': '3',
-  '٤': '4',
-  '٥': '5',
-  '٦': '6',
-  '٧': '7',
-  '٨': '8',
-  '٩': '9',
-};
 
 /**
  * OCR result from Python script
@@ -43,23 +20,12 @@ interface OCRResult {
 }
 
 /**
- * Convert Persian/Arabic numerals to ASCII numerals
- */
-function convertPersianToArabic(text: string): string {
-  let result = '';
-  for (const char of text) {
-    result += PERSIAN_TO_ARABIC[char] || char;
-  }
-  return result;
-}
-
-/**
  * Clean up captcha text - extract only digits
  * The captcha is always 3 Persian numbers
  */
 function cleanCaptchaText(rawText: string): string {
   // Convert Persian digits to Arabic
-  const converted = convertPersianToArabic(rawText);
+  const converted = convertToEnglishDigits(rawText);
   // Extract only digits
   const digits = converted.replace(/[^0-9]/g, '');
   return digits;
