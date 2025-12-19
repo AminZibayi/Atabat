@@ -109,10 +109,6 @@ async function getErrorMessage(page: Page, selector: string): Promise<string | n
 async function handleLoginForm(page: Page, credentials: StoredCredentials): Promise<boolean> {
   console.log('[Auth] Handling login form...');
 
-  // Fill username and password
-  await page.fill(LOGIN_SELECTORS.USERNAME, credentials.username);
-  await page.fill(LOGIN_SELECTORS.PASSWORD, credentials.password);
-
   let captchaSolved = false;
   let attempts = 0;
 
@@ -121,6 +117,10 @@ async function handleLoginForm(page: Page, credentials: StoredCredentials): Prom
     console.log(`[Auth] Captcha attempt ${attempts}/${credentials.captchaMaxAttempts}`);
 
     try {
+      // Fill username and password (refill on retry as password might be cleared)
+      await page.fill(LOGIN_SELECTORS.USERNAME, credentials.username);
+      await page.fill(LOGIN_SELECTORS.PASSWORD, credentials.password);
+
       // Wait for captcha image to be visible
       await page.waitForSelector(LOGIN_SELECTORS.CAPTCHA_IMAGE, {
         state: 'visible',
