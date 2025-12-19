@@ -1,4 +1,5 @@
 // In the Name of God, the Creative, the Originator
+
 export * from './types';
 export * from './adapter';
 export * from './mockAdapter';
@@ -9,30 +10,35 @@ export * from './reservation';
 export * from './receipt';
 export * from './status';
 
+import type {
+  TripSearchParams,
+  TripData,
+  ReservationResult,
+  PassengerInfo,
+  ReceiptData,
+} from './types';
 import type { IAtabatAdapter } from './adapter';
 import { getAdapterConfig } from './adapter';
 import { getMockAdapter } from './mockAdapter';
+import { getContext, isSessionValid } from './browser';
+import { searchTrips, selectTrip } from './trips';
+import { createReservation } from './reservation';
+import { scrapeReceipt } from './receipt';
+import { authenticate } from './auth';
 
 /**
  * Real adapter implementation that wraps the Playwright scraper functions.
  * This connects the interface to the actual scraper implementations.
  */
 class RealAdapter implements IAtabatAdapter {
-  async searchTrips(
-    params: import('./types').TripSearchParams
-  ): Promise<import('./types').TripData[]> {
-    const { searchTrips } = await import('./trips');
+  async searchTrips(params: TripSearchParams): Promise<TripData[]> {
     return searchTrips(params);
   }
 
   async createReservation(
-    tripData: import('./types').TripData,
-    passenger: import('./types').PassengerInfo
-  ): Promise<import('./types').ReservationResult> {
-    const { getContext } = await import('./browser');
-    const { selectTrip } = await import('./trips');
-    const { createReservation } = await import('./reservation');
-
+    tripData: TripData,
+    passenger: PassengerInfo
+  ): Promise<ReservationResult> {
     const context = await getContext();
     const page = await context.newPage();
 
@@ -52,8 +58,7 @@ class RealAdapter implements IAtabatAdapter {
     }
   }
 
-  async getReceipt(resId: string): Promise<import('./types').ReceiptData> {
-    const { scrapeReceipt } = await import('./receipt');
+  async getReceipt(resId: string): Promise<ReceiptData> {
     return scrapeReceipt(resId);
   }
 
@@ -63,7 +68,6 @@ class RealAdapter implements IAtabatAdapter {
   }
 
   async isAuthenticated(): Promise<boolean> {
-    const { getContext, isSessionValid } = await import('./browser');
     const context = await getContext();
     const page = await context.newPage();
     try {
@@ -74,7 +78,6 @@ class RealAdapter implements IAtabatAdapter {
   }
 
   async authenticate(): Promise<boolean> {
-    const { authenticate } = await import('./auth');
     return authenticate();
   }
 }
