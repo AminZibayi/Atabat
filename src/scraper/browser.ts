@@ -2,7 +2,8 @@
 import { chromium, Browser, BrowserContext, Page } from 'playwright';
 import path from 'path';
 import fs from 'fs/promises';
-import payload from 'payload';
+import { getPayload } from 'payload';
+import config from '@payload-config';
 
 let browserInstance: Browser | null = null;
 let contextInstance: BrowserContext | null = null;
@@ -62,11 +63,12 @@ export async function saveCookies(context: BrowserContext) {
     // Using local payload API if available in this context
     // This assumes this code runs in the Next.js server context where payload is initialized
     // If this runs in a separate worker, we might need a different approach (REST API)
-    const config = await payload.findGlobal({
+    const payload = await getPayload({ config });
+    const kargozarConfig = await payload.findGlobal({
       slug: 'kargozar-config',
     });
 
-    if (config) {
+    if (kargozarConfig) {
       await payload.updateGlobal({
         slug: 'kargozar-config',
         data: {
@@ -84,12 +86,13 @@ export async function saveCookies(context: BrowserContext) {
 export async function loadCookies(context: BrowserContext) {
   try {
     // Try DB first
-    const config = await payload.findGlobal({
+    const payload = await getPayload({ config });
+    const kargozarConfig = await payload.findGlobal({
       slug: 'kargozar-config',
     });
 
-    if (config && config.cookiesData) {
-      const cookies = config.cookiesData as any[];
+    if (kargozarConfig && kargozarConfig.cookiesData) {
+      const cookies = kargozarConfig.cookiesData as any[];
       if (cookies.length > 0) {
         await context.addCookies(cookies);
         console.log('Cookies loaded from DB');

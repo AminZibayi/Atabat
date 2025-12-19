@@ -39,7 +39,8 @@ yarn-error.log*
 next-env.d.ts
 
 .env
-
+/data/cookies.json
+/data/temp_captcha
 /media
 
 # Playwright

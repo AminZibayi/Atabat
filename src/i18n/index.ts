@@ -1,3 +1,5 @@
+import { password } from 'payload/shared';
+
 // In the Name of God, the Creative, the Originator
 export const i18n = {
   collections: {
@@ -94,8 +96,10 @@ export const i18n = {
       },
       fields: {
         username: { label: { en: 'Username', fa: 'نام کاربری' } },
+        password: { label: { en: 'Password', fa: 'رمز عبور' } },
         currentOTP: { label: { en: 'Current OTP', fa: 'رمز یکبار مصرف فعلی' } },
         otpLastUpdated: { label: { en: 'OTP Last Updated', fa: 'آخرین بروزرسانی رمز' } },
+        captchaMaxAttempts: { label: { en: 'Captcha Max Attempts', fa: 'حداکثر تلاش کپچا' } },
       },
     },
   },

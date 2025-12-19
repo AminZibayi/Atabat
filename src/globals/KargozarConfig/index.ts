@@ -23,12 +23,7 @@ export const KargozarConfig: GlobalConfig = {
       name: 'password',
       type: 'text',
       required: true,
-      admin: {
-        description: 'Password for Atabat kargozar panel',
-        condition: () => false, // Hide from UI if possible, or just protect it.
-        // Payload 'hidden' property might be better, but we need to set it via API/Env or have admin set it once.
-        // For now, let's keep it visible to admin so they can set it.
-      },
+      label: i18n.collections.kargozarConfig.fields.password.label,
     },
     {
       name: 'currentOTP',
@@ -67,6 +62,15 @@ export const KargozarConfig: GlobalConfig = {
       type: 'date',
       admin: {
         readOnly: true,
+      },
+    },
+    {
+      name: 'captchaMaxAttempts',
+      type: 'number',
+      defaultValue: 5,
+      label: i18n.collections.kargozarConfig.fields.captchaMaxAttempts.label,
+      admin: {
+        description: 'Maximum number of captcha solve attempts before giving up',
       },
     },
   ],

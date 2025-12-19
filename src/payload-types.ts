@@ -560,10 +560,7 @@ export interface PayloadMigrationsSelect<T extends boolean = true> {
 export interface KargozarConfig {
   id: number;
   username: string;
-  /**
-   * Password for Atabat kargozar panel
-   */
-  password?: string | null;
+  password: string;
   /**
    * Daily OTP code (valid for 24h)
    */
@@ -583,6 +580,10 @@ export interface KargozarConfig {
     | null;
   cookiesExpireAt?: string | null;
   lastAuthAt?: string | null;
+  /**
+   * Maximum number of captcha solve attempts before giving up
+   */
+  captchaMaxAttempts?: number | null;
   updatedAt?: string | null;
   createdAt?: string | null;
 }
@@ -682,6 +683,7 @@ export interface KargozarConfigSelect<T extends boolean = true> {
   cookiesData?: T;
   cookiesExpireAt?: T;
   lastAuthAt?: T;
+  captchaMaxAttempts?: T;
   updatedAt?: T;
   createdAt?: T;
   globalType?: T;
