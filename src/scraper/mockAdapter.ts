@@ -22,7 +22,8 @@ export class MockAdapter implements IAtabatAdapter {
   // Sample trip data for testing
   private sampleTrips: TripData[] = [
     {
-      id: 'trip-684-1404-10-05',
+      rowIndex: '0',
+      tripIdentifier: '1404/10/05|684|زاگرس',
       dayOfWeek: 'جمعه',
       departureDate: '1404/10/05',
       remainingCapacity: 5,
@@ -37,10 +38,11 @@ export class MockAdapter implements IAtabatAdapter {
       karbalaHotel: 'ملک',
       kazemainHotel: 'قرطاج',
       address: 'خیابان سپهبد قرنی، بالاتر از تقاطع طالقانی، پلاک 85',
-      selectButtonId: 'mock-trip-1',
+      selectButtonScript: "javascript:__doPostBack('ctl00$cp1$grdKargroup','Select$0')",
     },
     {
-      id: 'trip-126-1404-10-10',
+      rowIndex: '1',
+      tripIdentifier: '1404/10/10|126|خادمان حریم نینوا',
       dayOfWeek: 'پنجشنبه',
       departureDate: '1404/10/10',
       remainingCapacity: 3,
@@ -55,10 +57,11 @@ export class MockAdapter implements IAtabatAdapter {
       karbalaHotel: 'برج المرتضی',
       kazemainHotel: '-',
       address: 'خیابان چهارباغ بالا، نبش خیابان نظر غربی',
-      selectButtonId: 'mock-trip-2',
+      selectButtonScript: "javascript:__doPostBack('ctl00$cp1$grdKargroup','Select$1')",
     },
     {
-      id: 'trip-3267-1404-10-15',
+      rowIndex: '2',
+      tripIdentifier: '1404/10/15|3267|دریای کرم حسین',
       dayOfWeek: 'شنبه',
       departureDate: '1404/10/15',
       remainingCapacity: 8,
@@ -73,10 +76,11 @@ export class MockAdapter implements IAtabatAdapter {
       karbalaHotel: 'الکربلائی',
       kazemainHotel: 'الکاظمین',
       address: 'بلوار وکیل آباد، روبروی باغ ملی',
-      selectButtonId: 'mock-trip-3',
+      selectButtonScript: "javascript:__doPostBack('ctl00$cp1$grdKargroup','Select$2')",
     },
     {
-      id: 'trip-4455-1404-10-20',
+      rowIndex: '3',
+      tripIdentifier: '1404/10/20|4455|راهیان نور',
       dayOfWeek: 'دوشنبه',
       departureDate: '1404/10/20',
       remainingCapacity: 20,
@@ -91,10 +95,11 @@ export class MockAdapter implements IAtabatAdapter {
       karbalaHotel: 'الدرویش',
       kazemainHotel: '-',
       address: 'خیابان ارم',
-      selectButtonId: 'mock-trip-4',
+      selectButtonScript: "javascript:__doPostBack('ctl00$cp1$grdKargroup','Select$3')",
     },
     {
-      id: 'trip-8899-1404-10-25',
+      rowIndex: '4',
+      tripIdentifier: '1404/10/25|8899|شاهچراغ',
       dayOfWeek: 'چهارشنبه',
       departureDate: '1404/10/25',
       remainingCapacity: 2,
@@ -109,7 +114,7 @@ export class MockAdapter implements IAtabatAdapter {
       karbalaHotel: 'جنه الحسین',
       kazemainHotel: 'الهدی',
       address: 'بلوار زند',
-      selectButtonId: 'mock-trip-5',
+      selectButtonScript: "javascript:__doPostBack('ctl00$cp1$grdKargroup','Select$4')",
     },
   ];
 

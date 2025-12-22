@@ -24,16 +24,23 @@ interface SearchFilters {
 }
 
 interface Trip {
-  id: string;
+  rowIndex: string;
+  tripIdentifier: string;
   dayOfWeek: string;
   departureDate: string;
   remainingCapacity: number;
   tripType: string;
   cost: number;
+  departureLocation: string;
   city: string;
   agentName: string;
+  groupCode: string;
+  executorName: string;
   najafHotel: string;
   karbalaHotel: string;
+  kazemainHotel: string;
+  address: string;
+  selectButtonScript?: string;
 }
 
 export default function TripsPage() {
@@ -164,8 +171,10 @@ export default function TripsPage() {
   const router = useRouter();
 
   const handleTripDetails = (trip: Trip) => {
-    // Navigate to reservation page with trip ID
-    router.push(`/reservations/new?tripId=${trip.id}`);
+    // Store full trip data in sessionStorage for the reservation page
+    sessionStorage.setItem('selectedTrip', JSON.stringify(trip));
+    // Navigate to reservation page with tripIdentifier in URL
+    router.push(`/reservations/new?trip=${encodeURIComponent(trip.tripIdentifier)}`);
   };
 
   return (
@@ -252,7 +261,7 @@ export default function TripsPage() {
                     </thead>
                     <tbody>
                       {trips.map(trip => (
-                        <tr key={trip.id}>
+                        <tr key={trip.tripIdentifier}>
                           <td>{trip.dayOfWeek}</td>
                           <td>{trip.departureDate}</td>
                           <td>
@@ -282,7 +291,7 @@ export default function TripsPage() {
                 {/* Results Cards - Mobile */}
                 <div className={styles.cardsWrapper}>
                   {trips.map(trip => (
-                    <div key={trip.id} className={styles.tripCard}>
+                    <div key={trip.tripIdentifier} className={styles.tripCard}>
                       <div className={styles.cardHeader}>
                         <span className={styles.cardDate}>{trip.departureDate}</span>
                         <span className={styles.cardCapacity}>

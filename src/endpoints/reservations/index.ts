@@ -19,13 +19,20 @@ export const createReservationHandler: PayloadHandler = async req => {
     // Safe body parsing
     const body = typeof req.json === 'function' ? await req.json() : (req as any).body;
 
-    // Validation
+    // Validation - now expects tripSnapshot with full trip data
     const validation = tripSelectionSchema.safeParse(body);
     if (!validation.success) {
       return errorResponse(validation.error);
     }
 
-    const { tripId, tripSnapshot: clientSnapshot } = validation.data;
+    const { tripSnapshot } = validation.data;
+
+    // Validate tripSnapshot has required selectButtonScript
+    if (!tripSnapshot.selectButtonScript) {
+      return errorResponse(
+        new AppError('Invalid trip data: missing selectButtonScript', ErrorCodes.BAD_REQUEST, 400)
+      );
+    }
 
     // 24-Hour Rule Check
     const lastReservations = await req.payload.find({
@@ -56,12 +63,9 @@ export const createReservationHandler: PayloadHandler = async req => {
       }
     }
 
-    // Use Adapter
+    // Use Adapter with tripSnapshot (contains selectButtonScript from original search)
     const { getAdapter } = await import('@/scraper');
     const adapter = getAdapter();
-
-    // Construct TripData & PassengerInfo
-    const tripData: any = { selectButtonId: tripId }; // provisional
 
     // Passenger info from logged in user
     const passenger = {
@@ -73,18 +77,27 @@ export const createReservationHandler: PayloadHandler = async req => {
     };
 
     try {
-      const reservationResult = await adapter.createReservation(tripData, passenger);
+      // Pass tripSnapshot directly - it includes selectButtonScript
+      const reservationResult = await adapter.createReservation(tripSnapshot as any, passenger);
 
-      // Save to Payload
-      const finalSnapshot = clientSnapshot || { id: tripId, ...reservationResult };
+      if (!reservationResult.success) {
+        return errorResponse(
+          new AppError(
+            reservationResult.message || 'Reservation failed',
+            ErrorCodes.RESERVATION_CREATE_FAILED,
+            400
+          )
+        );
+      }
 
+      // Save to Payload with externalResId (GUID from Atabat)
       const newRes = await req.payload.create({
         collection: 'reservations',
         data: {
           pilgrim: pilgrim.id,
           externalResId: reservationResult.reservationId || 'UNKNOWN',
           status: 'pending',
-          tripSnapshot: finalSnapshot,
+          tripSnapshot: tripSnapshot,
           bookedAt: new Date().toISOString(),
         },
       });

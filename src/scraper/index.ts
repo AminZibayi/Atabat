@@ -43,15 +43,18 @@ class RealAdapter implements IAtabatAdapter {
     const page = await context.newPage();
 
     try {
-      // Navigate to trips page and select the trip
+      // Navigate to trips page first (required to execute postback)
       await page.goto('https://atabatorg.haj.ir/Kargozar/KargroupResLock.aspx');
 
-      // Select the trip using stored button ID
-      if (tripData.selectButtonId) {
-        await selectTrip(page, tripData.selectButtonId);
+      // Select the trip using stored button script
+      // This triggers postback and redirects to Reservation_cs.aspx?resId=<GUID>
+      if (!tripData.selectButtonScript) {
+        throw new Error('Trip missing selection script');
       }
+      await selectTrip(page, tripData.selectButtonScript);
 
       // Create reservation with passenger info
+      // At this point we're on the reservation page with a new resId in URL
       return await createReservation(page, passenger);
     } finally {
       await page.close();

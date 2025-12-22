@@ -46,7 +46,7 @@ export const Reservations: CollectionConfig = {
     // Created by scraper adaptor
     create: () => false,
     update: () => false,
-    delete: () => false,
+    delete: isAdmin,
   },
   fields: [
     {

@@ -33,9 +33,21 @@ export const tripSearchSchema = z.object({
 export type TripSearchInput = z.infer<typeof tripSearchSchema>;
 
 // Validation for selecting a trip to reserve
+// tripSnapshot contains the full trip data from the search (including selectButtonScript)
 export const tripSelectionSchema = z.object({
-  tripId: z.string().min(1),
+  tripSnapshot: z
+    .object({
+      rowIndex: z.string(),
+      tripIdentifier: z.string().min(1),
+      departureDate: z.string(),
+      groupCode: z.string(),
+      agentName: z.string(),
+      cost: z.number(),
+      selectButtonScript: z.string().min(1),
+      // Allow additional fields from TripData
+    })
+    .passthrough(),
   passengerCount: z.number().int().min(1).optional().default(1),
-  tripSnapshot: z.record(z.string(), z.unknown()).optional(),
-  passengerInfo: z.record(z.string(), z.unknown()).optional(),
 });
+
+export type TripSelectionInput = z.infer<typeof tripSelectionSchema>;

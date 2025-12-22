@@ -28,11 +28,11 @@ describe('Reservation API Integration', () => {
       },
     });
 
-    // Get a valid trip ID from mock adapter
+    // Get a valid trip from mock adapter
     const { getAdapter } = await import('../../src/scraper');
     const adapter = getAdapter();
     const trips = await adapter.searchTrips({});
-    tripId = trips[0].selectButtonId || 'test-trip-id';
+    tripId = trips[0].selectButtonScript || 'test-trip-script';
   });
 
   afterAll(async () => {
@@ -65,9 +65,14 @@ describe('Reservation API Integration', () => {
   describe('Create Reservation', () => {
     it('should reject unauthenticated requests', async () => {
       const { createReservationHandler } = await import('../../src/endpoints/reservations');
+      const { getAdapter } = await import('../../src/scraper');
+      const adapter = getAdapter();
+      const trips = await adapter.searchTrips({});
+      const tripSnapshot = trips[0];
+
       const req = new Request('http://localhost:3000/api/reservations', {
         method: 'POST',
-        body: JSON.stringify({ tripId, passengerCount: 1 }),
+        body: JSON.stringify({ tripSnapshot }),
       });
       (req as any).payload = payload;
 
@@ -79,7 +84,7 @@ describe('Reservation API Integration', () => {
       const { createReservationHandler } = await import('../../src/endpoints/reservations');
       const req = new Request('http://localhost:3000/api/reservations', {
         method: 'POST',
-        body: JSON.stringify({}), // Missing tripId
+        body: JSON.stringify({}), // Missing tripSnapshot
       });
       (req as any).payload = payload;
       (req as any).user = { ...pilgrim, collection: 'pilgrims' };
@@ -95,10 +100,15 @@ describe('Reservation API Integration', () => {
         where: { pilgrim: { equals: pilgrim.id } },
       });
 
+      const { getAdapter } = await import('../../src/scraper');
+      const adapter = getAdapter();
+      const trips = await adapter.searchTrips({});
+      const tripSnapshot = trips[0];
+
       const { createReservationHandler } = await import('../../src/endpoints/reservations');
       const req = new Request('http://localhost:3000/api/reservations', {
         method: 'POST',
-        body: JSON.stringify({ tripId, passengerCount: 1 }),
+        body: JSON.stringify({ tripSnapshot }),
       });
       (req as any).payload = payload;
       (req as any).user = { ...pilgrim, collection: 'pilgrims' };
@@ -120,10 +130,15 @@ describe('Reservation API Integration', () => {
     });
 
     it('should block new reservation if one is active', async () => {
+      const { getAdapter } = await import('../../src/scraper');
+      const adapter = getAdapter();
+      const trips = await adapter.searchTrips({});
+      const tripSnapshot = trips[0];
+
       const { createReservationHandler } = await import('../../src/endpoints/reservations');
       const req = new Request('http://localhost:3000/api/reservations', {
         method: 'POST',
-        body: JSON.stringify({ tripId, passengerCount: 1 }),
+        body: JSON.stringify({ tripSnapshot }),
       });
       (req as any).payload = payload;
       (req as any).user = { ...pilgrim, collection: 'pilgrims' };
@@ -143,22 +158,35 @@ describe('Reservation API Integration', () => {
       });
 
       // Manually create a cancelled reservation recently
-      // Need to use 'any' to bypass strict Payload options if generating types creates conflict in tests
       await payload.create({
         collection: 'reservations',
         data: {
           pilgrim: pilgrim.id,
           status: 'cancelled',
           bookedAt: new Date(Date.now() - 1000 * 60 * 60).toISOString(), // 1 hour ago
-          tripSnapshot: { id: 'cancelled-trip' } as any,
+          tripSnapshot: {
+            rowIndex: '0',
+            tripIdentifier: 'cancelled',
+            departureDate: '1404/01/01',
+            groupCode: '123',
+            agentName: 'Test',
+            cost: 1000,
+            selectButtonScript: 'test',
+          } as any,
         } as any,
       });
+
+      // Get trip for request
+      const { getAdapter } = await import('../../src/scraper');
+      const adapter = getAdapter();
+      const trips = await adapter.searchTrips({});
+      const tripSnapshot = trips[0];
 
       // Try to create new one
       const { createReservationHandler } = await import('../../src/endpoints/reservations');
       const req = new Request('http://localhost:3000/api/reservations', {
         method: 'POST',
-        body: JSON.stringify({ tripId, passengerCount: 1 }),
+        body: JSON.stringify({ tripSnapshot }),
       });
       (req as any).payload = payload;
       (req as any).user = { ...pilgrim, collection: 'pilgrims' };

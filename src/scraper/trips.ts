@@ -75,7 +75,7 @@ export async function searchTrips(params: TripSearchParams): Promise<TripData[]>
     console.error('Error searching trips', e);
     throw e;
   } finally {
-    await page.close();
+    // await page.close();
   }
 }
 
@@ -110,30 +110,39 @@ async function parseTripsTable(page: Page): Promise<TripData[]> {
       // Helper to get cell text
       const txt = (idx: number) => cells[idx]?.innerText?.trim() || '';
 
-      // Extract trip ID from the select button's onclick attribute
+      // Extract row index from the select button's onclick attribute
       // Format: javascript:__doPostBack('ctl00$cp1$grdKargroup','Select$0')
       const onclickAttr =
         cells[14]?.querySelector('input[type="button"]')?.getAttribute('onclick') || '';
       const selectMatch = onclickAttr.match(/Select\$(\d+)/);
-      const tripId = selectMatch ? selectMatch[1] : `row-${results.length}`;
+      const rowIndex = selectMatch ? selectMatch[1] : `row-${results.length}`;
+
+      // Extract trip data
+      const departureDate = txt(1);
+      const groupCode = txt(8);
+      const agentName = txt(7);
+
+      // Generate stable tripIdentifier
+      const tripIdentifier = `${departureDate}|${groupCode}|${agentName}`;
 
       results.push({
-        id: tripId,
+        rowIndex,
+        tripIdentifier,
         dayOfWeek: txt(0),
-        departureDate: txt(1),
+        departureDate,
         remainingCapacity: parseInt(txt(2)) || 0,
         tripType: txt(3),
         cost: parseInt(txt(4).replace(/,/g, '')) || 0,
         departureLocation: txt(5),
         city: txt(6),
-        agentName: txt(7),
-        groupCode: txt(8),
+        agentName,
+        groupCode,
         executorName: txt(9),
         najafHotel: txt(10),
         karbalaHotel: txt(11),
         kazemainHotel: txt(12),
         address: txt(13),
-        selectButtonId: onclickAttr,
+        selectButtonScript: onclickAttr,
       });
     }
     return results;

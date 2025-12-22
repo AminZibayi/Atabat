@@ -1,5 +1,5 @@
 // In the Name of God, the Creative, the Originator
-import type { CollectionConfig } from 'payload';
+import { APIError, type CollectionConfig } from 'payload';
 
 import { i18n } from '@/i18n';
 import { validateZod } from '@/utils/validateZod';
@@ -36,6 +36,28 @@ export const Pilgrims: CollectionConfig = {
     },
   },
   hooks: {
+    beforeDelete: [
+      async ({ req, id }) => {
+        const existingReservations = await req.payload.find({
+          collection: 'reservations',
+          where: {
+            pilgrim: {
+              equals: id,
+            },
+          },
+          limit: 1, // We only need to know if at least one exists
+        });
+
+        if (existingReservations.totalDocs > 0) {
+          throw new APIError(
+            'Cannot delete this pilgrim because they have existing reservations. Please delete the reservations first.',
+            400,
+            undefined,
+            true // isPublic: true so the user sees this message
+          );
+        }
+      },
+    ],
     beforeChange: [
       ({ data }) => {
         if (data.phone) {

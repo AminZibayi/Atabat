@@ -1,7 +1,8 @@
 // In the Name of God, the Creative, the Originator
 
 export interface TripData {
-  id: string; // Unique identifier for the trip
+  rowIndex: string; // Ephemeral row index (e.g., "0", "35") - session-specific
+  tripIdentifier: string; // Stable composite key: `${departureDate}|${groupCode}|${agentName}`
   dayOfWeek: string;
   departureDate: string;
   remainingCapacity: number;
@@ -16,7 +17,7 @@ export interface TripData {
   karbalaHotel: string;
   kazemainHotel: string;
   address: string;
-  selectButtonId?: string; // For Playwright interaction
+  selectButtonScript?: string; // ASP.NET postback script (session-specific)
 }
 
 export interface TripSearchParams {
@@ -72,4 +73,13 @@ export interface PassengerReceiptItem {
   lastName: string;
   birthdate: string;
   cost: number;
+}
+
+export interface AtabatReservationStatus {
+  resId: string;
+  status: 'pending' | 'registered' | 'paid' | 'cancelled' | 'unknown';
+  registrationDate?: string;
+  departureDate?: string;
+  groupCode?: string;
+  agentName?: string;
 }

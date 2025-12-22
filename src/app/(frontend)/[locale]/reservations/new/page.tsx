@@ -14,7 +14,8 @@ import { Card } from '@/components/ui/Card';
 import styles from './page.module.css';
 
 interface TripData {
-  id: string;
+  rowIndex: string;
+  tripIdentifier: string;
   dayOfWeek: string;
   departureDate: string;
   remainingCapacity: number;
@@ -29,6 +30,7 @@ interface TripData {
   karbalaHotel: string;
   kazemainHotel: string;
   address: string;
+  selectButtonScript?: string;
 }
 
 export default function NewReservationPage() {
@@ -41,7 +43,7 @@ export default function NewReservationPage() {
   const searchParams = useSearchParams();
   const { isLoading: isAuthLoading, isAuthenticated, user } = useAuth();
 
-  const tripId = searchParams.get('tripId');
+  const tripIdentifier = searchParams.get('trip');
 
   const [trip, setTrip] = useState<TripData | null>(null);
   const [isLoadingTrip, setIsLoadingTrip] = useState(true);
@@ -56,9 +58,11 @@ export default function NewReservationPage() {
   // Redirect to login if not authenticated
   useEffect(() => {
     if (!isAuthLoading && !isAuthenticated) {
-      router.push(`/auth/login?redirect=/reservations/new?tripId=${tripId}`);
+      router.push(
+        `/auth/login?redirect=/reservations/new?trip=${encodeURIComponent(tripIdentifier || '')}`
+      );
     }
-  }, [isAuthLoading, isAuthenticated, router, tripId]);
+  }, [isAuthLoading, isAuthenticated, router, tripIdentifier]);
 
   // Pre-fill user data if available
   useEffect(() => {
@@ -69,34 +73,24 @@ export default function NewReservationPage() {
     }
   }, [user]);
 
-  // Fetch trip data
+  // Fetch trip data from sessionStorage
   useEffect(() => {
-    if (tripId && tripId !== 'undefined') {
-      fetchTrip();
-    } else {
-      setIsLoadingTrip(false);
-    }
-  }, [tripId]);
-
-  const fetchTrip = async () => {
-    try {
-      // Fetch trips and find the one with matching ID
-      const response = await fetch('/api/trips/search');
-      const result = await response.json();
-
-      if (result.success && result.data?.trips) {
-        const foundTrip = result.data.trips.find((t: TripData) => t.id === tripId);
-        if (foundTrip) {
-          setTrip(foundTrip);
+    if (tripIdentifier) {
+      const storedTrip = sessionStorage.getItem('selectedTrip');
+      if (storedTrip) {
+        try {
+          const parsed = JSON.parse(storedTrip) as TripData;
+          // Verify it's the same trip
+          if (parsed.tripIdentifier === tripIdentifier) {
+            setTrip(parsed);
+          }
+        } catch (error) {
+          console.error('Failed to parse stored trip:', error);
         }
       }
-    } catch (error) {
-      console.error('Failed to fetch trip:', error);
-      toast.error('خطا در دریافت اطلاعات سفر');
-    } finally {
-      setIsLoadingTrip(false);
     }
-  };
+    setIsLoadingTrip(false);
+  }, [tripIdentifier]);
 
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat('fa-IR').format(amount) + ' تومان';
@@ -124,20 +118,7 @@ export default function NewReservationPage() {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          tripId: trip.id,
-          tripSnapshot: {
-            departureDate: trip.departureDate,
-            city: trip.city,
-            tripType: trip.tripType,
-            cost: trip.cost,
-            agentName: trip.agentName,
-            groupCode: trip.groupCode,
-          },
-          passengerInfo: {
-            nationalId,
-            birthdate,
-            phone,
-          },
+          tripSnapshot: trip, // Send full trip data including selectButtonScript
         }),
       });
 
@@ -170,7 +151,7 @@ export default function NewReservationPage() {
     );
   }
 
-  if (!tripId || tripId === 'undefined' || !trip) {
+  if (!tripIdentifier || !trip) {
     return (
       <div className={styles.page}>
         <div className={styles.container}>
