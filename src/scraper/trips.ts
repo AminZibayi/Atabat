@@ -23,60 +23,64 @@ export async function searchTrips(params: TripSearchParams): Promise<TripData[]>
   const page = await context.newPage();
 
   try {
-    // Check session and navigate
-    if (!(await isSessionValid(page))) {
-      const authSuccess = await authenticate();
-      if (!authSuccess) throw new Error('Could not authenticate session for trip search');
-    }
-    await page.goto(TRIPS_URL, { waitUntil: 'networkidle' });
-
-    // Fill date inputs - KamaDatepicker uses readonly inputs, so we need to:
-    // 1. Remove readonly attribute
-    // 2. Clear the field
-    // 3. Fill with the value
-    // 4. Dispatch change event to trigger any JS listeners
-    if (params.dateFrom) {
-      await fillDateInput(page, SELECTORS.dateFrom, params.dateFrom);
-    }
-    if (params.dateTo) {
-      await fillDateInput(page, SELECTORS.dateTo, params.dateTo);
-    }
-
-    // Province selection
-    if (params.provinceCode) {
-      await page.selectOption(SELECTORS.province, params.provinceCode);
-    }
-
-    // Border type selection (trip type: 1=Land, 2=Air, 128=Accommodation, 129=Flight only)
-    if (params.borderType) {
-      await page.selectOption(SELECTORS.borderType, params.borderType);
-    }
-
-    // Adult count
-    if (params.adultCount) {
-      await page.selectOption(SELECTORS.adultCount, params.adultCount.toString());
-    }
-
-    // Infant count (under 2 years)
-    if (params.infantCount !== undefined) {
-      await page.selectOption(SELECTORS.infantCount, params.infantCount.toString());
-    }
-
-    // Click search button and wait for postback to complete
-    await Promise.all([page.waitForLoadState('networkidle'), page.click(SELECTORS.searchButton)]);
-
-    // Wait for the grid to be present (it should be there after postback)
-    await page.waitForSelector(SELECTORS.tripsGrid, { timeout: 10000 }).catch(() => null);
-
-    // Parse and return trips
-    const trips = await parseTripsTable(page);
-    return trips;
-  } catch (e) {
-    console.error('Error searching trips', e);
-    throw e;
+    return await searchTripsOnPage(page, params);
   } finally {
-    // await page.close();
+    await page.close();
   }
+}
+
+/**
+ * Search for trips on an existing page - allows reusing the same page for trip selection
+ */
+export async function searchTripsOnPage(page: Page, params: TripSearchParams): Promise<TripData[]> {
+  // Check session and navigate
+  if (!(await isSessionValid(page))) {
+    const authSuccess = await authenticate();
+    if (!authSuccess) throw new Error('Could not authenticate session for trip search');
+  }
+  await page.goto(TRIPS_URL, { waitUntil: 'networkidle' });
+
+  // Fill date inputs - KamaDatepicker uses readonly inputs, so we need to:
+  // 1. Remove readonly attribute
+  // 2. Clear the field
+  // 3. Fill with the value
+  // 4. Dispatch change event to trigger any JS listeners
+  if (params.dateFrom) {
+    await fillDateInput(page, SELECTORS.dateFrom, params.dateFrom);
+  }
+  if (params.dateTo) {
+    await fillDateInput(page, SELECTORS.dateTo, params.dateTo);
+  }
+
+  // Province selection
+  if (params.provinceCode) {
+    await page.selectOption(SELECTORS.province, params.provinceCode);
+  }
+
+  // Border type selection (trip type: 1=Land, 2=Air, 128=Accommodation, 129=Flight only)
+  if (params.borderType) {
+    await page.selectOption(SELECTORS.borderType, params.borderType);
+  }
+
+  // Adult count
+  if (params.adultCount) {
+    await page.selectOption(SELECTORS.adultCount, params.adultCount.toString());
+  }
+
+  // Infant count (under 2 years)
+  if (params.infantCount !== undefined) {
+    await page.selectOption(SELECTORS.infantCount, params.infantCount.toString());
+  }
+
+  // Click search button and wait for postback to complete
+  await Promise.all([page.waitForLoadState('networkidle'), page.click(SELECTORS.searchButton)]);
+
+  // Wait for the grid to be present (it should be there after postback)
+  await page.waitForSelector(SELECTORS.tripsGrid, { timeout: 10000 }).catch(() => null);
+
+  // Parse and return trips
+  const trips = await parseTripsTable(page);
+  return trips;
 }
 
 /**

@@ -10,6 +10,7 @@ export interface TripData {
   cost: number;
   departureLocation: string;
   city: string;
+  provinceCode?: string; // Province code used in original search
   agentName: string;
   groupCode: string;
   executorName: string;

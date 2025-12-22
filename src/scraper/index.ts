@@ -21,8 +21,8 @@ import type { IAtabatAdapter } from './adapter';
 import { getAdapterConfig } from './adapter';
 import { getMockAdapter } from './mockAdapter';
 import { getContext, isSessionValid } from './browser';
-import { searchTrips, selectTrip } from './trips';
-import { createReservation } from './reservation';
+import { searchTrips } from './trips';
+import { createReservationWithTrip } from './reservation';
 import { scrapeReceipt } from './receipt';
 import { authenticate } from './auth';
 
@@ -39,26 +39,9 @@ class RealAdapter implements IAtabatAdapter {
     tripData: TripData,
     passenger: PassengerInfo
   ): Promise<ReservationResult> {
-    const context = await getContext();
-    const page = await context.newPage();
-
-    try {
-      // Navigate to trips page first (required to execute postback)
-      await page.goto('https://atabatorg.haj.ir/Kargozar/KargroupResLock.aspx');
-
-      // Select the trip using stored button script
-      // This triggers postback and redirects to Reservation_cs.aspx?resId=<GUID>
-      if (!tripData.selectButtonScript) {
-        throw new Error('Trip missing selection script');
-      }
-      await selectTrip(page, tripData.selectButtonScript);
-
-      // Create reservation with passenger info
-      // At this point we're on the reservation page with a new resId in URL
-      return await createReservation(page, passenger);
-    } finally {
-      await page.close();
-    }
+    // Delegates to reservation.ts which handles the full flow:
+    // re-search for trip, match, select, fill form
+    return createReservationWithTrip(tripData, passenger);
   }
 
   async getReceipt(resId: string): Promise<ReceiptData> {

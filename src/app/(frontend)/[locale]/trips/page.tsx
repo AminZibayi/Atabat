@@ -172,7 +172,9 @@ export default function TripsPage() {
 
   const handleTripDetails = (trip: Trip) => {
     // Store full trip data in sessionStorage for the reservation page
-    sessionStorage.setItem('selectedTrip', JSON.stringify(trip));
+    // Include provinceCode from current search filters for re-search
+    const tripWithProvince = { ...trip, provinceCode: filters.province };
+    sessionStorage.setItem('selectedTrip', JSON.stringify(tripWithProvince));
     // Navigate to reservation page with tripIdentifier in URL
     router.push(`/reservations/new?trip=${encodeURIComponent(trip.tripIdentifier)}`);
   };

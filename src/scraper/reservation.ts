@@ -1,6 +1,10 @@
 // In the Name of God, the Creative, the Originator
 import { Page } from 'playwright';
-import { PassengerInfo, ReservationResult } from './types';
+import { PassengerInfo, ReservationResult, TripData, TripSearchParams } from './types';
+import { getContext } from './browser';
+import { searchTripsOnPage, selectTrip } from './trips';
+import { addDaysToJalali } from '@/utils/jalaliDate';
+import { convertToEnglishDigits } from '@/utils/digits';
 
 // Selectors
 const SELECTORS = {
@@ -13,7 +17,75 @@ const SELECTORS = {
   SUCCESS_TABLE: '#tblOk',
 };
 
-export async function createReservation(
+/**
+ * Complete reservation flow: re-search for trip, select it, and fill passenger form.
+ * This is the main entry point for reservation creation.
+ */
+export async function createReservationWithTrip(
+  tripData: TripData,
+  passenger: PassengerInfo
+): Promise<ReservationResult> {
+  const context = await getContext();
+  const page = await context.newPage();
+
+  try {
+    // The stored selectButtonScript is session-specific and will fail ASP.NET Event Validation
+    // We need to re-search for the trip to get a fresh script for the current session
+    // IMPORTANT: We must use the SAME PAGE for search and selection (postback tied to ViewState)
+
+    // Build search params from trip data
+    const nextDay = convertToEnglishDigits(addDaysToJalali(tripData.departureDate, 1));
+    const searchParams: TripSearchParams = {
+      dateFrom: tripData.departureDate,
+      dateTo: nextDay,
+      provinceCode: tripData.provinceCode,
+      // Map trip type back to borderType filter
+      borderType: tripData.tripType?.includes('هوایی')
+        ? '2'
+        : tripData.tripType?.includes('زمینی')
+          ? '1'
+          : undefined,
+    };
+
+    console.log(`[Scraper] Re-searching for trip: ${tripData.tripIdentifier}`);
+    const freshTrips = await searchTripsOnPage(page, searchParams);
+    console.log(`[Scraper] Found ${freshTrips.length} trips in fresh search`);
+
+    // Find the matching trip by tripIdentifier
+    const matchingTrip = freshTrips.find(t => t.tripIdentifier === tripData.tripIdentifier);
+
+    if (!matchingTrip) {
+      console.error(`[Scraper] Trip not found. Looking for: ${tripData.tripIdentifier}`);
+      return {
+        success: false,
+        message: 'سفر مورد نظر یافت نشد. ممکن است ظرفیت تکمیل شده باشد.',
+      };
+    }
+
+    if (!matchingTrip.selectButtonScript) {
+      return {
+        success: false,
+        message: 'امکان انتخاب این سفر وجود ندارد.',
+      };
+    }
+
+    console.log(`[Scraper] Found matching trip, selecting with fresh script...`);
+
+    // Select the trip using the fresh script from current page
+    await selectTrip(page, matchingTrip.selectButtonScript);
+
+    // Fill the reservation form with passenger info
+    return await fillReservationForm(page, passenger);
+  } finally {
+    // await page.close();
+  }
+}
+
+/**
+ * Fill the reservation form after trip is selected.
+ * Internal function - expects page to already be on reservation form.
+ */
+async function fillReservationForm(
   page: Page,
   passenger: PassengerInfo
 ): Promise<ReservationResult> {
@@ -86,4 +158,12 @@ export async function createReservation(
     console.error('Reservation creation failed', e);
     return { success: false, message: 'System error during reservation' };
   }
+}
+
+// Keep old function for backwards compatibility - deprecated
+export async function createReservation(
+  page: Page,
+  passenger: PassengerInfo
+): Promise<ReservationResult> {
+  return fillReservationForm(page, passenger);
 }

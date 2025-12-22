@@ -44,3 +44,41 @@ export function dateObjectToJalaliString(date: DateObject | null): string {
   if (!date) return '';
   return date.format('YYYY/MM/DD');
 }
+
+/**
+ * Add days to a Jalali date string and return the result in format YYYY/MM/DD
+ */
+export function addDaysToJalali(jalaliDate: string, days: number): string {
+  try {
+    // Convert any Persian/Arabic digits to English first
+    const persianToEnglish: Record<string, string> = {
+      '۰': '0',
+      '۱': '1',
+      '۲': '2',
+      '۳': '3',
+      '۴': '4',
+      '۵': '5',
+      '۶': '6',
+      '۷': '7',
+      '۸': '8',
+      '۹': '9',
+    };
+    let normalized = '';
+    for (const char of jalaliDate) {
+      normalized += persianToEnglish[char] || char;
+    }
+
+    const date = new DateObject({
+      date: normalized,
+      format: 'YYYY/MM/DD',
+      calendar: persian,
+      locale: persian_fa,
+    });
+    date.add(days, 'day');
+    return date.format('YYYY/MM/DD');
+  } catch (e) {
+    console.error('Failed to parse Jalali date:', jalaliDate, e);
+    // If parsing fails, return original date
+    return jalaliDate;
+  }
+}

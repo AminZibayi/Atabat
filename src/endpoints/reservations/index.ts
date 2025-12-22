@@ -73,7 +73,7 @@ export const createReservationHandler: PayloadHandler = async req => {
       lastName: pilgrim.lastName || '',
       nationalId: pilgrim.nationalId || '',
       phone: pilgrim.phone,
-      birthdate: pilgrim.birthdate || '1300/01/01',
+      birthdate: pilgrim.birthdate || '',
     };
 
     try {
