@@ -51,12 +51,13 @@ export default function ReservationsPage() {
   const fetchReservations = async () => {
     try {
       const response = await fetch('/api/reservations/list');
-      const data = await response.json();
-      if (data.reservations) {
-        setReservations(data.reservations);
-      } else if (data.docs) {
+      const result = await response.json();
+      // API returns {success, data: {reservations}, code}
+      if (result.success && result.data?.reservations) {
+        setReservations(result.data.reservations);
+      } else if (result.docs) {
         // Fallback for direct collection API response
-        setReservations(data.docs);
+        setReservations(result.docs);
       }
     } catch {
       console.error('Failed to fetch reservations');
