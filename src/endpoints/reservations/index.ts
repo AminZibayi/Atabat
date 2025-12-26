@@ -4,7 +4,7 @@ import { createReservation } from '@/scraper/reservation';
 import { getContext } from '@/scraper/browser';
 import { tripSelectionSchema } from '@/validations/trip';
 import { Pilgrim, Reservation } from '@/payload-types';
-import { AppError, ErrorCodes } from '@/utils/AppError';
+import { AppError, ErrorCodes, type ErrorCode } from '@/utils/AppError';
 import { successResponse, errorResponse } from '@/utils/apiResponse';
 
 export const createReservationHandler: PayloadHandler = async req => {
@@ -77,17 +77,27 @@ export const createReservationHandler: PayloadHandler = async req => {
     };
 
     try {
-      // Pass tripSnapshot directly - it includes selectButtonScript
       const reservationResult = await adapter.createReservation(tripSnapshot as any, passenger);
 
       if (!reservationResult.success) {
-        return errorResponse(
-          new AppError(
-            reservationResult.message || 'Reservation failed',
-            ErrorCodes.RESERVATION_CREATE_FAILED,
-            400
-          )
-        );
+        // Map specific Atabat error messages to error codes for i18n
+        const errorMessage = reservationResult.message || 'Reservation failed';
+        let errorCode: ErrorCode = ErrorCodes.RESERVATION_CREATE_FAILED;
+
+        // Check for duplicate registration (e.g., "زائري با کد ملي ... قبلا ثبت شده است")
+        if (errorMessage.includes('قبلا ثبت شده است') || errorMessage.includes('قبلا ثبت شده')) {
+          errorCode = ErrorCodes.RESERVATION_PASSENGER_DUPLICATE;
+        }
+        // Check for invalid passenger data
+        else if (
+          errorMessage.includes('نامعتبر') ||
+          errorMessage.includes('اشتباه') ||
+          errorMessage.includes('مطابقت ندارد')
+        ) {
+          errorCode = ErrorCodes.RESERVATION_PASSENGER_INVALID;
+        }
+
+        return errorResponse(new AppError(errorMessage, errorCode, 400));
       }
 
       // Save to Payload with externalResId (GUID from Atabat)

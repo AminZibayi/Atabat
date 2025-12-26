@@ -6,16 +6,74 @@ import { searchTripsOnPage, selectTrip } from './trips';
 import { addDaysToJalali } from '@/utils/jalaliDate';
 import { convertToEnglishDigits } from '@/utils/digits';
 
-// Selectors
+// Selectors based on actual HTML analysis
 const SELECTORS = {
+  // Form inputs
+  PASSENGER_TABLE: '#tblPassenger',
   NATIONAL_ID: '#txtMelliCode',
   BIRTHDATE: '#txtBDate',
   PHONE: '#txtEmergincyTel',
-  SAVE_BTN: '#ctl00_cp1_btnSave',
+
+  // Buttons
+  SAVE_BTN: '#ctl00_cp1_btnSave', // "ثبت" - triggers AJAX
+  CONFIRM_BTN: '#ctl00_cp1_btnSaveData', // "تائید و چاپ فیش" - form submit
+
+  // Feedback elements
   MSG_LABEL: '#lblmessage',
-  CONFIRM_BTN: '#ctl00_cp1_btnSaveData', // "تائید و چاپ فیش"
+  GLOBAL_MSG_LABEL: '#ctl00_cp1_lblmsg', // Shows errors like "زائري با کد ملي ... قبلا ثبت شده است"
+  PERSON_LIST_TABLE: '#myTable',
+  PERSON_ROW: '#myTable .personRow',
+
+  // Confirmation area
   SUCCESS_TABLE: '#tblOk',
 };
+
+// Timeout constants (in ms)
+const TIMEOUT = {
+  SHORT: 2000,
+  MEDIUM: 5000,
+  LONG: 10000,
+  AJAX: 15000,
+};
+
+/**
+ * Wait for the number of elements matching selector to exceed a threshold.
+ * Uses polling with page.evaluate for type safety.
+ */
+async function waitForRowCount(
+  page: Page,
+  selector: string,
+  minCount: number,
+  timeout: number
+): Promise<void> {
+  const pollInterval = 200;
+  const deadline = Date.now() + timeout;
+
+  while (Date.now() < deadline) {
+    const count = await page.$$eval(selector, els => els.length).catch(() => 0);
+    if (count > minCount) return;
+    await page.waitForTimeout(pollInterval);
+  }
+  throw new Error(`Timeout waiting for row count > ${minCount}`);
+}
+
+/**
+ * Wait for an element to have text content (length > 5).
+ * Uses polling with page.evaluate for type safety.
+ */
+async function waitForTextContent(page: Page, selector: string, timeout: number): Promise<void> {
+  const pollInterval = 200;
+  const deadline = Date.now() + timeout;
+
+  while (Date.now() < deadline) {
+    const text = await page
+      .$eval(selector, el => (el as HTMLElement).textContent?.trim() || '')
+      .catch(() => '');
+    if (text.length > 5) return;
+    await page.waitForTimeout(pollInterval);
+  }
+  throw new Error(`Timeout waiting for text in ${selector}`);
+}
 
 /**
  * Complete reservation flow: re-search for trip, select it, and fill passenger form.
@@ -29,17 +87,12 @@ export async function createReservationWithTrip(
   const page = await context.newPage();
 
   try {
-    // The stored selectButtonScript is session-specific and will fail ASP.NET Event Validation
-    // We need to re-search for the trip to get a fresh script for the current session
-    // IMPORTANT: We must use the SAME PAGE for search and selection (postback tied to ViewState)
-
     // Build search params from trip data
     const nextDay = convertToEnglishDigits(addDaysToJalali(tripData.departureDate, 1));
     const searchParams: TripSearchParams = {
       dateFrom: tripData.departureDate,
       dateTo: nextDay,
       provinceCode: tripData.provinceCode,
-      // Map trip type back to borderType filter
       borderType: tripData.tripType?.includes('هوایی')
         ? '2'
         : tripData.tripType?.includes('زمینی')
@@ -77,86 +130,241 @@ export async function createReservationWithTrip(
     // Fill the reservation form with passenger info
     return await fillReservationForm(page, passenger);
   } finally {
-    // await page.close();
+    // Keep page open for debugging in dev, close in prod
+    if (process.env.NODE_ENV === 'production') {
+      await page.close();
+    }
   }
 }
 
 /**
  * Fill the reservation form after trip is selected.
- * Internal function - expects page to already be on reservation form.
+ * Uses AJAX interception for reliable success/failure detection.
  */
 async function fillReservationForm(
   page: Page,
   passenger: PassengerInfo
 ): Promise<ReservationResult> {
+  console.log('[Scraper] Filling reservation form...');
+
+  // Setup dialog handler BEFORE any interaction
+  let dialogMessage = '';
+  const dialogHandler = async (dialog: any) => {
+    dialogMessage = dialog.message();
+    console.log('[Scraper] Dialog received:', dialogMessage);
+    await dialog.accept();
+  };
+  page.on('dialog', dialogHandler);
+
   try {
-    await page.waitForSelector(SELECTORS.NATIONAL_ID);
+    // Wait for form to be visible (it may start hidden)
+    await page.waitForSelector(SELECTORS.PASSENGER_TABLE, {
+      state: 'visible',
+      timeout: TIMEOUT.MEDIUM,
+    });
+
+    // Wait for input fields
+    await page.waitForSelector(SELECTORS.NATIONAL_ID, { timeout: TIMEOUT.SHORT });
 
     // Fill Form
+    console.log('[Scraper] Filling passenger data...');
     await page.fill(SELECTORS.NATIONAL_ID, passenger.nationalId);
     await page.fill(SELECTORS.BIRTHDATE, passenger.birthdate);
     await page.fill(SELECTORS.PHONE, passenger.phone);
 
-    // Handle Alerts
-    let alertMessage = '';
-    page.on('dialog', async dialog => {
-      alertMessage = dialog.message();
-      console.log('Dialog opened:', alertMessage);
-      await dialog.accept();
-    });
+    // Get initial row count in person list (to detect new additions)
+    const initialRowCount = await page
+      .$$eval(SELECTORS.PERSON_ROW, rows => rows.length)
+      .catch(() => 0);
+    console.log(`[Scraper] Initial person rows: ${initialRowCount}`);
 
-    // Click Save "ثبت"
+    // Setup AJAX response listener BEFORE clicking save
+    // The "ثبت" button triggers callAjaxRegister() which POSTs to Sabteahval_Validate
+    const ajaxResponsePromise = page
+      .waitForResponse(
+        resp => resp.url().includes('Sabteahval_Validate') || resp.url().includes('IsOmrehFishOk'),
+        { timeout: TIMEOUT.AJAX }
+      )
+      .catch(() => null);
+
+    // Click Save "ثبت" button
+    console.log('[Scraper] Clicking save button...');
     await page.click(SELECTORS.SAVE_BTN);
 
-    // Wait for result
-    // Could be successful table OR error message
-    try {
-      await Promise.race([
-        page.waitForSelector(SELECTORS.SUCCESS_TABLE, { timeout: 10000 }),
-        page.waitForFunction(
-          () => {
-            const el = document.querySelector('#lblmessage');
-            return el && el.textContent && el.textContent.length > 5;
-          },
-          { timeout: 10000 }
-        ),
-      ]);
-    } catch (e) {
-      // timeout
-    }
+    // Wait for AJAX response OR DOM changes OR dialog
+    const result = await Promise.race([
+      // Option 1: AJAX response (fastest)
+      ajaxResponsePromise.then(async resp => {
+        if (!resp) return null;
+        try {
+          const json = await resp.json();
+          console.log('[Scraper] AJAX response:', json);
+          return { type: 'ajax', data: json };
+        } catch {
+          return { type: 'ajax', data: null };
+        }
+      }),
 
-    // Check for error
-    const errorMsg = await page.$eval(SELECTORS.MSG_LABEL, el => el.textContent?.trim());
-    if (errorMsg) {
+      // Option 2: New row appears in person list (success indicator)
+      waitForRowCount(page, SELECTORS.PERSON_ROW, initialRowCount, TIMEOUT.LONG)
+        .then(() => ({ type: 'newRow' }))
+        .catch(() => null),
+
+      // Option 3: Error message appears in #lblmessage or #ctl00_cp1_lblmsg
+      waitForTextContent(page, SELECTORS.MSG_LABEL, TIMEOUT.LONG)
+        .then(() => ({ type: 'error' }))
+        .catch(() => null),
+
+      // Option 4: Global error message appears (e.g., duplicate registration)
+      waitForTextContent(page, SELECTORS.GLOBAL_MSG_LABEL, TIMEOUT.LONG)
+        .then(() => ({ type: 'globalError' }))
+        .catch(() => null),
+
+      // Option 5: Timeout fallback
+      new Promise(resolve => setTimeout(() => resolve({ type: 'timeout' }), TIMEOUT.LONG)),
+    ]);
+
+    console.log('[Scraper] Wait result:', result);
+
+    // Brief pause to let DOM settle after AJAX
+    await page.waitForTimeout(500);
+
+    // Check for error message first (inline message)
+    const errorMsg = await page
+      .$eval(SELECTORS.MSG_LABEL, el => el.textContent?.trim() || '')
+      .catch(() => '');
+
+    if (errorMsg && errorMsg.length > 5) {
+      console.log('[Scraper] Error from lblmessage:', errorMsg);
       return { success: false, message: errorMsg };
     }
 
-    // Check for Success Table and Confirm Button
-    if (await page.isVisible(SELECTORS.SUCCESS_TABLE)) {
-      // If we need to finalize immediately (as per user flow "submit button on that new table must be clicked")
-      if (await page.isVisible(SELECTORS.CONFIRM_BTN)) {
-        await page.click(SELECTORS.CONFIRM_BTN);
-        // This should redirect to Receipt or something?
-        // User says: "asp page will show an alert ... unless a new record is created on another table ... submit button on that new table must be clicked"
-        // After clicking, it might redirect or show new content.
-        await page.waitForNavigation({ waitUntil: 'domcontentloaded' }).catch(() => {});
+    // Check for global error message (e.g., "زائري با کد ملي ... قبلا ثبت شده است")
+    const globalErrorMsg = await page
+      .$eval(SELECTORS.GLOBAL_MSG_LABEL, el => el.textContent?.trim() || '')
+      .catch(() => '');
 
-        // Get Reservation ID from URL
-        const url = page.url();
-        const resId = new URL(url).searchParams.get('resId');
+    if (globalErrorMsg && globalErrorMsg.length > 5) {
+      console.log('[Scraper] Error from global lblmsg:', globalErrorMsg);
+      return { success: false, message: globalErrorMsg };
+    }
 
-        return { success: true, reservationId: resId || undefined };
+    // Check if new row was added (success case)
+    const currentRowCount = await page
+      .$$eval(SELECTORS.PERSON_ROW, rows => rows.length)
+      .catch(() => 0);
+
+    console.log(`[Scraper] Current person rows: ${currentRowCount}`);
+
+    if (currentRowCount > initialRowCount) {
+      console.log('[Scraper] Person added successfully, confirming reservation...');
+      return await confirmReservation(page);
+    }
+
+    // Check if confirm button is visible (alternative success indicator)
+    const confirmVisible = await page.isVisible(SELECTORS.CONFIRM_BTN);
+    if (confirmVisible) {
+      console.log('[Scraper] Confirm button visible, confirming reservation...');
+      return await confirmReservation(page);
+    }
+
+    // Fallback: unknown state
+    console.error('[Scraper] Unknown state after form submission');
+    return {
+      success: false,
+      message: dialogMessage || 'وضعیت نامشخص پس از ارسال فرم. لطفا مجددا تلاش کنید.',
+    };
+  } catch (error) {
+    console.error('[Scraper] Reservation creation failed:', error);
+    return {
+      success: false,
+      message: dialogMessage || 'خطای سیستمی در ایجاد رزرو. لطفا مجددا تلاش کنید.',
+    };
+  } finally {
+    page.off('dialog', dialogHandler);
+  }
+}
+
+/**
+ * Click the confirmation button and extract reservation ID from resulting URL.
+ * Handles two outcomes:
+ * 1. Success: Navigation to Receipt.aspx
+ * 2. Failure: Page reloads with error message in #ctl00_cp1_lblmsg
+ */
+async function confirmReservation(page: Page): Promise<ReservationResult> {
+  try {
+    // Wait for confirm button to be visible
+    await page.waitForSelector(SELECTORS.CONFIRM_BTN, {
+      state: 'visible',
+      timeout: TIMEOUT.SHORT,
+    });
+
+    console.log('[Scraper] Clicking confirmation button...');
+
+    // Click confirm button - this will either:
+    // 1. Navigate to Receipt.aspx (success)
+    // 2. Reload the page with error message (failure)
+    await page.click(SELECTORS.CONFIRM_BTN);
+
+    // Wait for either navigation to Receipt OR page load complete
+    await page.waitForLoadState('domcontentloaded', { timeout: TIMEOUT.LONG });
+
+    // Check if we navigated to Receipt page (success)
+    const currentUrl = page.url();
+    console.log('[Scraper] After confirmation, URL:', currentUrl);
+
+    if (currentUrl.includes('Receipt.aspx')) {
+      // Success - extract reservation ID
+      const urlObj = new URL(currentUrl);
+      const resId = urlObj.searchParams.get('resId') || urlObj.searchParams.get('resID');
+
+      if (resId) {
+        console.log('[Scraper] Reservation created successfully, ID:', resId);
+        return {
+          success: true,
+          reservationId: resId,
+          message: 'رزرو با موفقیت ثبت شد.',
+        };
       }
+
+      return {
+        success: true,
+        message: 'رزرو با موفقیت ثبت شد.',
+      };
     }
 
-    if (alertMessage) {
-      return { success: false, message: alertMessage };
+    // Page reloaded (not navigated to Receipt) - check for error message
+    const globalErrorMsg = await page
+      .$eval(SELECTORS.GLOBAL_MSG_LABEL, el => el.textContent?.trim() || '')
+      .catch(() => '');
+
+    if (globalErrorMsg && globalErrorMsg.length > 5) {
+      console.log('[Scraper] Error after confirmation:', globalErrorMsg);
+      return { success: false, message: globalErrorMsg };
     }
 
-    return { success: false, message: 'Unknown state after submission' };
-  } catch (e) {
-    console.error('Reservation creation failed', e);
-    return { success: false, message: 'System error during reservation' };
+    // Check for inline error message too
+    const inlineErrorMsg = await page
+      .$eval(SELECTORS.MSG_LABEL, el => el.textContent?.trim() || '')
+      .catch(() => '');
+
+    if (inlineErrorMsg && inlineErrorMsg.length > 5) {
+      console.log('[Scraper] Inline error after confirmation:', inlineErrorMsg);
+      return { success: false, message: inlineErrorMsg };
+    }
+
+    // Unknown state - page reloaded but no error found
+    console.error('[Scraper] Unknown state after confirmation');
+    return {
+      success: false,
+      message: 'وضعیت نامشخص پس از تایید. لطفا وضعیت رزرو را بررسی کنید.',
+    };
+  } catch (error) {
+    console.error('[Scraper] Confirmation failed:', error);
+    return {
+      success: false,
+      message: 'خطا در تایید نهایی رزرو. لطفا وضعیت را در پنل مدیریت بررسی کنید.',
+    };
   }
 }
 

@@ -25,7 +25,9 @@ export async function searchTrips(params: TripSearchParams): Promise<TripData[]>
   try {
     return await searchTripsOnPage(page, params);
   } finally {
-    await page.close();
+    if (process.env.NODE_ENV === 'production') {
+      await page.close();
+    }
   }
 }
 
