@@ -17,6 +17,7 @@ import { StaticPages } from './globals/StaticPages';
 
 import { tripSearchHandler } from '@/endpoints/trips';
 import { initiatePaymentHandler } from '@/endpoints/payments';
+import { OTPRefreshTask } from './jobs/otpRefreshTask';
 
 const filename = fileURLToPath(import.meta.url);
 const dirname = path.dirname(filename);
@@ -112,5 +113,18 @@ export default buildConfig({
       key: 'seed-static-pages',
       scriptPath: path.resolve(dirname, 'scripts/seed-static-pages.ts'),
     },
+    {
+      key: 'bale-login',
+      scriptPath: path.resolve(dirname, 'scripts/bale-login.ts'),
+    },
   ],
+  jobs: {
+    tasks: [OTPRefreshTask],
+    autoRun: [
+      {
+        cron: '0 0 * * *', // Run at midnight to handle scheduled OTP refresh
+        queue: 'nightly',
+      },
+    ],
+  },
 });

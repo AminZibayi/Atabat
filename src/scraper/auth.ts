@@ -1,16 +1,17 @@
 // In the Name of God, the Creative, the Originator
-import { Page } from 'playwright';
+import { Page, BrowserContext } from 'playwright';
+import { chromium } from 'playwright';
 import { getPayload } from 'payload';
 import config from '@payload-config';
 import { saveCookies, getContext } from './browser';
 import { solveCaptcha, refreshCaptcha, cleanupOCR } from './captcha';
+import { getLatestAtabatOTP } from './bale';
 
 // URLs
 const LOGIN_URL = 'https://atabatorg.haj.ir/login.aspx';
-const OTP_URL = 'https://atabatorg.haj.ir/Verify_MobileNo.aspx';
 
-// Login Page Selectors (from research/Login/ورود به سیستم.html)
-const LOGIN_SELECTORS = {
+// Login Page Selectors - exported for reuse
+export const LOGIN_SELECTORS = {
   USERNAME: '#tbUserName',
   PASSWORD: '#tbPass',
   CAPTCHA_IMAGE: '#captcha_image',
@@ -20,8 +21,8 @@ const LOGIN_SELECTORS = {
   ERROR_MSG: '#lblmsg',
 };
 
-// OTP Page Selectors (from research/OTP/Verify_MobileNo.aspx.html)
-const OTP_SELECTORS = {
+// OTP Page Selectors - exported for reuse
+export const OTP_SELECTORS = {
   OTP_INPUT: '#ctl00_cp1_txtCode',
   VERIFY_BTN: '#ctl00_cp1_btnVerifyCode',
   RESEND_BTN: '#ctl00_cp1_SendAgain',
@@ -31,18 +32,20 @@ const OTP_SELECTORS = {
 
 // Default max captcha attempts
 const DEFAULT_MAX_ATTEMPTS = 5;
+const HEADLESS = process.env.PLAYWRIGHT_HEADLESS === 'true';
 
-interface StoredCredentials {
+export interface StoredCredentials {
   username: string;
   password: string;
   otp: string;
+  otpLastUpdated: string | null;
   captchaMaxAttempts: number;
 }
 
 /**
  * Get authentication credentials from KargozarConfig global
  */
-async function getStoredCredentials(): Promise<StoredCredentials> {
+export async function getStoredCredentials(): Promise<StoredCredentials> {
   const payload = await getPayload({ config });
   const kargozarConfig = await payload.findGlobal({
     slug: 'kargozar-config',
@@ -51,19 +54,76 @@ async function getStoredCredentials(): Promise<StoredCredentials> {
   const username = kargozarConfig.username as string;
   const password = kargozarConfig.password as string;
   const otp = kargozarConfig.currentOTP as string;
+  const otpLastUpdated = kargozarConfig.otpLastUpdated as string | null;
   const captchaMaxAttempts = (kargozarConfig.captchaMaxAttempts as number) || DEFAULT_MAX_ATTEMPTS;
 
-  if (!username || !password || !otp) {
+  if (!username || !password) {
     throw new Error('Missing credentials in Kargozar Config');
   }
 
-  return { username, password, otp, captchaMaxAttempts };
+  return { username, password, otp, otpLastUpdated, captchaMaxAttempts };
+}
+
+/**
+ * Check if the OTP is expired (OTP expires at midnight, so check if it's from a previous day)
+ */
+export function isOTPExpired(otpLastUpdated: string | null): boolean {
+  if (!otpLastUpdated) {
+    console.log('[Auth] No OTP update timestamp found, considering expired');
+    return true;
+  }
+
+  const lastUpdateDate = new Date(otpLastUpdated);
+  const now = new Date();
+
+  // OTP expires at midnight, so check if the last update was on a different day
+  const lastUpdateDay = lastUpdateDate.toDateString();
+  const todayDay = now.toDateString();
+
+  const expired = lastUpdateDay !== todayDay;
+  if (expired) {
+    console.log(`[Auth] OTP expired (last updated: ${lastUpdateDay}, today: ${todayDay})`);
+  }
+
+  return expired;
+}
+
+/**
+ * Refresh OTP by scraping from Bale and updating the database
+ */
+export async function refreshOTPFromBale(): Promise<string | null> {
+  console.log('[Auth] Refreshing OTP from Bale...');
+
+  try {
+    const newOTP = await getLatestAtabatOTP();
+
+    if (!newOTP) {
+      console.error('[Auth] Failed to get OTP from Bale');
+      return null;
+    }
+
+    // Save new OTP to database
+    const payload = await getPayload({ config });
+    await payload.updateGlobal({
+      slug: 'kargozar-config',
+      data: {
+        currentOTP: newOTP,
+        otpLastUpdated: new Date().toISOString(),
+      },
+    });
+
+    console.log('[Auth] OTP refreshed and saved:', newOTP);
+    return newOTP;
+  } catch (error) {
+    console.error('[Auth] Failed to refresh OTP from Bale:', error);
+    return null;
+  }
 }
 
 /**
  * Check if we are on the login page
  */
-async function isOnLoginPage(page: Page): Promise<boolean> {
+export async function isOnLoginPage(page: Page): Promise<boolean> {
   return (
     page.url().toLowerCase().includes('login') || (await page.isVisible(LOGIN_SELECTORS.USERNAME))
   );
@@ -72,7 +132,7 @@ async function isOnLoginPage(page: Page): Promise<boolean> {
 /**
  * Check if we are on the OTP verification page
  */
-async function isOnOTPPage(page: Page): Promise<boolean> {
+export async function isOnOTPPage(page: Page): Promise<boolean> {
   return (
     page.url().toLowerCase().includes('verify_mobileno') ||
     (await page.isVisible(OTP_SELECTORS.OTP_INPUT))
@@ -82,7 +142,7 @@ async function isOnOTPPage(page: Page): Promise<boolean> {
 /**
  * Check if login was successful (redirected to Kargozar panel)
  */
-async function isLoginSuccessful(page: Page): Promise<boolean> {
+export async function isLoginSuccessful(page: Page): Promise<boolean> {
   const url = page.url().toLowerCase();
   return url.includes('default') && !url.includes('login');
 }
@@ -90,7 +150,7 @@ async function isLoginSuccessful(page: Page): Promise<boolean> {
 /**
  * Get error message from the page if present
  */
-async function getErrorMessage(page: Page, selector: string): Promise<string | null> {
+export async function getErrorMessage(page: Page, selector: string): Promise<string | null> {
   try {
     const errorElement = await page.$(selector);
     if (errorElement) {
@@ -104,9 +164,12 @@ async function getErrorMessage(page: Page, selector: string): Promise<string | n
 }
 
 /**
- * Step 1: Handle the login form with captcha
+ * Handle the login form with captcha
  */
-async function handleLoginForm(page: Page, credentials: StoredCredentials): Promise<boolean> {
+export async function handleLoginForm(
+  page: Page,
+  credentials: StoredCredentials
+): Promise<boolean> {
   console.log('[Auth] Handling login form...');
 
   let captchaSolved = false;
@@ -169,9 +232,9 @@ async function handleLoginForm(page: Page, credentials: StoredCredentials): Prom
 }
 
 /**
- * Step 2: Handle OTP verification
+ * Handle OTP verification
  */
-async function handleOTPVerification(page: Page, otp: string): Promise<boolean> {
+export async function handleOTPVerification(page: Page, otp: string): Promise<boolean> {
   console.log('[Auth] Handling OTP verification...');
 
   try {
@@ -213,7 +276,7 @@ async function handleOTPVerification(page: Page, otp: string): Promise<boolean> 
  * Main authentication function
  * Handles the two-step login process:
  * 1. Login with username/password/captcha
- * 2. OTP verification
+ * 2. OTP verification (auto-refreshes from Bale if expired)
  */
 export async function authenticate(): Promise<boolean> {
   const context = await getContext();
@@ -235,7 +298,20 @@ export async function authenticate(): Promise<boolean> {
 
     // Step 2: Handle OTP verification if needed
     if (await isOnOTPPage(page)) {
-      const otpSuccess = await handleOTPVerification(page, credentials.otp);
+      let otpToUse = credentials.otp;
+
+      // Check if OTP is expired and refresh from Bale if needed
+      if (isOTPExpired(credentials.otpLastUpdated) || !otpToUse) {
+        console.log('[Auth] OTP is expired or missing, refreshing from Bale...');
+        const freshOTP = await refreshOTPFromBale();
+        if (freshOTP) {
+          otpToUse = freshOTP;
+        } else {
+          throw new Error('Failed to refresh OTP from Bale');
+        }
+      }
+
+      const otpSuccess = await handleOTPVerification(page, otpToUse);
       if (!otpSuccess) {
         throw new Error('Failed to verify OTP');
       }
@@ -254,6 +330,100 @@ export async function authenticate(): Promise<boolean> {
     return false;
   } finally {
     await page.close();
+    await cleanupOCR();
+  }
+}
+
+/**
+ * Force fresh authentication and refresh OTP from Bale
+ * Used by cron job when OTP needs renewal at midnight.
+ * Creates a fresh browser context (no cookies) to force OTP page.
+ */
+export async function authenticateWithFreshOTP(): Promise<{
+  success: boolean;
+  newOTP?: string;
+  error?: string;
+}> {
+  console.log('[Auth] Starting fresh authentication with OTP refresh...');
+
+  // Launch fresh browser (no cookies to force new login)
+  const browser = await chromium.launch({
+    headless: HEADLESS,
+    args: ['--no-sandbox', '--disable-setuid-sandbox'],
+  });
+
+  const context = await browser.newContext({
+    userAgent:
+      'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+    viewport: { width: 1280, height: 720 },
+  });
+
+  const page = await context.newPage();
+
+  try {
+    const credentials = await getStoredCredentials();
+
+    // Step 1: Navigate to login
+    console.log('[Auth] Navigating to Atabat login...');
+    await page.goto(LOGIN_URL, { waitUntil: 'domcontentloaded' });
+    await page.waitForTimeout(2000);
+
+    // Step 2: Handle login form with captcha
+    if (await isOnLoginPage(page)) {
+      const loginSuccess = await handleLoginForm(page, credentials);
+      if (!loginSuccess) {
+        throw new Error('Failed to pass login form after max captcha attempts');
+      }
+    }
+
+    // Step 3: We should now be on OTP page - scrape fresh OTP from Bale
+    if (!(await isOnOTPPage(page))) {
+      throw new Error('Expected OTP page but got: ' + page.url());
+    }
+
+    console.log('[Auth] Scraping fresh OTP from Bale...');
+    const newOTP = await refreshOTPFromBale();
+
+    if (!newOTP) {
+      throw new Error('Failed to get OTP from Bale');
+    }
+
+    // Step 4: Enter OTP
+    const otpSuccess = await handleOTPVerification(page, newOTP);
+    if (!otpSuccess) {
+      throw new Error('Failed to verify OTP');
+    }
+
+    // Step 5: Save cookies
+    if (await isLoginSuccessful(page)) {
+      console.log('[Auth] Fresh authentication successful!');
+
+      // Save cookies to database
+      const payload = await getPayload({ config });
+      const cookies = await context.cookies();
+      await payload.updateGlobal({
+        slug: 'kargozar-config',
+        data: {
+          cookiesData: cookies,
+          cookiesExpireAt: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
+          lastAuthAt: new Date().toISOString(),
+        },
+      });
+
+      return { success: true, newOTP };
+    } else {
+      throw new Error('Authentication failed - unexpected page: ' + page.url());
+    }
+  } catch (error) {
+    console.error('[Auth] Fresh authentication failed:', error);
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : String(error),
+    };
+  } finally {
+    await page.close();
+    await context.close();
+    await browser.close();
     await cleanupOCR();
   }
 }

@@ -74,21 +74,4 @@ export const KargozarConfig: GlobalConfig = {
       },
     },
   ],
-  hooks: {
-    beforeChange: [
-      ({ data, req }) => {
-        if (
-          data.currentOTP &&
-          data.currentOTP !==
-            req.payload.config.globals
-              .find(g => g.slug === 'kargozar-config')
-              ?.fields.find(f => 'name' in f && f.name === 'currentOTP')
-        ) {
-          // If OTP changed, update timestamp
-          data.otpLastUpdated = new Date().toISOString();
-        }
-        return data;
-      },
-    ],
-  },
 };

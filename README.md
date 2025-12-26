@@ -63,6 +63,69 @@ Minimal Next.js + Payload CMS 3 starter wired for Postgres, Lexical editor, i18n
 - If admin assets fail to load, run `pnpm generate:importmap` to refresh
   aliases.
 
+## Bale OTP Scraper
+
+This project includes an automated OTP scraper that retrieves Atabat OTP codes from Bale messenger and refreshes them daily at midnight.
+
+### Features
+
+- **Automated OTP Refresh**: Daily cron job at midnight to scrape fresh OTP from Bale
+- **Session Management**: Uses Playwright's `storageState` API to persist both cookies and localStorage
+- **Smart OTP Detection**: Automatically checks if OTP is expired (from previous day) and refreshes when needed
+- **Authentication Flow**: Integrates with Atabat login to complete the authentication cycle
+
+### Setup
+
+1. **Initial Bale Login** (one-time):
+
+   ```bash
+   PLAYWRIGHT_HEADLESS=false pnpm payload bale-login
+   ```
+
+   - Opens browser to Bale login page
+   - Prompts for OTP in terminal
+   - Saves session to `data/bale-storage.json`
+
+2. **Configure Environment**:
+   ```bash
+   PLAYWRIGHT_HEADLESS=true  # Set to false to see browser during scraping
+   ```
+
+### Architecture
+
+- **`src/scraper/bale.ts`**: Core Bale scraper with Playwright best practices
+  - Uses `getByRole()`, `getByTestId()` for accessibility-based selectors
+  - Saves full browser state (cookies + localStorage) via `storageState()`
+  - Scrapes OTP from chat with "سازمان حج و زیارت" using regex pattern
+
+- **`src/scraper/auth.ts`**: Single source of truth for Atabat authentication
+  - Exports reusable functions: `handleLoginForm()`, `handleOTPVerification()`
+  - `authenticateWithFreshOTP()`: Forces fresh login and OTP scraping
+  - Auto-refreshes OTP from Bale when expired
+
+- **`src/jobs/otpRefreshTask.ts`**: Payload Jobs Queue task
+  - Runs daily at midnight (cron: `0 0 * * *`)
+  - Calls `authenticateWithFreshOTP()` from auth.ts
+  - Updates `KargozarConfig` global with new OTP and session cookies
+
+### Files
+
+- `data/bale-storage.json` - Bale session (cookies + localStorage)
+- `data/cookies.json` - Atabat session cookies
+- `src/globals/KargozarConfig/` - Stores OTP, credentials, and session data
+
+### Manual Testing
+
+To test OTP refresh manually:
+
+```bash
+# Via Payload CLI
+pnpm payload jobs:run --queue nightly
+
+# Via API (while dev server is running)
+curl http://localhost:3000/api/payload-jobs/run?queue=nightly
+```
+
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
