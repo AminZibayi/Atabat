@@ -232,44 +232,79 @@ export async function handleLoginForm(
 }
 
 /**
- * Handle OTP verification
+ * Handle OTP verification with retry logic
+ * Retries when OTP is incorrect by scraping fresh OTP from Bale
  */
-export async function handleOTPVerification(page: Page, otp: string): Promise<boolean> {
+export async function handleOTPVerification(
+  page: Page,
+  initialOTP: string,
+  maxRetries: number = 3
+): Promise<boolean> {
   console.log('[Auth] Handling OTP verification...');
 
-  try {
-    // Wait for OTP input to be visible
-    await page.waitForSelector(OTP_SELECTORS.OTP_INPUT, {
-      state: 'visible',
-      timeout: 10000,
-    });
+  let attempts = 0;
+  let otpToUse = initialOTP;
 
-    // Fill OTP
-    await page.fill(OTP_SELECTORS.OTP_INPUT, otp);
+  while (attempts < maxRetries) {
+    attempts++;
+    console.log(`[Auth] OTP verification attempt ${attempts}/${maxRetries}`);
 
-    // Click verify button
-    await page.click(OTP_SELECTORS.VERIFY_BTN);
+    try {
+      // Wait for OTP input to be visible
+      await page.waitForSelector(OTP_SELECTORS.OTP_INPUT, {
+        state: 'visible',
+        timeout: 10000,
+      });
 
-    // Wait for navigation
-    await page.waitForTimeout(3000);
+      // Clear and fill OTP
+      await page.fill(OTP_SELECTORS.OTP_INPUT, ''); // Clear first
+      await page.fill(OTP_SELECTORS.OTP_INPUT, otpToUse);
 
-    // Check for success
-    if (await isLoginSuccessful(page)) {
-      console.log('[Auth] OTP verification successful');
-      return true;
+      // Click verify button
+      await page.click(OTP_SELECTORS.VERIFY_BTN);
+
+      // Wait for navigation
+      await page.waitForTimeout(3000);
+
+      // Check for success
+      if (await isLoginSuccessful(page)) {
+        console.log('[Auth] OTP verification successful');
+        return true;
+      }
+
+      // Check for error
+      const errorMsg = await getErrorMessage(page, OTP_SELECTORS.ERROR_MSG);
+      if (errorMsg?.includes('کد وارد شده صحیح نمی باشد')) {
+        console.log(`[Auth] OTP incorrect (${errorMsg}), attempt ${attempts}/${maxRetries}`);
+
+        // If not last attempt, scrape fresh OTP from Bale
+        if (attempts < maxRetries) {
+          console.log('[Auth] Scraping fresh OTP from Bale...');
+          const freshOTP = await refreshOTPFromBale();
+          if (freshOTP) {
+            otpToUse = freshOTP;
+            console.log('[Auth] Got fresh OTP, retrying...');
+            continue; // Retry with new OTP
+          } else {
+            console.error('[Auth] Failed to get fresh OTP from Bale');
+            return false;
+          }
+        }
+      } else if (errorMsg) {
+        // Different error, don't retry
+        console.error(`[Auth] OTP verification error (non-retryable): ${errorMsg}`);
+        return false;
+      }
+    } catch (error) {
+      console.error(`[Auth] OTP verification attempt ${attempts} failed:`, error);
+      if (attempts >= maxRetries) {
+        return false;
+      }
     }
-
-    // Check for error
-    const errorMsg = await getErrorMessage(page, OTP_SELECTORS.ERROR_MSG);
-    if (errorMsg) {
-      console.error(`[Auth] OTP verification error: ${errorMsg}`);
-    }
-
-    return false;
-  } catch (error) {
-    console.error('[Auth] OTP verification failed:', error);
-    return false;
   }
+
+  console.error('[Auth] OTP verification failed after max retries');
+  return false;
 }
 
 /**
@@ -311,7 +346,7 @@ export async function authenticate(): Promise<boolean> {
         }
       }
 
-      const otpSuccess = await handleOTPVerification(page, otpToUse);
+      const otpSuccess = await handleOTPVerification(page, otpToUse, 3);
       if (!otpSuccess) {
         throw new Error('Failed to verify OTP');
       }
@@ -389,7 +424,7 @@ export async function authenticateWithFreshOTP(): Promise<{
     }
 
     // Step 4: Enter OTP
-    const otpSuccess = await handleOTPVerification(page, newOTP);
+    const otpSuccess = await handleOTPVerification(page, newOTP, 3);
     if (!otpSuccess) {
       throw new Error('Failed to verify OTP');
     }
