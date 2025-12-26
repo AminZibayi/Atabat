@@ -119,6 +119,11 @@ export default function NewReservationPage() {
         },
         body: JSON.stringify({
           tripSnapshot: trip, // Send full trip data including selectButtonScript
+          passengerOverrides: {
+            nationalId,
+            birthdate,
+            phone,
+          },
         }),
       });
 

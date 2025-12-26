@@ -48,6 +48,14 @@ export const tripSelectionSchema = z.object({
     })
     .passthrough(),
   passengerCount: z.number().int().min(1).optional().default(1),
+  // Optional overrides for passenger info (from reservation form)
+  passengerOverrides: z
+    .object({
+      nationalId: z.string().optional(),
+      birthdate: z.string().optional(),
+      phone: z.string().optional(),
+    })
+    .optional(),
 });
 
 export type TripSelectionInput = z.infer<typeof tripSelectionSchema>;

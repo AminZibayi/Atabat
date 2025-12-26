@@ -25,7 +25,7 @@ export const createReservationHandler: PayloadHandler = async req => {
       return errorResponse(validation.error);
     }
 
-    const { tripSnapshot } = validation.data;
+    const { tripSnapshot, passengerOverrides } = validation.data;
 
     // Validate tripSnapshot has required selectButtonScript
     if (!tripSnapshot.selectButtonScript) {
@@ -67,13 +67,13 @@ export const createReservationHandler: PayloadHandler = async req => {
     const { getAdapter } = await import('@/scraper');
     const adapter = getAdapter();
 
-    // Passenger info from logged in user
+    // Passenger info: use form overrides if provided, otherwise fall back to profile
     const passenger = {
       firstName: pilgrim.firstName || '',
       lastName: pilgrim.lastName || '',
-      nationalId: pilgrim.nationalId || '',
-      phone: pilgrim.phone,
-      birthdate: pilgrim.birthdate || '',
+      nationalId: passengerOverrides?.nationalId || pilgrim.nationalId || '',
+      phone: passengerOverrides?.phone || pilgrim.phone,
+      birthdate: passengerOverrides?.birthdate || pilgrim.birthdate || '',
     };
 
     try {
