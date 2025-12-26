@@ -6,8 +6,15 @@ import { searchTrips } from './trips';
 
 (async () => {
   try {
-    const success = await searchTrips();
-    console.log('Execution result:', success);
+    const trips = await searchTrips({
+      dateFrom: '1403/10/01',
+      dateTo: '1403/10/10',
+      provinceCode: '8', // Tehran
+      borderType: '1', // Land
+      adultCount: 1,
+      infantCount: 0,
+    });
+    console.log('Search result:', trips);
   } catch (error) {
     console.error('❌ Execution failed:', (error as Error).message);
   }

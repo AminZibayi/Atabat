@@ -9,6 +9,7 @@ export interface User {
   firstName?: string;
   lastName?: string;
   nationalId?: string;
+  birthdate?: string;
 }
 
 interface AuthState {
