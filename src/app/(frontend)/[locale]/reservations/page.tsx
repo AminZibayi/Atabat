@@ -76,7 +76,7 @@ export default function ReservationsPage() {
   };
 
   const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat('fa-IR').format(amount) + ' تومان';
+    return new Intl.NumberFormat('fa-IR').format(amount) + ' ریال';
   };
 
   return (

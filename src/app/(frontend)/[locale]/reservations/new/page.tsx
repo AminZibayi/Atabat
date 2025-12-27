@@ -93,7 +93,7 @@ function NewReservationContent() {
   }, [tripIdentifier]);
 
   const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat('fa-IR').format(amount) + ' تومان';
+    return new Intl.NumberFormat('fa-IR').format(amount) + ' ریال';
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
