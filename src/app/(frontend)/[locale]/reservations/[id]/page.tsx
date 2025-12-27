@@ -10,6 +10,7 @@ import { useRouter, Link } from '@/i18n/navigation';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import { StatusBadge, StatusType } from '@/components/ui/StatusBadge';
+import { PaymentOptionsModal } from '@/components/ui/PaymentOptionsModal';
 import styles from './page.module.css';
 
 type TripSnapshot = {
@@ -73,7 +74,7 @@ export default function ReservationDetailPage({ params }: PageParams) {
 
   const [reservation, setReservation] = useState<ReservationData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [isPaymentLoading, setIsPaymentLoading] = useState(false);
+  const [showPaymentModal, setShowPaymentModal] = useState(false);
   const [reservationId, setReservationId] = useState<string | null>(null);
 
   // Unwrap params
@@ -112,31 +113,12 @@ export default function ReservationDetailPage({ params }: PageParams) {
     }
   };
 
-  const handlePayment = async () => {
-    if (!reservation) return;
+  const handlePayment = () => {
+    setShowPaymentModal(true);
+  };
 
-    setIsPaymentLoading(true);
-    try {
-      const response = await fetch('/api/payments/initiate', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ reservationId: reservation.id }),
-      });
-
-      const data = await response.json();
-
-      if (response.ok && data.paymentUrl) {
-        // Redirect to payment gateway
-        window.location.href = data.paymentUrl;
-      } else {
-        toast.error(data.error || tCommon('error'));
-      }
-    } catch (error) {
-      console.error('Payment initiation failed:', error);
-      toast.error(tCommon('error'));
-    } finally {
-      setIsPaymentLoading(false);
-    }
+  const handleClosePaymentModal = () => {
+    setShowPaymentModal(false);
   };
 
   const formatCurrency = (amount: number) => {
@@ -335,7 +317,7 @@ export default function ReservationDetailPage({ params }: PageParams) {
 
             <div className={styles.actions}>
               {canPay && (
-                <Button onClick={handlePayment} isLoading={isPaymentLoading} fullWidth>
+                <Button onClick={handlePayment} fullWidth>
                   {t('details.payNow')}
                 </Button>
               )}
@@ -347,6 +329,25 @@ export default function ReservationDetailPage({ params }: PageParams) {
           </Card>
         </div>
       </div>
+
+      {/* Payment Options Modal */}
+      <PaymentOptionsModal
+        isOpen={showPaymentModal}
+        onClose={handleClosePaymentModal}
+        officeInfo={
+          receipt
+            ? {
+                agentName: receipt.agentName,
+                agentPhone: receipt.agentPhone,
+                agentAddress: receipt.agentAddress,
+              }
+            : undefined
+        }
+        passengers={receipt?.passengers?.map(p => ({
+          id: p.id,
+          nationalId: p.nationalId,
+        }))}
+      />
     </div>
   );
 }

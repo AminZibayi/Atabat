@@ -168,7 +168,23 @@
       "birthdate": "تاریخ تولد",
       "cost": "هزینه سفر",
       "paidOn": "تاریخ پرداخت",
-      "paymentComplete": "پرداخت انجام شد"
+      "paymentComplete": "پرداخت انجام شد",
+      "paymentModal": {
+        "title": "انتخاب روش پرداخت",
+        "or": "یا",
+        "inPerson": {
+          "title": "پرداخت حضوری",
+          "description": "تا ۲۴ ساعت آینده به دفتر مراجعه و پرداخت کنید",
+          "deadline": "مهلت پرداخت: ۲۴ ساعت"
+        },
+        "online": {
+          "title": "پرداخت آنلاین",
+          "description": "اطلاعات زیر را در سامانه پرداخت وارد کنید",
+          "passengerId": "شناسه زائر",
+          "nationalId": "کد ملی",
+          "payButton": "ورود به سامانه پرداخت"
+        }
+      }
     },
     "status": {
       "pending": "در انتظار",

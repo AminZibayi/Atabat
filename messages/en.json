@@ -168,7 +168,23 @@
       "birthdate": "Birth Date",
       "cost": "Trip Cost",
       "paidOn": "Paid On",
-      "paymentComplete": "Payment Completed"
+      "paymentComplete": "Payment Completed",
+      "paymentModal": {
+        "title": "Select Payment Method",
+        "or": "or",
+        "inPerson": {
+          "title": "In-Person Payment",
+          "description": "Visit the office within 24 hours to pay",
+          "deadline": "Payment deadline: 24 hours"
+        },
+        "online": {
+          "title": "Online Payment",
+          "description": "Enter the following information in the payment portal",
+          "passengerId": "Passenger ID",
+          "nationalId": "National ID",
+          "payButton": "Go to Payment Portal"
+        }
+      }
     },
     "status": {
       "pending": "Pending",
