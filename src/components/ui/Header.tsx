@@ -2,10 +2,11 @@
 
 // In the Name of God, the Creative, the Originator
 import { useLocale, useTranslations } from 'next-intl';
-import React from 'react';
+import React, { useState } from 'react';
 
 import { Link, usePathname } from '@/i18n/navigation';
 import { LanguageSwitcher } from './LanguageSwitcher';
+import { MobileMenu } from './MobileMenu';
 import { UserMenu } from './UserMenu';
 import styles from './Header.module.css';
 
@@ -13,6 +14,7 @@ export function Header() {
   const t = useTranslations('nav');
   const locale = useLocale();
   const pathname = usePathname();
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const navItems = [
     { href: '/', label: t('home') },
@@ -53,7 +55,10 @@ export function Header() {
         </div>
 
         {/* Mobile menu button */}
-        <button className={styles.mobileMenuBtn} aria-label="Menu">
+        <button
+          className={styles.mobileMenuBtn}
+          aria-label="Menu"
+          onClick={() => setIsMobileMenuOpen(true)}>
           <svg
             width="24"
             height="24"
@@ -67,6 +72,8 @@ export function Header() {
           </svg>
         </button>
       </div>
+
+      <MobileMenu isOpen={isMobileMenuOpen} onClose={() => setIsMobileMenuOpen(false)} />
     </header>
   );
 }

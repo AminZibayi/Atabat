@@ -11,6 +11,9 @@ export { Footer } from './Footer';
 
 export { Header } from './Header';
 
+export { MobileMenu } from './MobileMenu';
+export type { MobileMenuProps } from './MobileMenu';
+
 export { Input } from './Input';
 export type { InputProps } from './Input';
 
@@ -21,3 +24,6 @@ export type { SelectProps, SelectOption } from './Select';
 
 export { StatusBadge } from './StatusBadge';
 export type { StatusBadgeProps, StatusType } from './StatusBadge';
+
+export { UserMenu } from './UserMenu';
+export type { UserMenuProps } from './UserMenu';

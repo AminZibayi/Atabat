@@ -145,3 +145,18 @@
     opacity: 0.5;
   }
 }
+
+.dropdownTop {
+  top: auto;
+  bottom: calc(100% + 0.5rem);
+  transform: translateY(10px);
+}
+
+[dir='rtl'] .dropdownTop {
+  left: auto;
+  right: 0;
+}
+
+.dropdownTop.open {
+  transform: translateY(0);
+}
