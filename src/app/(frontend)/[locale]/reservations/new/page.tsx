@@ -3,7 +3,7 @@
 // In the Name of God, the Creative, the Originator
 import { useTranslations } from 'next-intl';
 import { useSearchParams } from 'next/navigation';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Suspense } from 'react';
 import toast from 'react-hot-toast';
 
 import { useAuth } from '@/hooks/useAuth';
@@ -33,7 +33,7 @@ interface TripData {
   selectButtonScript?: string;
 }
 
-export default function NewReservationPage() {
+function NewReservationContent() {
   const t = useTranslations('reservations.new');
   const tTrips = useTranslations('trips.details');
   const tCommon = useTranslations('common');
@@ -297,5 +297,22 @@ export default function NewReservationPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function NewReservationPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className={styles.page}>
+          <div className={styles.container}>
+            <div className={styles.loading}>
+              <div className={styles.spinner} />
+            </div>
+          </div>
+        </div>
+      }>
+      <NewReservationContent />
+    </Suspense>
   );
 }
