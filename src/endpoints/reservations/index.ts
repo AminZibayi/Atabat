@@ -100,6 +100,23 @@ export const createReservationHandler: PayloadHandler = async req => {
         return errorResponse(new AppError(errorMessage, errorCode, 400));
       }
 
+      // Scrape receipt data after successful reservation
+      let receiptData: Record<string, unknown> | null = null;
+      let paymentUrl: string | undefined = undefined;
+      if (reservationResult.reservationId) {
+        try {
+          console.log('[Reservation] Scraping receipt for:', reservationResult.reservationId);
+          const receipt = await adapter.getReceipt(reservationResult.reservationId);
+          // Cast to Record for Payload's JSON field type
+          receiptData = receipt as unknown as Record<string, unknown>;
+          paymentUrl = receipt.paymentUrl;
+          console.log('[Reservation] Receipt scraped successfully');
+        } catch (err) {
+          console.error('[Reservation] Failed to scrape receipt (non-fatal):', err);
+          // Continue without receipt - user can refresh later
+        }
+      }
+
       // Save to Payload with externalResId (GUID from Atabat)
       const newRes = await req.payload.create({
         collection: 'reservations',
@@ -108,6 +125,8 @@ export const createReservationHandler: PayloadHandler = async req => {
           externalResId: reservationResult.reservationId || 'UNKNOWN',
           status: 'pending',
           tripSnapshot: tripSnapshot,
+          receiptData: receiptData,
+          paymentUrl: paymentUrl,
           bookedAt: new Date().toISOString(),
         },
       });

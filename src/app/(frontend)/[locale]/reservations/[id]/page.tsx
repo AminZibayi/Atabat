@@ -22,11 +22,11 @@ type TripSnapshot = {
 };
 
 type ItineraryItem = {
-  order: number;
-  checkIn: string;
+  row: number;
+  entryDate: string;
   city: string;
   hotel: string;
-  checkOut: string;
+  exitDate: string;
 };
 
 type ReservationData = {
@@ -35,13 +35,14 @@ type ReservationData = {
   status: StatusType;
   tripSnapshot?: TripSnapshot;
   receiptData?: {
-    paymentDeadline?: string;
+    resId?: string;
+    expireDate?: string;
     city?: string;
     tripType?: string;
     departureDate?: string;
-    officeName?: string;
-    officePhone?: string;
-    officeAddress?: string;
+    agentName?: string;
+    agentPhone?: string;
+    agentAddress?: string;
     executorName?: string;
     itinerary?: ItineraryItem[];
     passengers?: Array<{
@@ -52,6 +53,7 @@ type ReservationData = {
       birthdate: string;
       cost: number;
     }>;
+    paymentUrl?: string;
   };
   paymentUrl?: string;
   bookedAt?: string;
@@ -233,22 +235,22 @@ export default function ReservationDetailPage({ params }: PageParams) {
             <Card className={styles.receiptCard}>
               <h2 className={styles.sectionTitle}>{t('details.receipt')}</h2>
 
-              {receipt.paymentDeadline && (
+              {receipt.expireDate && (
                 <div className={styles.deadline}>
                   <span className={styles.deadlineLabel}>{t('details.paymentDeadline')}</span>
-                  <span className={styles.deadlineValue}>{receipt.paymentDeadline}</span>
+                  <span className={styles.deadlineValue}>{receipt.expireDate}</span>
                 </div>
               )}
 
               {/* Office Info */}
-              {receipt.officeName && (
+              {receipt.agentName && (
                 <div className={styles.officeInfo}>
                   <h3>{t('details.officeInfo')}</h3>
                   <p>
-                    <strong>{receipt.officeName}</strong>
+                    <strong>{receipt.agentName}</strong>
                   </p>
-                  {receipt.officePhone && <p>📞 {receipt.officePhone}</p>}
-                  {receipt.officeAddress && <p>📍 {receipt.officeAddress}</p>}
+                  {receipt.agentPhone && <p>📞 {receipt.agentPhone}</p>}
+                  {receipt.agentAddress && <p>📍 {receipt.agentAddress}</p>}
                 </div>
               )}
 
@@ -269,11 +271,11 @@ export default function ReservationDetailPage({ params }: PageParams) {
                     <tbody>
                       {receipt.itinerary.map((item, idx) => (
                         <tr key={idx}>
-                          <td>{item.order}</td>
-                          <td>{item.checkIn}</td>
+                          <td>{item.row}</td>
+                          <td>{item.entryDate}</td>
                           <td>{item.city}</td>
                           <td>{item.hotel}</td>
-                          <td>{item.checkOut}</td>
+                          <td>{item.exitDate}</td>
                         </tr>
                       ))}
                     </tbody>
