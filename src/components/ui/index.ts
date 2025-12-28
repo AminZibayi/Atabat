@@ -19,6 +19,9 @@ export type { InputProps } from './Input';
 
 export { LanguageSwitcher } from './LanguageSwitcher';
 
+export { Logo } from './Logo';
+export type { LogoProps, LogoSize } from './Logo';
+
 export { Select } from './Select';
 export type { SelectProps, SelectOption } from './Select';
 

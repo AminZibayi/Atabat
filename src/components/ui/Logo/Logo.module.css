@@ -1,0 +1,25 @@
+/* In the Name of God, the Creative, the Originator */
+
+.logo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.image {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+/* Apply green/teal tint to match the app's accent color */
+.tinted .image {
+  filter: brightness(0) saturate(100%) invert(76%) sepia(45%) saturate(528%) hue-rotate(115deg)
+    brightness(92%) contrast(88%);
+}
+
+/* For dark backgrounds, use brightness filter to make the logo appear lighter */
+.inverted .image {
+  filter: brightness(0) invert(1);
+}

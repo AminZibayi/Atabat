@@ -1,36 +1,26 @@
+// In the Name of God, the Creative, the Originator
 'use client';
 
 import { useTheme } from '@payloadcms/ui';
 import * as React from 'react';
 
-const PlyaLogo = () => {
+const AdminLogo = () => {
   const { theme } = useTheme();
 
   return (
-    <div className="plya-logo">
-      {theme === 'dark' ? (
-        <img
-          alt="Plya Logo"
-          src="/logo_white-removebg_upscayl_3x.png"
-          style={{
-            width: 'auto',
-            height: '180px',
-            marginBottom: '-40px',
-          }}
-        />
-      ) : (
-        <img
-          alt="Plya Logo"
-          src="/logo-removebg_upscayl_3x.png"
-          style={{
-            width: 'auto',
-            height: '180px',
-            marginBottom: '-40px',
-          }}
-        />
-      )}
+    <div className="admin-logo">
+      <img
+        alt="Atabat Logo"
+        src="/logo.png"
+        style={{
+          width: 'auto',
+          height: '180px',
+          marginBottom: '-40px',
+          filter: theme === 'dark' ? 'brightness(0) invert(1)' : 'none',
+        }}
+      />
     </div>
   );
 };
 
-export default PlyaLogo;
+export default AdminLogo;

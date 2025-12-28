@@ -7,6 +7,7 @@ import toast from 'react-hot-toast';
 
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
+import { Logo } from '@/components/ui/Logo';
 import { Link } from '@/i18n/navigation';
 import styles from './page.module.css';
 
@@ -55,11 +56,7 @@ export default function LoginPage() {
         <div className={styles.formCard}>
           {/* Logo */}
           <div className={styles.logo}>
-            <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <circle cx="24" cy="24" r="20" stroke="currentColor" strokeWidth="2" />
-              <path d="M24 12L30 20H18L24 12Z" fill="currentColor" />
-              <path d="M24 36L18 28H30L24 36Z" fill="currentColor" />
-            </svg>
+            <Logo size="xl" />
           </div>
 
           <h1 className={styles.title}>{t('title')}</h1>

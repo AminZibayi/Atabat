@@ -5,6 +5,7 @@ import React from 'react';
 
 import { Header } from '@/components/ui/Header';
 import { Footer } from '@/components/ui/Footer';
+import { Logo } from '@/components/ui/Logo';
 import { Link } from '@/i18n/navigation';
 import styles from './page.module.css';
 
@@ -34,38 +35,7 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
             </div>
             <div className={styles.heroVisual}>
               <div className={styles.heroGlow} />
-              <svg
-                className={styles.heroIcon}
-                viewBox="0 0 200 200"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg">
-                <circle
-                  cx="100"
-                  cy="100"
-                  r="90"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  opacity="0.3"
-                />
-                <circle
-                  cx="100"
-                  cy="100"
-                  r="70"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  opacity="0.5"
-                />
-                <circle
-                  cx="100"
-                  cy="100"
-                  r="50"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  opacity="0.7"
-                />
-                <path d="M100 50L120 85H80L100 50Z" fill="currentColor" />
-                <path d="M100 150L80 115H120L100 150Z" fill="currentColor" />
-              </svg>
+              <Logo size="hero" className={styles.heroIcon} />
             </div>
           </div>
         </section>

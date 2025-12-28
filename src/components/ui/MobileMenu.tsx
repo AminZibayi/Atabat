@@ -7,6 +7,7 @@ import { createPortal } from 'react-dom';
 
 import { Link, usePathname } from '@/i18n/navigation';
 import { LanguageSwitcher } from './LanguageSwitcher';
+import { Logo } from './Logo';
 import { UserMenu } from './UserMenu';
 import styles from './MobileMenu.module.css';
 
@@ -76,7 +77,10 @@ export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
     <div className={styles.overlay} onClick={handleOverlayClick}>
       <div className={styles.drawer} role="dialog" aria-modal="true" aria-label="Navigation menu">
         <div className={styles.header}>
-          <span className={styles.title}>{locale === 'fa' ? 'عتبات' : 'Atabat'}</span>
+          <div className={styles.brand}>
+            <Logo size="sm" />
+            <span className={styles.title}>{locale === 'fa' ? 'عتبات' : 'Atabat'}</span>
+          </div>
           <button
             className={styles.closeBtn}
             onClick={onClose}

@@ -6,6 +6,7 @@ import React, { useState } from 'react';
 
 import { Link, usePathname } from '@/i18n/navigation';
 import { LanguageSwitcher } from './LanguageSwitcher';
+import { Logo } from './Logo';
 import { MobileMenu } from './MobileMenu';
 import { UserMenu } from './UserMenu';
 import styles from './Header.module.css';
@@ -26,15 +27,7 @@ export function Header() {
     <header className={styles.header}>
       <div className={styles.container}>
         <Link href="/" className={styles.logo}>
-          <svg
-            className={styles.logoIcon}
-            viewBox="0 0 32 32"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg">
-            <circle cx="16" cy="16" r="14" stroke="currentColor" strokeWidth="2" />
-            <path d="M16 8L20 14H12L16 8Z" fill="currentColor" />
-            <path d="M16 24L12 18H20L16 24Z" fill="currentColor" />
-          </svg>
+          <Logo size="md" />
           <span className={styles.logoText}>{locale === 'fa' ? 'عتبات' : 'Atabat'}</span>
         </Link>
 
