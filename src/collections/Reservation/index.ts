@@ -11,10 +11,14 @@ import {
 } from '@/endpoints/reservations';
 
 import { i18n } from '@/i18n';
+import { beforeReadReservation } from '@/hooks/beforeReadReservation';
 
 export const Reservations: CollectionConfig = {
   slug: 'reservations',
   labels: i18n.collections.reservations.labels,
+  hooks: {
+    beforeRead: [beforeReadReservation],
+  },
   // Custom endpoints at collection level to avoid conflict with /:id route
   endpoints: [
     {
@@ -114,6 +118,15 @@ export const Reservations: CollectionConfig = {
     {
       name: 'paidAt',
       type: 'date',
+    },
+    {
+      name: 'lastValidatedAt',
+      type: 'date',
+      defaultValue: () => new Date().toISOString(),
+      admin: {
+        description: 'Last time this reservation was validated against external system',
+        hidden: true,
+      },
     },
   ],
 };

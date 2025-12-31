@@ -314,6 +314,10 @@ export interface Reservation {
     | null;
   bookedAt?: string | null;
   paidAt?: string | null;
+  /**
+   * Last time this reservation was validated against external system
+   */
+  lastValidatedAt?: string | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -621,6 +625,7 @@ export interface ReservationsSelect<T extends boolean = true> {
   itinerary?: T;
   bookedAt?: T;
   paidAt?: T;
+  lastValidatedAt?: T;
   updatedAt?: T;
   createdAt?: T;
 }

@@ -9,6 +9,7 @@ export * from './trips';
 export * from './reservation';
 export * from './receipt';
 export * from './status';
+export * from './checkReservationExists';
 
 import type {
   TripSearchParams,
@@ -59,7 +60,10 @@ class RealAdapter implements IAtabatAdapter {
     try {
       return await isSessionValid(page);
     } finally {
-      await page.close();
+      // Keep page open for debugging in dev, close in prod
+      if (process.env.NODE_ENV === 'production') {
+        await page.close();
+      }
     }
   }
 
