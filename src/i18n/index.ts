@@ -1,5 +1,3 @@
-import { password } from 'payload/shared';
-
 // In the Name of God, the Creative, the Originator
 export const i18n = {
   collections: {

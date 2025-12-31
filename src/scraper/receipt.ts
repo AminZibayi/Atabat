@@ -1,6 +1,5 @@
 // In the Name of God, the Creative, the Originator
-import { Page } from 'playwright';
-import { ReceiptData, ItineraryItem, PassengerReceiptItem } from './types';
+import type { ReceiptData, ItineraryItem, PassengerReceiptItem } from './types';
 import { getContext, isSessionValid } from './browser';
 import { authenticate } from './auth';
 
@@ -34,7 +33,7 @@ export async function scrapeReceipt(resId: string): Promise<ReceiptData> {
 
     // Itinerary Table
     data.itinerary = await page.$$eval('#ctl00_cp1_grdReceiptPlan tbody tr', rows => {
-      const items: any[] = [];
+      const items: ItineraryItem[] = [];
       // Skip header
       for (const row of rows) {
         const cells = row.querySelectorAll('td');
@@ -52,7 +51,7 @@ export async function scrapeReceipt(resId: string): Promise<ReceiptData> {
 
     // Passengers Table
     data.passengers = await page.$$eval('#ctl00_cp1_grdPrePassenger tbody tr', rows => {
-      const items: any[] = [];
+      const items: PassengerReceiptItem[] = [];
       // Skip header
       for (const row of rows) {
         const cells = row.querySelectorAll('td');

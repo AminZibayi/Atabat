@@ -8,10 +8,13 @@ export const initiatePaymentHandler: PayloadHandler = async req => {
   if (!req.user || req.user.collection !== 'pilgrims') {
     return errorResponse(new AppError('Unauthorized', ErrorCodes.UNAUTHORIZED, 401));
   }
-  const pilgrim = req.user as unknown as Pilgrim & { collection: 'pilgrims' };
+  const _pilgrim = req.user as unknown as Pilgrim & { collection: 'pilgrims' };
 
   try {
-    const body = typeof req.json === 'function' ? await req.json() : (req as any).body;
+    const body: { reservationId?: string } =
+      typeof req.json === 'function'
+        ? await req.json()
+        : (req as unknown as { body: { reservationId?: string } }).body;
     const { reservationId } = body || {};
 
     if (!reservationId) {
@@ -26,7 +29,7 @@ export const initiatePaymentHandler: PayloadHandler = async req => {
         collection: 'reservations',
         id: reservationId,
       });
-    } catch (e) {
+    } catch (_e) {
       throw new AppError('Reservation not found', ErrorCodes.RESERVATION_NOT_FOUND, 404);
     }
 

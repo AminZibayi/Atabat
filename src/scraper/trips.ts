@@ -18,6 +18,11 @@ const SELECTORS = {
   tripsGrid: '#ctl00_cp1_grdKargroup',
 };
 
+// Type for ASP.NET page with __doPostBack
+interface WindowWithPostBack extends Window {
+  __doPostBack?: (eventTarget: string, eventArgument: string) => void;
+}
+
 export async function searchTrips(params: TripSearchParams): Promise<TripData[]> {
   const context = await getContext();
   const page = await context.newPage();
@@ -170,8 +175,9 @@ export async function selectTrip(page: Page, selectButtonScript: string): Promis
       page.evaluate(
         ({ target, arg }) => {
           // ASP.NET __doPostBack is a global function
-          if (typeof (window as any).__doPostBack === 'function') {
-            (window as any).__doPostBack(target, arg);
+          const w = window as unknown as WindowWithPostBack;
+          if (typeof w.__doPostBack === 'function') {
+            w.__doPostBack(target, arg);
           }
         },
         { target: eventTarget, arg: eventArgument }

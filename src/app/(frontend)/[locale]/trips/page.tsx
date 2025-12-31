@@ -46,7 +46,7 @@ interface Trip {
 export default function TripsPage() {
   const t = useTranslations('trips');
   const tApiErrors = useTranslations('api.result.error');
-  const tCommon = useTranslations('common');
+  const _tCommon = useTranslations('common');
 
   // Calculate default dates (today and today+14)
   const defaultDates = useMemo(

@@ -2,7 +2,6 @@
 import type { CollectionConfig } from 'payload';
 
 import { isAdmin } from '@/policies/isAdmin';
-import { isLoggedIn } from '@/policies/isLoggedIn';
 import { isReservationOwner } from '@/policies/isReservationOwner';
 import {
   createReservationHandler,

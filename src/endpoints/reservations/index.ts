@@ -1,8 +1,7 @@
 // In the Name of God, the Creative, the Originator
 import type { PayloadHandler } from 'payload';
-import { createReservation } from '@/scraper/reservation';
-import { getContext } from '@/scraper/browser';
 import { tripSelectionSchema } from '@/validations/trip';
+import { TripData } from '@/scraper/types';
 import { Pilgrim, Reservation } from '@/payload-types';
 import { AppError, ErrorCodes, type ErrorCode } from '@/utils/AppError';
 import { successResponse, errorResponse } from '@/utils/apiResponse';
@@ -17,7 +16,10 @@ export const createReservationHandler: PayloadHandler = async req => {
 
   try {
     // Safe body parsing
-    const body = typeof req.json === 'function' ? await req.json() : (req as any).body;
+    const body: unknown =
+      typeof req.json === 'function'
+        ? await req.json()
+        : (req as unknown as { body: unknown }).body;
 
     // Validation - now expects tripSnapshot with full trip data
     const validation = tripSelectionSchema.safeParse(body);
@@ -77,7 +79,10 @@ export const createReservationHandler: PayloadHandler = async req => {
     };
 
     try {
-      const reservationResult = await adapter.createReservation(tripSnapshot as any, passenger);
+      const reservationResult = await adapter.createReservation(
+        tripSnapshot as unknown as TripData,
+        passenger
+      );
 
       if (!reservationResult.success) {
         // Map specific Atabat error messages to error codes for i18n
@@ -182,7 +187,7 @@ export const getReceiptHandler: PayloadHandler = async req => {
         collection: 'reservations',
         id: parseInt(id as string),
       });
-    } catch (error) {
+    } catch (_error) {
       throw new AppError('Reservation not found', ErrorCodes.RESERVATION_NOT_FOUND, 404);
     }
 

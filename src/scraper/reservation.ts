@@ -1,5 +1,5 @@
 // In the Name of God, the Creative, the Originator
-import { Page } from 'playwright';
+import { Page, Dialog } from 'playwright';
 import { PassengerInfo, ReservationResult, TripData, TripSearchParams } from './types';
 import { getContext } from './browser';
 import { searchTripsOnPage, selectTrip } from './trips';
@@ -149,7 +149,7 @@ async function fillReservationForm(
 
   // Setup dialog handler BEFORE any interaction
   let dialogMessage = '';
-  const dialogHandler = async (dialog: any) => {
+  const dialogHandler = async (dialog: Dialog) => {
     dialogMessage = dialog.message();
     console.log('[Scraper] Dialog received:', dialogMessage);
     await dialog.accept();

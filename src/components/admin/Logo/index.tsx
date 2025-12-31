@@ -8,6 +8,7 @@ const AdminLogo = () => {
   const { theme } = useTheme();
 
   return (
+    // eslint-disable-next-line @next/next/no-img-element
     <div className="admin-logo">
       <img
         alt="Atabat Logo"

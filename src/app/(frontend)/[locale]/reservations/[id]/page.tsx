@@ -2,7 +2,7 @@
 
 // In the Name of God, the Creative, the Originator
 import { useTranslations } from 'next-intl';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import toast from 'react-hot-toast';
 
 import { useAuth } from '@/hooks/useAuth';
@@ -89,14 +89,7 @@ export default function ReservationDetailPage({ params }: PageParams) {
     }
   }, [isAuthLoading, isAuthenticated, router, reservationId]);
 
-  // Fetch reservation data
-  useEffect(() => {
-    if (isAuthenticated && reservationId) {
-      fetchReservation();
-    }
-  }, [isAuthenticated, reservationId]);
-
-  const fetchReservation = async () => {
+  const fetchReservation = useCallback(async () => {
     try {
       const response = await fetch(`/api/reservations/${reservationId}`);
       if (response.ok) {
@@ -111,7 +104,14 @@ export default function ReservationDetailPage({ params }: PageParams) {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [reservationId, tCommon]);
+
+  // Fetch reservation data
+  useEffect(() => {
+    if (isAuthenticated && reservationId) {
+      fetchReservation();
+    }
+  }, [isAuthenticated, reservationId, fetchReservation]);
 
   const handlePayment = () => {
     setShowPaymentModal(true);

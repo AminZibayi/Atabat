@@ -100,7 +100,7 @@ export async function saveBaleSession(context: BrowserContext): Promise<void> {
  * Load Bale session - kept for backward compatibility
  * Note: With storageState, loading is done at context creation time
  */
-export async function loadBaleSession(context: BrowserContext): Promise<boolean> {
+export async function loadBaleSession(_context: BrowserContext): Promise<boolean> {
   // With storageState approach, loading is handled in getBaleContext
   // This function is kept for backward compatibility but is no longer the primary method
   return await hasStoredSession();

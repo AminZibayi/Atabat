@@ -4,7 +4,6 @@ import type { SanitizedConfig } from 'payload';
 import { getPayload } from 'payload';
 import readline from 'readline';
 import {
-  getBaleBrowser,
   getBaleContext,
   closeBaleBrowser,
   saveBaleSession,

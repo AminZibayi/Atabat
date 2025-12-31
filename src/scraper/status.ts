@@ -1,9 +1,15 @@
 // In the Name of God, the Creative, the Originator
-import { Page } from 'playwright';
 import { getContext, isSessionValid } from './browser';
 import { authenticate } from './auth';
 
 const STATUS_URL = 'https://atabatorg.haj.ir/Kargozar/KargroupReslockStatus.aspx';
+
+interface StatusResult {
+  user: string;
+  regDate: string;
+  agent: string;
+  status: string;
+}
 
 export async function searchStatus(dateFrom?: string, dateTo?: string) {
   const context = await getContext();
@@ -16,10 +22,18 @@ export async function searchStatus(dateFrom?: string, dateTo?: string) {
     await page.goto(STATUS_URL);
 
     if (dateFrom) {
-      await page.$eval('#ctl00_cp1_txtDateFrom', (el: any, val: any) => (el.value = val), dateFrom);
+      await page.$eval(
+        '#ctl00_cp1_txtDateFrom',
+        (el: HTMLInputElement, val: string) => (el.value = val),
+        dateFrom
+      );
     }
     if (dateTo) {
-      await page.$eval('#ctl00_cp1_txtDateTo', (el: any, val: any) => (el.value = val), dateTo);
+      await page.$eval(
+        '#ctl00_cp1_txtDateTo',
+        (el: HTMLInputElement, val: string) => (el.value = val),
+        dateTo
+      );
     }
 
     // Click Load/Recover "بازیابی"
@@ -29,7 +43,7 @@ export async function searchStatus(dateFrom?: string, dateTo?: string) {
     // Parse Status Table
     // Need to return data, for now just returning raw count or basic info
     const results = await page.$$eval('#ctl00_cp1_grdResLockStatus tbody tr', rows => {
-      const items: any[] = [];
+      const items: StatusResult[] = [];
       for (const row of rows) {
         const cells = row.querySelectorAll('td');
         if (cells.length < 9) continue;

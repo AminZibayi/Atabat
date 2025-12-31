@@ -1,5 +1,5 @@
 // In the Name of God, the Creative, the Originator
-import { Page, BrowserContext } from 'playwright';
+import { Page } from 'playwright';
 import { chromium } from 'playwright';
 import { getPayload } from 'payload';
 import config from '@payload-config';

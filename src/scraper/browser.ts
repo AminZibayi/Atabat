@@ -1,6 +1,6 @@
 // In the Name of God, the Creative, the Originator
 
-import { chromium, Browser, BrowserContext, Page } from 'playwright';
+import { chromium, Browser, BrowserContext, Page, Cookie } from 'playwright';
 import path from 'path';
 import fs from 'fs/promises';
 import { getPayload } from 'payload';
@@ -93,7 +93,7 @@ export async function loadCookies(context: BrowserContext) {
     });
 
     if (kargozarConfig && kargozarConfig.cookiesData) {
-      const cookies = kargozarConfig.cookiesData as any[];
+      const cookies = kargozarConfig.cookiesData as Cookie[];
       if (cookies.length > 0) {
         await context.addCookies(cookies);
         console.log('Cookies loaded from DB');
@@ -110,7 +110,7 @@ export async function loadCookies(context: BrowserContext) {
     const cookies = JSON.parse(cookiesString);
     await context.addCookies(cookies);
     console.log('Cookies loaded from File');
-  } catch (error) {
+  } catch (_error) {
     // No cookies found, that's fine
     console.log('No stored cookies found.');
   }
@@ -131,7 +131,7 @@ export async function isSessionValid(page: Page): Promise<boolean> {
     // Check for specific element that should exist when logged in
     const kargozarName = await page.$('#ctl00_lblKargozarTitle'); // Check selector later
     return !!kargozarName;
-  } catch (e) {
+  } catch (_e) {
     return false;
   }
 }
