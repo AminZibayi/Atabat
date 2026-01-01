@@ -28,7 +28,6 @@ export const KargozarConfig: GlobalConfig = {
     {
       name: 'currentOTP',
       type: 'text',
-      required: true,
       label: i18n.collections.kargozarConfig.fields.currentOTP.label,
       admin: {
         description: 'Daily OTP code (valid for 24h)',
