@@ -45,7 +45,6 @@ export const KargozarConfig: GlobalConfig = {
       name: 'cookiesData',
       type: 'json',
       admin: {
-        readOnly: true,
         description: 'Active session cookies for the scraper',
       },
     },

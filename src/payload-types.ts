@@ -712,7 +712,7 @@ export interface KargozarConfig {
   /**
    * Daily OTP code (valid for 24h)
    */
-  currentOTP: string;
+  currentOTP?: string | null;
   otpLastUpdated?: string | null;
   /**
    * Active session cookies for the scraper
