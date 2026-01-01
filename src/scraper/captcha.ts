@@ -100,7 +100,7 @@ export async function preprocessCaptcha(
  */
 async function runPythonOCR(imagePath: string): Promise<OCRResult> {
   return new Promise((resolve, reject) => {
-    const python = spawn('python', [OCR_SCRIPT_PATH, imagePath], {
+    const python = spawn(process.env.PYTHON || 'python3', [OCR_SCRIPT_PATH, imagePath], {
       encoding: 'utf-8',
     } as never);
 
