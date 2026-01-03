@@ -19,6 +19,10 @@ Comprehensive guide for deploying the Atabat application on an Ubuntu server.
 # Install Node.js
 curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.3/install.sh | bash
 
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
+[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+
 nvm install --lts
 
 # Verify installation
@@ -32,7 +36,7 @@ node -v  # Should show v2x.x.x
 corepack enable
 
 # Verify
-pnpm -v  # Should show v9.x or v10.x
+pnpm -v
 ```
 
 ### 1.3 Install Python 3 and Dependencies
