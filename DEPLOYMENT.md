@@ -178,7 +178,19 @@ GRANT ALL PRIVILEGES ON DATABASE atabat TO atabat_user;
 
 ### 4.2 Run Migrations
 
-Migrations run automatically on first build/start. The Next.js + Payload setup handles schema creation.
+Run the database migrations to create the schema:
+
+```bash
+pnpm payload migrate
+```
+
+### 4.3 Seed Data
+
+Initialize the database with default static pages (About, Contact, Terms, etc.):
+
+```bash
+pnpm payload seed-static-pages
+```
 
 ---
 
@@ -521,6 +533,8 @@ tail -f logs/error.log
 | Restart app | `pm2 restart atabat`                    |
 | View logs   | `pm2 logs atabat`                       |
 | Build       | `pnpm build`                            |
+| Migrate     | `pnpm payload migrate`                  |
+| Seed Data   | `pnpm payload seed-static-pages`        |
 | Update deps | `pnpm install --frozen-lockfile`        |
 | Run OTP job | `pnpm payload jobs:run --queue nightly` |
 | Test OCR    | `python scripts/ocr_captcha.py <image>` |
