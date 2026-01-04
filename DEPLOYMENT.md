@@ -522,6 +522,74 @@ pm2 logs atabat --err --lines 100
 tail -f logs/error.log
 ```
 
+### Issue: Python OCR fails with "Unsupported hardware" (NNPACK) or "weights_only" errors
+
+This typically happens on modern Ubuntu systems (24.04+) where the system Python (3.12+) is too new for legacy PyTorch 1.8.1, or when the CPU does not support the NNPACK optimization library.
+
+#### Error Symptoms:
+
+[W NNPACK.cpp:56] Could not initialize NNPACK! Reason: Unsupported hardware.
+
+Error: Python OCR failed with code 1: {"error": "'weights_only' is an invalid keyword argument for load()"}
+
+A module that was compiled using NumPy 1.x cannot be run in NumPy 2.0.2
+
+#### Solution:
+
+You must isolate the OCR environment using Python 3.9 and specific legacy versions of the dependencies.
+
+Install System Build Dependencies:
+
+```bash
+sudo apt update && sudo apt install -y build-essential libssl-dev zlib1g-dev \
+libbz2-dev libreadline-dev libsqlite3-dev wget curl llvm \
+libncursesw5-dev xz-utils tk-dev libxml2-dev libxmlsec1-dev libffi-dev liblzma-dev
+```
+
+Setup Python 3.9 using pyenv:
+
+```bash
+# Install Python 3.9.13
+pyenv install 3.9.13
+
+# Move to your project directory and set the local version
+cd /home/ubuntu/var/www/atabat
+pyenv local 3.9.13
+```
+
+Recreate the Virtual Environment:
+
+```bash
+# Remove old environment if it exists
+rm -rf venv
+
+# Create a fresh 3.9 environment
+python -m venv venv
+source venv/bin/activate
+```
+
+Install Compatible Legacy Packages:
+
+```bash
+# Install Torch 1.8.1 (CPU version)
+pip install torch==1.8.1+cpu torchvision==0.9.1+cpu -f [https://download.pytorch.org/whl/lts/1.8/torch_lts.html](https://download.pytorch.org/whl/lts/1.8/torch_lts.html)
+
+# Force NumPy to version 1.x (to avoid NumPy 2.0 crashes)
+pip install "numpy<2"
+
+# Install EasyOCR version compatible with Torch 1.8.1
+pip install easyocr==1.4.1
+```
+
+Restart the Application:
+
+```bash
+# Ensure the environment is active when starting the app
+pm2 restart atabat-app
+```
+
+Note on NNPACK Error: The "Unsupported hardware" message is a warning regarding CPU optimization. By using the +cpu specific wheels and the downgraded easyocr version above, the OCR will bypass the incompatible hardware checks and function normally.
+
 ---
 
 ## Quick Reference
