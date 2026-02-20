@@ -9,7 +9,6 @@ import toast from 'react-hot-toast';
 import { Header } from '@/components/ui/Header';
 import { Footer } from '@/components/ui/Footer';
 import { Button } from '@/components/ui/Button';
-import { Input } from '@/components/ui/Input';
 import { Select } from '@/components/ui/Select';
 import { JalaliDatePicker } from '@/components/ui/JalaliDatePicker';
 import { Link } from '@/i18n/navigation';
@@ -147,6 +146,7 @@ export default function HomePage() {
 
             {/* Search Card */}
             <div className={styles.heroSearchCard}>
+              <div className={styles.heroSearchCardBar} />
               <form onSubmit={handleSearch} className={styles.heroForm}>
                 <div className={styles.heroFormGrid}>
                   <JalaliDatePicker
@@ -169,14 +169,6 @@ export default function HomePage() {
                     options={provinces}
                     value={filters.province}
                     onChange={e => setFilters({ ...filters, province: e.target.value })}
-                    fullWidth
-                  />
-                  <Input
-                    label={tSearch('minCapacity')}
-                    type="number"
-                    min="1"
-                    value={filters.minCapacity}
-                    onChange={e => setFilters({ ...filters, minCapacity: e.target.value })}
                     fullWidth
                   />
                   <Select

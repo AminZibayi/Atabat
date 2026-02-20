@@ -84,26 +84,28 @@
 /* Hero Search Card */
 .heroSearchCard {
   width: 100%;
-  max-width: 1100px;
-  background: rgba(255, 255, 255, 0.15);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.3);
+  max-width: 900px;
+  background: #ffffff;
   border-radius: var(--radius-2xl);
-  padding: var(--space-6);
+  overflow: hidden;
   box-shadow:
-    0 8px 32px rgba(0, 0, 0, 0.2),
-    0 2px 8px rgba(0, 0, 0, 0.1);
+    0 20px 60px rgba(0, 0, 0, 0.3),
+    0 4px 16px rgba(0, 0, 0, 0.15);
 }
 
-@media (min-width: 768px) {
-  .heroSearchCard {
-    padding: var(--space-8);
-  }
+.heroSearchCardBar {
+  height: 5px;
+  background: linear-gradient(90deg, var(--color-accent) 0%, var(--color-secondary) 100%);
 }
 
 .heroForm {
-  width: 100%;
+  padding: var(--space-6);
+}
+
+@media (min-width: 768px) {
+  .heroForm {
+    padding: var(--space-8);
+  }
 }
 
 .heroFormGrid {
@@ -120,7 +122,9 @@
 
 @media (min-width: 1024px) {
   .heroFormGrid {
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: 1fr 1fr 1fr 1fr auto;
+    gap: var(--space-4);
+    align-items: end;
   }
 }
 
@@ -128,19 +132,26 @@
   grid-column: 1 / -1;
 }
 
+@media (min-width: 1024px) {
+  .heroSearchBtnWrapper {
+    grid-column: auto;
+  }
+}
+
 .heroSearchBtn {
   background: linear-gradient(135deg, var(--color-accent) 0%, var(--color-secondary) 100%);
   color: var(--color-text-inverse);
-  font-size: var(--font-size-lg);
+  font-size: var(--font-size-base);
   font-weight: var(--font-weight-semibold);
   border-radius: var(--radius-xl);
   transition: all var(--transition-normal);
-  box-shadow: 0 4px 20px rgba(26, 92, 56, 0.2);
+  box-shadow: 0 4px 16px rgba(26, 92, 56, 0.35);
+  white-space: nowrap;
 }
 
 .heroSearchBtn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 30px rgba(26, 92, 56, 0.3);
+  transform: translateY(-1px);
+  box-shadow: 0 8px 24px rgba(26, 92, 56, 0.4);
 }
 
 /* ========================================
