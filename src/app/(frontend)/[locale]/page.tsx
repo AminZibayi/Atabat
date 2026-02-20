@@ -124,8 +124,10 @@ export default function HomePage() {
 
       // Navigate to trips page with search params
       router.push(`/trips?${params.toString()}`);
-    } catch {
-      toast.error('خطای شبکه، لطفا دوباره تلاش کنید');
+    } catch (error) {
+      // Handle unexpected errors during validation or navigation
+      toast.error('خطا در انجام عملیات، لطفا دوباره تلاش کنید');
+      console.error('Search form error:', error);
     }
   };
 
