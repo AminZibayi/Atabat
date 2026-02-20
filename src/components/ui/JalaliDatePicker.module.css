@@ -10,7 +10,7 @@
 .label {
   font-size: 0.875rem;
   font-weight: 500;
-  color: var(--color-text, #fff);
+  color: var(--color-text, #1a202c);
 }
 
 .inputWrapper {
@@ -22,10 +22,10 @@
 .dateInput {
   width: 100%;
   padding: 0.75rem 1rem;
-  background: var(--color-surface-hover, rgba(255, 255, 255, 0.05));
-  border: 1px solid var(--color-border, rgba(255, 255, 255, 0.1));
+  background: var(--color-surface-hover, rgba(26, 92, 56, 0.05));
+  border: 1px solid var(--color-border, #e2e8f0);
   border-radius: 0.75rem;
-  color: var(--color-text, #fff);
+  color: var(--color-text, #1a202c);
   font-size: 0.875rem;
   font-family: inherit;
   transition: all 0.2s ease;
@@ -35,18 +35,18 @@
 }
 
 .dateInput:hover {
-  border-color: var(--color-primary, #8b5cf6);
-  background: var(--color-surface-active, rgba(255, 255, 255, 0.08));
+  border-color: var(--color-primary, #1a5c38);
+  background: var(--color-surface-active, rgba(26, 92, 56, 0.08));
 }
 
 .dateInput:focus {
   outline: none;
-  border-color: var(--color-primary, #8b5cf6);
-  box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.15);
+  border-color: var(--color-primary, #1a5c38);
+  box-shadow: 0 0 0 3px rgba(26, 92, 56, 0.15);
 }
 
 .dateInput::placeholder {
-  color: var(--color-text-muted, rgba(255, 255, 255, 0.5));
+  color: var(--color-text-muted, rgba(26, 32, 44, 0.5));
 }
 
 /* Full width modifier */
@@ -62,10 +62,10 @@
 .inputWrapper :global(.rmdp-input) {
   width: 100% !important;
   padding: 0.75rem 1rem !important;
-  background: var(--color-surface-hover, rgba(255, 255, 255, 0.05)) !important;
-  border: 1px solid var(--color-border, rgba(255, 255, 255, 0.1)) !important;
+  background: var(--color-surface-hover, rgba(26, 92, 56, 0.05)) !important;
+  border: 1px solid var(--color-border, #e2e8f0) !important;
   border-radius: 0.75rem !important;
-  color: var(--color-text, #fff) !important;
+  color: var(--color-text, #1a202c) !important;
   font-size: 0.875rem !important;
   font-family: inherit !important;
   text-align: right !important;
@@ -75,16 +75,16 @@
 
 .inputWrapper :global(.rmdp-input:focus) {
   outline: none !important;
-  border-color: var(--color-primary, #8b5cf6) !important;
-  box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.15) !important;
+  border-color: var(--color-primary, #1a5c38) !important;
+  box-shadow: 0 0 0 3px rgba(26, 92, 56, 0.15) !important;
 }
 
 /* Calendar popup styling */
 .inputWrapper :global(.rmdp-wrapper) {
-  background: var(--color-surface, #1a1a2e) !important;
-  border: 1px solid var(--color-border, rgba(255, 255, 255, 0.1)) !important;
+  background: var(--color-surface, #ffffff) !important;
+  border: 1px solid var(--color-border, #e2e8f0) !important;
   border-radius: 1rem !important;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4) !important;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15) !important;
 }
 
 .inputWrapper :global(.rmdp-calendar) {
@@ -93,49 +93,49 @@
 
 .inputWrapper :global(.rmdp-header) {
   background: transparent !important;
-  border-bottom: 1px solid var(--color-border, rgba(255, 255, 255, 0.1)) !important;
+  border-bottom: 1px solid var(--color-border, #e2e8f0) !important;
   padding: 0.5rem !important;
 }
 
 .inputWrapper :global(.rmdp-header-values) {
-  color: var(--color-text, #fff) !important;
+  color: var(--color-text, #1a202c) !important;
   font-weight: 600 !important;
 }
 
 .inputWrapper :global(.rmdp-arrow) {
-  border-color: var(--color-text, #fff) !important;
+  border-color: var(--color-text, #1a202c) !important;
 }
 
 .inputWrapper :global(.rmdp-arrow:hover) {
-  border-color: var(--color-primary, #8b5cf6) !important;
+  border-color: var(--color-primary, #1a5c38) !important;
 }
 
 .inputWrapper :global(.rmdp-week-day) {
-  color: var(--color-text-muted, rgba(255, 255, 255, 0.5)) !important;
+  color: var(--color-text-muted, rgba(26, 32, 44, 0.5)) !important;
   font-size: 0.75rem !important;
 }
 
 .inputWrapper :global(.rmdp-day) {
-  color: var(--color-text, #fff) !important;
+  color: var(--color-text, #1a202c) !important;
 }
 
 .inputWrapper :global(.rmdp-day:not(.rmdp-disabled):hover span) {
-  background: var(--color-surface-hover, rgba(255, 255, 255, 0.1)) !important;
+  background: var(--color-surface-hover, rgba(26, 92, 56, 0.1)) !important;
 }
 
 .inputWrapper :global(.rmdp-day.rmdp-selected span:not(.highlight)) {
-  background: var(--color-primary, #8b5cf6) !important;
+  background: var(--color-primary, #1a5c38) !important;
   color: #fff !important;
-  box-shadow: 0 0 10px rgba(139, 92, 246, 0.3) !important;
+  box-shadow: 0 0 10px rgba(26, 92, 56, 0.3) !important;
 }
 
 .inputWrapper :global(.rmdp-day.rmdp-today span) {
-  background: var(--color-surface-active, rgba(255, 255, 255, 0.15)) !important;
-  color: var(--color-primary, #8b5cf6) !important;
+  background: var(--color-surface-active, rgba(26, 92, 56, 0.15)) !important;
+  color: var(--color-primary, #1a5c38) !important;
 }
 
 .inputWrapper :global(.rmdp-day.rmdp-disabled) {
-  color: var(--color-text-muted, rgba(255, 255, 255, 0.3)) !important;
+  color: var(--color-text-muted, rgba(26, 32, 44, 0.3)) !important;
 }
 
 .inputWrapper :global(.rmdp-day-picker) {
@@ -145,20 +145,20 @@
 /* Year/Month picker */
 .inputWrapper :global(.rmdp-year-picker),
 .inputWrapper :global(.rmdp-month-picker) {
-  background: var(--color-surface, #1a1a2e) !important;
+  background: var(--color-surface, #ffffff) !important;
 }
 
 .inputWrapper :global(.rmdp-year-picker .rmdp-ym),
 .inputWrapper :global(.rmdp-month-picker .rmdp-ym) {
-  color: var(--color-text, #fff) !important;
+  color: var(--color-text, #1a202c) !important;
 }
 
 .inputWrapper :global(.rmdp-year-picker .rmdp-ym:hover),
 .inputWrapper :global(.rmdp-month-picker .rmdp-ym:hover) {
-  background: var(--color-surface-hover, rgba(255, 255, 255, 0.1)) !important;
+  background: var(--color-surface-hover, rgba(26, 92, 56, 0.1)) !important;
 }
 
 .inputWrapper :global(.rmdp-year-picker .rmdp-ym.rmdp-selected),
 .inputWrapper :global(.rmdp-month-picker .rmdp-ym.rmdp-selected) {
-  background: var(--color-primary, #8b5cf6) !important;
+  background: var(--color-primary, #1a5c38) !important;
 }
