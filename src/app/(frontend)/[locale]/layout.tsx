@@ -65,9 +65,9 @@ export default async function LocaleLayout({
             toastOptions={{
               duration: 4000,
               style: {
-                background: 'var(--color-surface, #1a1a2e)',
-                color: 'var(--color-text, #fff)',
-                border: '1px solid var(--color-border, #333)',
+                background: 'var(--color-surface, #ffffff)',
+                color: 'var(--color-text-primary, #1a202c)',
+                border: '1px solid var(--color-border, #e2e8f0)',
                 borderRadius: '12px',
                 padding: '12px 16px',
                 fontFamily: 'inherit',

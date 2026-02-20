@@ -121,12 +121,12 @@
   text-decoration: none;
   border-radius: var(--radius-xl);
   transition: all var(--transition-normal);
-  box-shadow: 0 4px 20px rgba(20, 184, 166, 0.3);
+  box-shadow: 0 4px 20px rgba(26, 92, 56, 0.2);
 }
 
 .primaryBtn:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 30px rgba(20, 184, 166, 0.4);
+  box-shadow: 0 8px 30px rgba(26, 92, 56, 0.3);
   color: var(--color-text-inverse);
 }
 
@@ -259,7 +259,7 @@
   border-color: var(--color-accent);
   box-shadow:
     var(--shadow-lg),
-    0 0 30px rgba(20, 184, 166, 0.1);
+    0 0 30px rgba(26, 92, 56, 0.08);
 }
 
 .actionCard:hover::before {
