@@ -9,9 +9,7 @@ import config from '@/payload.config';
 import { Header } from '@/components/ui/Header';
 import { Footer } from '@/components/ui/Footer';
 import { LivePreviewListener } from '@/components/ui/LivePreviewListener';
-import { RichText } from '@/components/ui/RichText';
-import { useRandomHeroBackground } from '@/hooks/useRandomHeroBackground';
-import styles from '../static.module.css';
+import { AboutPageClient } from './AboutPageClient';
 
 export default async function AboutPage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;
@@ -37,44 +35,5 @@ export default async function AboutPage({ params }: { params: Promise<{ locale: 
       <AboutPageClient title={title} content={content} locale={locale} />
       <Footer />
     </>
-  );
-}
-
-// Client component wrapper
-function AboutPageClient({
-  title,
-  content,
-  locale,
-}: {
-  title: string;
-  content: any;
-  locale: string;
-}) {
-  const bgImage = useRandomHeroBackground();
-
-  return (
-    <main className={styles.page}>
-      <div
-        className={styles.header}
-        style={bgImage ? ({ '--hero-bg': `url("${bgImage}")` } as React.CSSProperties) : undefined}>
-        <div className={styles.container}>
-          <h1 className={styles.title}>{title}</h1>
-        </div>
-      </div>
-
-      <div className={styles.contentWrapper}>
-        <div className={styles.container}>
-          <div className={styles.content}>
-            {content ? (
-              <RichText data={content} />
-            ) : (
-              <div className={styles.empty}>
-                <p>{locale === 'fa' ? 'محتوایی وجود ندارد' : 'No content available'}</p>
-              </div>
-            )}
-          </div>
-        </div>
-      </div>
-    </main>
   );
 }

@@ -32,7 +32,7 @@ export function Logo({ size = 'md', className = '', inverted = false }: LogoProp
       style={{ width: pixelSize, height: pixelSize }}>
       <Image
         src="/logo.png"
-        alt="عتبات"
+        alt="موج زمزم"
         width={pixelSize}
         height={pixelSize}
         className={styles.image}
