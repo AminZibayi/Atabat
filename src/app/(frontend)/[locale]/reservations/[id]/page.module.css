@@ -1,6 +1,13 @@
 .page {
   min-height: calc(100vh - var(--header-height));
   background-color: var(--color-bg-secondary);
+  padding-bottom: var(--space-12);
+}
+
+@media (min-width: 768px) {
+  .page {
+    padding-bottom: var(--space-16);
+  }
 }
 
 .container {
