@@ -2,9 +2,13 @@
   position: sticky;
   top: 0;
   z-index: var(--z-sticky);
-  background-color: rgba(248, 249, 250, 0.92);
-  backdrop-filter: blur(12px);
-  border-bottom: 1px solid var(--color-border);
+  background-color: rgba(253, 253, 251, 0.92);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-bottom: 1px solid var(--color-border-gold);
+  box-shadow:
+    0 1px 0 rgba(212, 175, 55, 0.12),
+    0 2px 8px rgba(13, 38, 29, 0.04);
 }
 
 .container {
@@ -85,13 +89,14 @@
 .navLink.active::after {
   content: '';
   position: absolute;
-  bottom: -11px;
+  bottom: -13px;
   left: 50%;
   transform: translateX(-50%);
-  width: 24px;
+  width: 28px;
   height: 2px;
-  background-color: var(--color-accent);
+  background: var(--gradient-gold);
   border-radius: var(--radius-full);
+  box-shadow: 0 0 6px rgba(212, 175, 55, 0.5);
 }
 
 /* Actions */
@@ -112,17 +117,18 @@
   align-items: center;
   justify-content: center;
   padding: var(--space-2) var(--space-4);
-  background-color: var(--color-accent);
+  background: var(--gradient-green);
   color: var(--color-text-inverse);
   font-size: var(--font-size-sm);
   font-weight: var(--font-weight-medium);
   border-radius: var(--radius-md);
   text-decoration: none;
   transition: all var(--transition-fast);
+  box-shadow: 0 2px 8px rgba(17, 74, 53, 0.2);
 }
 
 .loginBtn:hover {
-  background-color: var(--color-accent-hover);
+  background: linear-gradient(to right, #0d3828, #114a35);
   color: var(--color-text-inverse);
   transform: translateY(-1px);
   box-shadow: var(--shadow-glow);

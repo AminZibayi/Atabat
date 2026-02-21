@@ -44,17 +44,37 @@
 
 /* Variants */
 .primary {
-  background-color: var(--color-accent);
+  background: var(--gradient-green);
   color: var(--color-text-inverse);
+  box-shadow: 0 2px 10px rgba(17, 74, 53, 0.25);
 }
 
 .primary:hover:not(:disabled) {
-  background-color: var(--color-accent-hover);
-  transform: translateY(-1px);
+  background: linear-gradient(to right, #0d3828, #114a35);
+  transform: translateY(-2px);
   box-shadow: var(--shadow-glow);
 }
 
 .primary:active:not(:disabled) {
+  transform: translateY(0);
+  box-shadow: 0 1px 4px rgba(17, 74, 53, 0.2);
+}
+
+/* Gold CTA variant (ikarbala.ir style) */
+.gold {
+  background: var(--gradient-gold);
+  color: #1a0a00;
+  font-weight: var(--font-weight-semibold);
+  box-shadow: 0 2px 10px rgba(212, 175, 55, 0.3);
+}
+
+.gold:hover:not(:disabled) {
+  background: linear-gradient(to right, #f59e0b, #d97706, #f59e0b);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-gold-glow);
+}
+
+.gold:active:not(:disabled) {
   transform: translateY(0);
 }
 
@@ -66,7 +86,8 @@
 
 .secondary:hover:not(:disabled) {
   background-color: var(--color-surface-hover);
-  border-color: var(--color-border-light);
+  border-color: var(--color-accent);
+  color: var(--color-accent);
 }
 
 .ghost {

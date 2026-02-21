@@ -1,7 +1,11 @@
 .footer {
   margin-top: auto;
   background-color: var(--color-bg-secondary);
-  border-top: 1px solid var(--color-border);
+  border-top: 1px solid var(--color-border-gold);
+  background-image: var(--gradient-glow-gold);
+  background-repeat: no-repeat;
+  background-position: top center;
+  background-size: 60% 120px;
 }
 
 .container {

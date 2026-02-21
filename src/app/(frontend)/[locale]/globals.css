@@ -1,6 +1,7 @@
 /*
- * Atabat Design System
- * A premium light theme with Islamic green and gold accents
+ * Moj Zamzam Design System
+ * A premium light theme inspired by ikarbala.ir
+ * Deep Karbala Green + Warm Gold accents
  * Full RTL support for Persian/Arabic
  */
 
@@ -14,43 +15,50 @@
    CSS CUSTOM PROPERTIES (Design Tokens)
    ============================================ */
 :root {
-  /* Colors - Light Theme */
-  --color-bg-primary: #f8f9fa;
-  --color-bg-secondary: #ffffff;
-  --color-bg-tertiary: #f0f4f8;
+  /* Colors - Light Theme (ikarbala.ir inspired) */
+  --color-bg-primary: #fdfdfb;
+  --color-bg-secondary: #fcfbf8;
+  --color-bg-tertiary: #f4f2eb;
   --color-bg-elevated: #ffffff;
-  --color-bg-hover: #f0f4f8;
+  --color-bg-hover: #f4f2eb;
 
   /* Surface colors for cards, modals */
   --color-surface: #ffffff;
-  --color-surface-hover: #f8f9fa;
-  --color-surface-active: #f0f4f8;
+  --color-surface-warm: #fdfdfb;
+  --color-surface-hover: #f8f6ef;
+  --color-surface-active: #f0ede2;
 
   /* Border colors */
-  --color-border: #e2e8f0;
-  --color-border-light: #cbd5e1;
-  --color-border-focus: #1a5c38;
+  --color-border: #e8e4d8;
+  --color-border-light: #d6d0be;
+  --color-border-focus: #114a35;
+  --color-border-gold: rgba(212, 175, 55, 0.3);
 
-  /* Accent - Deep Green (Islamic/Karbala theme) */
-  --color-accent: #1a5c38;
-  --color-accent-hover: #14472c;
-  --color-accent-light: #22763f;
-  --color-accent-muted: rgba(26, 92, 56, 0.1);
+  /* Primary Accent - Deep Karbala Green */
+  --color-accent: #114a35;
+  --color-accent-hover: #0d3828;
+  --color-accent-light: #1a6b4a;
+  --color-accent-muted: rgba(17, 74, 53, 0.1);
+  --color-accent-subtle: rgba(17, 74, 53, 0.05);
 
-  /* Secondary accent - Gold */
-  --color-secondary: #c9a84c;
-  --color-secondary-hover: #b8960a;
+  /* Secondary Accent - Warm Islamic Gold */
+  --color-secondary: #d4af37;
+  --color-secondary-bright: #f9bb1f;
+  --color-secondary-hover: #c09a20;
+  --color-secondary-muted: rgba(212, 175, 55, 0.15);
+  --color-secondary-subtle: rgba(212, 175, 55, 0.07);
 
-  /* Text colors */
-  --color-text-primary: #1a202c;
-  --color-text-secondary: #4a5568;
-  --color-text-tertiary: #718096;
-  --color-text-muted: #a0aec0;
+  /* Text colors - warmer, greener tone */
+  --color-text-primary: #0d261d;
+  --color-text-secondary: #3d5a4f;
+  --color-text-tertiary: #6b8a7e;
+  --color-text-muted: #a0b3ac;
   --color-text-inverse: #ffffff;
+  --color-text-gold: #d4af37;
 
   /* Status colors */
-  --color-success: #22c55e;
-  --color-success-bg: rgba(34, 197, 94, 0.1);
+  --color-success: #10b981;
+  --color-success-bg: rgba(16, 185, 129, 0.1);
   --color-warning: #d97706;
   --color-warning-bg: rgba(217, 119, 6, 0.1);
   --color-error: #dc2626;
@@ -61,8 +69,42 @@
   /* Reservation status */
   --color-status-pending: #d97706;
   --color-status-confirmed: #2563eb;
-  --color-status-paid: #22c55e;
+  --color-status-paid: #10b981;
   --color-status-cancelled: #dc2626;
+
+  /* ========== Gradient Palette (ikarbala.ir inspired) ========== */
+
+  /* Gold gradients */
+  --gradient-gold: linear-gradient(to right, #fbbf24, #f59e0b, #fbbf24);
+  --gradient-gold-shimmer: linear-gradient(to right, #d4af37, #f5e6a3, #d4af37);
+  --gradient-gold-soft: linear-gradient(
+    to right,
+    rgba(212, 175, 55, 0.5),
+    rgba(245, 230, 163, 0.6),
+    rgba(212, 175, 55, 0.5)
+  );
+
+  /* Green gradients */
+  --gradient-green: linear-gradient(to right, #114a35, #166534);
+  --gradient-green-light: linear-gradient(to right, #114a35, #10b981, #114a35);
+  --gradient-green-rich: linear-gradient(to right bottom, #114a35, #114a35, rgba(17, 74, 53, 0.8));
+
+  /* Combined / hero gradients */
+  --gradient-green-gold: linear-gradient(to right, #114a35, #f9bb1f, #114a35);
+  --gradient-hero-overlay: linear-gradient(
+    to bottom,
+    rgba(13, 38, 29, 0.55),
+    rgba(13, 38, 29, 0.8)
+  );
+  --gradient-section-fade: linear-gradient(#fdfdfb, rgba(239, 245, 242, 0.1), #fdfdfb);
+
+  /* Radial glows */
+  --gradient-glow-gold: radial-gradient(circle, rgba(212, 175, 55, 0.4) 0%, rgba(0, 0, 0, 0) 70%);
+  --gradient-glow-green: radial-gradient(
+    80% 50% at 50% -10%,
+    rgba(17, 74, 53, 0.15) 0%,
+    rgba(0, 0, 0, 0) 60%
+  );
 
   /* Typography */
   --font-family-en: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
@@ -109,12 +151,13 @@
   --radius-2xl: 1.5rem;
   --radius-full: 9999px;
 
-  /* Shadows - lighter for light theme */
-  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.07), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
-  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -4px rgba(0, 0, 0, 0.05);
-  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
-  --shadow-glow: 0 0 20px rgba(26, 92, 56, 0.2);
+  /* Shadows - warm tinted for this palette */
+  --shadow-sm: 0 1px 2px 0 rgba(13, 38, 29, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(13, 38, 29, 0.07), 0 2px 4px -2px rgba(13, 38, 29, 0.05);
+  --shadow-lg: 0 10px 15px -3px rgba(13, 38, 29, 0.09), 0 4px 6px -4px rgba(13, 38, 29, 0.06);
+  --shadow-xl: 0 20px 25px -5px rgba(13, 38, 29, 0.12), 0 8px 10px -6px rgba(13, 38, 29, 0.07);
+  --shadow-glow: 0 0 24px rgba(17, 74, 53, 0.25);
+  --shadow-gold-glow: 0 0 24px rgba(212, 175, 55, 0.3);
 
   /* Transitions */
   --transition-fast: 150ms ease;
