@@ -10,6 +10,7 @@ import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import { StatusBadge, StatusType } from '@/components/ui/StatusBadge';
 import { Link } from '@/i18n/navigation';
+import { useRandomHeroBackground } from '@/hooks/useRandomHeroBackground';
 import styles from './page.module.css';
 
 interface Reservation {
@@ -34,6 +35,8 @@ export default function ReservationsPage() {
   const [reservations, setReservations] = useState<Reservation[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [activeFilter, setActiveFilter] = useState<string>('all');
+
+  const bgImage = useRandomHeroBackground();
 
   // Redirect to login if not authenticated
   useEffect(() => {
@@ -81,12 +84,16 @@ export default function ReservationsPage() {
 
   return (
     <div className={styles.page}>
-      <div className={styles.container}>
-        <div className={styles.header}>
+      <div
+        className={styles.header}
+        style={bgImage ? ({ '--hero-bg': `url("${bgImage}")` } as React.CSSProperties) : undefined}>
+        <div className={styles.container}>
           <h1 className={styles.title}>{t('title')}</h1>
           <p className={styles.subtitle}>{t('subtitle')}</p>
         </div>
+      </div>
 
+      <div className={styles.container}>
         {/* Filters */}
         <div className={styles.filters}>
           {filters.map(filter => (

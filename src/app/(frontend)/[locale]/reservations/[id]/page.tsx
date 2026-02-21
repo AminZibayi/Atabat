@@ -11,6 +11,7 @@ import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import { StatusBadge, StatusType } from '@/components/ui/StatusBadge';
 import { PaymentOptionsModal } from '@/components/ui/PaymentOptionsModal';
+import { useRandomHeroBackground } from '@/hooks/useRandomHeroBackground';
 import styles from './page.module.css';
 
 type TripSnapshot = {
@@ -76,6 +77,8 @@ export default function ReservationDetailPage({ params }: PageParams) {
   const [isLoading, setIsLoading] = useState(true);
   const [showPaymentModal, setShowPaymentModal] = useState(false);
   const [reservationId, setReservationId] = useState<string | null>(null);
+
+  const bgImage = useRandomHeroBackground();
 
   // Unwrap params
   useEffect(() => {
@@ -163,12 +166,14 @@ export default function ReservationDetailPage({ params }: PageParams) {
 
   return (
     <div className={styles.page}>
-      <div className={styles.container}>
-        {/* Header */}
-        <div className={styles.header}>
+      {/* Header */}
+      <div
+        className={styles.header}
+        style={bgImage ? ({ '--hero-bg': `url("${bgImage}")` } as React.CSSProperties) : undefined}>
+        <div className={styles.container}>
           <div className={styles.headerTop}>
             <Link href="/reservations" className={styles.backLink}>
-              <Button variant="ghost" size="sm">
+              <Button variant="ghost" size="sm" className={styles.backBtn}>
                 → {tCommon('back')}
               </Button>
             </Link>
@@ -179,7 +184,9 @@ export default function ReservationDetailPage({ params }: PageParams) {
             {t('card.bookingId')}: {reservation.externalResId || reservation.id}
           </p>
         </div>
+      </div>
 
+      <div className={styles.container}>
         <div className={styles.grid}>
           {/* Trip Info Card */}
           <Card className={styles.tripCard}>

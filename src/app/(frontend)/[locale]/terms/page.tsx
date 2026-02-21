@@ -10,6 +10,7 @@ import { Header } from '@/components/ui/Header';
 import { Footer } from '@/components/ui/Footer';
 import { LivePreviewListener } from '@/components/ui/LivePreviewListener';
 import { RichText } from '@/components/ui/RichText';
+import { useRandomHeroBackground } from '@/hooks/useRandomHeroBackground';
 import styles from '../static.module.css';
 
 export default async function TermsPage({ params }: { params: Promise<{ locale: string }> }) {
@@ -42,18 +43,39 @@ export default async function TermsPage({ params }: { params: Promise<{ locale: 
     <>
       {isDraftMode && <LivePreviewListener />}
       <Header />
-      <main className={styles.page}>
-        <div className={styles.container}>
-          <div className={styles.header}>
-            <h1 className={styles.title}>{title}</h1>
-            {lastUpdated && (
-              <p className={styles.lastUpdated}>
-                {locale === 'fa' ? 'آخرین بروزرسانی: ' : 'Last updated: '}
-                {formatDate(lastUpdated)}
-              </p>
-            )}
-          </div>
+      <TermsPageClient
+        title={title}
+        content={content}
+        locale={locale}
+        lastUpdated={lastUpdated}
+        formatDate={formatDate}
+      />
+      <Footer />
+    </>
+  );
+}
 
+function TermsPageClient({ title, content, locale, lastUpdated, formatDate }: any) {
+  const bgImage = useRandomHeroBackground();
+
+  return (
+    <main className={styles.page}>
+      <div
+        className={styles.header}
+        style={bgImage ? ({ '--hero-bg': `url("${bgImage}")` } as React.CSSProperties) : undefined}>
+        <div className={styles.container}>
+          <h1 className={styles.title}>{title}</h1>
+          {lastUpdated && (
+            <p className={styles.lastUpdated}>
+              {locale === 'fa' ? 'آخرین بروزرسانی: ' : 'Last updated: '}
+              {formatDate(lastUpdated)}
+            </p>
+          )}
+        </div>
+      </div>
+
+      <div className={styles.contentWrapper}>
+        <div className={styles.container}>
           <div className={styles.content}>
             {content ? (
               <RichText data={content} />
@@ -64,8 +86,7 @@ export default async function TermsPage({ params }: { params: Promise<{ locale: 
             )}
           </div>
         </div>
-      </main>
-      <Footer />
-    </>
+      </div>
+    </main>
   );
 }

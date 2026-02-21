@@ -13,6 +13,7 @@ import { JalaliDatePicker } from '@/components/ui/JalaliDatePicker';
 import { getTodayJalali, addDaysToTodayJalali } from '@/utils/jalaliDate';
 import { convertToEnglishDigits } from '@/utils/digits';
 import { tripSearchSchema } from '@/validations/trip';
+import { useRandomHeroBackground } from '@/hooks/useRandomHeroBackground';
 import styles from './page.module.css';
 
 interface SearchFilters {
@@ -67,6 +68,8 @@ export default function TripsPage() {
     minCapacity: '1',
     tripType: '',
   });
+
+  const bgImage = useRandomHeroBackground();
 
   // All provinces from the functional spec
   const provinces = [
@@ -182,7 +185,9 @@ export default function TripsPage() {
   return (
     <div className={styles.page}>
       {/* Search Form */}
-      <section className={styles.searchSection}>
+      <section
+        className={styles.searchSection}
+        style={bgImage ? ({ '--hero-bg': `url("${bgImage}")` } as React.CSSProperties) : undefined}>
         <div className={styles.container}>
           <h1 className={styles.title}>{t('title')}</h1>
           <p className={styles.subtitle}>{t('subtitle')}</p>

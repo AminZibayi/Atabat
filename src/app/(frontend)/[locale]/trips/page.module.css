@@ -16,13 +16,20 @@
 
 /* Search Section */
 .searchSection {
-  padding: var(--space-8) 0;
-  background: linear-gradient(180deg, var(--color-bg-primary) 0%, var(--color-bg-secondary) 100%);
+  position: relative;
+  padding: var(--space-12) 0;
+  background:
+    linear-gradient(to bottom, rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.7)),
+    var(
+        --hero-bg,
+        linear-gradient(180deg, var(--color-bg-primary) 0%, var(--color-bg-secondary) 100%)
+      )
+      center/cover no-repeat;
 }
 
 @media (min-width: 768px) {
   .searchSection {
-    padding: var(--space-12) 0;
+    padding: var(--space-16) 0;
   }
 }
 
@@ -31,6 +38,7 @@
   font-weight: var(--font-weight-bold);
   text-align: center;
   margin-bottom: var(--space-2);
+  color: #ffffff;
 }
 
 @media (min-width: 768px) {
@@ -41,7 +49,7 @@
 
 .subtitle {
   text-align: center;
-  color: var(--color-text-secondary);
+  color: rgba(255, 255, 255, 0.85);
   margin-bottom: var(--space-8);
 }
 

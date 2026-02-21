@@ -3,7 +3,7 @@
 // In the Name of God, the Creative, the Originator
 import { useTranslations } from 'next-intl';
 import { useRouter } from 'next/navigation';
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import toast from 'react-hot-toast';
 
 import { Header } from '@/components/ui/Header';
@@ -15,6 +15,7 @@ import { Link } from '@/i18n/navigation';
 import { getTodayJalali, addDaysToTodayJalali } from '@/utils/jalaliDate';
 import { convertToEnglishDigits } from '@/utils/digits';
 import { tripSearchSchema } from '@/validations/trip';
+import { useRandomHeroBackground } from '@/hooks/useRandomHeroBackground';
 import styles from './page.module.css';
 
 interface SearchFilters {
@@ -45,6 +46,8 @@ export default function HomePage() {
     minCapacity: '1',
     tripType: '',
   });
+
+  const bgImage = useRandomHeroBackground();
 
   // All provinces from the functional spec
   const provinces = [
@@ -135,7 +138,11 @@ export default function HomePage() {
       <Header />
       <main className={styles.main}>
         {/* Hero Section */}
-        <section className={styles.hero}>
+        <section
+          className={styles.hero}
+          style={
+            bgImage ? ({ '--hero-bg': `url("${bgImage}")` } as React.CSSProperties) : undefined
+          }>
           <div className={styles.heroContent}>
             <h1 className={styles.heroTitle}>
               <HeroTitle />

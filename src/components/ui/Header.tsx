@@ -28,7 +28,7 @@ export function Header() {
       <div className={styles.container}>
         <Link href="/" className={styles.logo}>
           <Logo size="md" />
-          <span className={styles.logoText}>{locale === 'fa' ? 'عتبات' : 'Atabat'}</span>
+          <span className={styles.logoText}>{locale === 'fa' ? 'موج زمزم' : 'Moj Zamzam'}</span>
         </Link>
 
         <nav className={styles.nav}>

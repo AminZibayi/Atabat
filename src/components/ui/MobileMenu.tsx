@@ -79,7 +79,7 @@ export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
         <div className={styles.header}>
           <div className={styles.brand}>
             <Logo size="sm" />
-            <span className={styles.title}>{locale === 'fa' ? 'عتبات' : 'Atabat'}</span>
+            <span className={styles.title}>{locale === 'fa' ? 'موج زمزم' : 'Moj Zamzam'}</span>
           </div>
           <button
             className={styles.closeBtn}

@@ -12,6 +12,7 @@ import { Footer } from '@/components/ui/Footer';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { Card } from '@/components/ui/Card';
+import { useRandomHeroBackground } from '@/hooks/useRandomHeroBackground';
 import styles from './page.module.css';
 
 export default function ProfilePage() {
@@ -26,6 +27,8 @@ export default function ProfilePage() {
     email: '',
   });
   const [isSaving, setIsSaving] = useState(false);
+
+  const bgImage = useRandomHeroBackground();
 
   // Redirect to login if not authenticated
   useEffect(() => {
@@ -105,12 +108,18 @@ export default function ProfilePage() {
     <>
       <Header />
       <main className={styles.page}>
-        <div className={styles.container}>
-          <div className={styles.header}>
+        <div
+          className={styles.header}
+          style={
+            bgImage ? ({ '--hero-bg': `url("${bgImage}")` } as React.CSSProperties) : undefined
+          }>
+          <div className={styles.container}>
             <h1 className={styles.title}>{t('title')}</h1>
             <p className={styles.subtitle}>{t('subtitle')}</p>
           </div>
+        </div>
 
+        <div className={styles.container}>
           <div className={styles.content}>
             <Card className={styles.card}>
               <form onSubmit={handleSubmit} className={styles.form}>

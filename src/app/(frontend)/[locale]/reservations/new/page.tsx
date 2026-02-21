@@ -11,6 +11,7 @@ import { useRouter, Link } from '@/i18n/navigation';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { Card } from '@/components/ui/Card';
+import { useRandomHeroBackground } from '@/hooks/useRandomHeroBackground';
 import styles from './page.module.css';
 
 interface TripData {
@@ -49,6 +50,8 @@ function NewReservationContent() {
   const [isLoadingTrip, setIsLoadingTrip] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [acceptTerms, setAcceptTerms] = useState(false);
+
+  const bgImage = useRandomHeroBackground();
 
   // Form fields
   const [nationalId, setNationalId] = useState('');
@@ -174,12 +177,16 @@ function NewReservationContent() {
 
   return (
     <div className={styles.page}>
-      <div className={styles.container}>
-        <div className={styles.header}>
+      <div
+        className={styles.header}
+        style={bgImage ? ({ '--hero-bg': `url("${bgImage}")` } as React.CSSProperties) : undefined}>
+        <div className={styles.container}>
           <h1 className={styles.title}>{t('title')}</h1>
           <p className={styles.subtitle}>{t('subtitle')}</p>
         </div>
+      </div>
 
+      <div className={styles.container}>
         <div className={styles.grid}>
           {/* Trip Summary */}
           <Card className={styles.tripSummary}>

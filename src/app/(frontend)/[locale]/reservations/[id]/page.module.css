@@ -1,6 +1,5 @@
 .page {
   min-height: calc(100vh - var(--header-height));
-  padding: var(--space-8) 0;
   background-color: var(--color-bg-secondary);
 }
 
@@ -16,9 +15,20 @@
   }
 }
 
-/* Header */
+/* Header Hero */
 .header {
-  margin-bottom: var(--space-6);
+  position: relative;
+  padding: var(--space-8) var(--space-4);
+  background:
+    linear-gradient(to bottom, rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.7)),
+    var(--hero-bg, var(--color-bg-primary)) center/cover no-repeat;
+  margin-bottom: var(--space-8);
+}
+
+@media (min-width: 768px) {
+  .header {
+    padding: var(--space-12) var(--space-4);
+  }
 }
 
 .headerTop {
@@ -32,10 +42,19 @@
   text-decoration: none;
 }
 
+.backBtn {
+  color: #ffffff !important;
+}
+
+.backBtn:hover {
+  background-color: rgba(255, 255, 255, 0.1) !important;
+}
+
 .title {
   font-size: var(--font-size-2xl);
   font-weight: var(--font-weight-bold);
   margin-bottom: var(--space-2);
+  color: #ffffff;
 }
 
 @media (min-width: 768px) {
@@ -45,7 +64,7 @@
 }
 
 .bookingId {
-  color: var(--color-text-secondary);
+  color: rgba(255, 255, 255, 0.85);
   font-size: var(--font-size-sm);
 }
 
