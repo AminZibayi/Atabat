@@ -597,6 +597,7 @@ Note on NNPACK Error: The "Unsupported hardware" message is a warning regarding 
 | Task        | Command                                 |
 | ----------- | --------------------------------------- |
 | Start app   | `pm2 start ecosystem.config.cjs`        |
+| Start app   | `pm2 start pnpm --name atabat -- start` |
 | Stop app    | `pm2 stop atabat`                       |
 | Restart app | `pm2 restart atabat`                    |
 | View logs   | `pm2 logs atabat`                       |
