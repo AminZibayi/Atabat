@@ -282,6 +282,7 @@ export default function TripsPage() {
                         <th>{t('table.tripType')}</th>
                         <th>{t('table.cost')}</th>
                         <th>{t('table.city')}</th>
+                        <th>{t('table.agent')}</th>
                         <th>{t('table.hotels')}</th>
                         <th>{t('table.actions')}</th>
                       </tr>
@@ -297,6 +298,7 @@ export default function TripsPage() {
                           <td>{trip.tripType}</td>
                           <td className={styles.cost}>{formatCurrency(trip.cost)}</td>
                           <td>{trip.city}</td>
+                          <td>{trip.agentName}</td>
                           <td className={styles.hotels}>
                             <span>{trip.najafHotel}</span>
                             <span>{trip.karbalaHotel}</span>
@@ -329,6 +331,7 @@ export default function TripsPage() {
                         <div className={styles.cardInfo}>
                           <span className={styles.cardCity}>{trip.city}</span>
                           <span className={styles.cardType}>{trip.tripType}</span>
+                          <span className={styles.cardAgent}>{trip.agentName}</span>
                         </div>
                         <div className={styles.cardCost}>
                           <span className={styles.cardPrice}>{formatCurrency(trip.cost)}</span>
