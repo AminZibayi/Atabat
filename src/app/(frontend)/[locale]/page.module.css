@@ -27,6 +27,10 @@
   background:
     var(--gradient-hero-overlay),
     var(--hero-bg, url('/bg1.jpg')) center/cover no-repeat;
+  min-height: calc(100vh - var(--header-height, 64px));
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 @media (min-width: 768px) {
@@ -40,6 +44,7 @@
 
 .heroContent {
   max-width: var(--max-content-width);
+  width: 100%;
   margin-inline: auto;
   display: flex;
   flex-direction: column;
