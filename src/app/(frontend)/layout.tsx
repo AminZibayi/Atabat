@@ -2,8 +2,8 @@
 import React from 'react';
 
 export const metadata = {
-  description: 'Atabat - Pilgrim Travel Management',
-  title: 'Atabat',
+  description: 'Moj Zamzam - Smart Pilgrimage Booking Platform',
+  title: 'Moj Zamzam',
   icons: [
     {
       rel: 'icon',

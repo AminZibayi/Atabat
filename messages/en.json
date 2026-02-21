@@ -1,7 +1,7 @@
 {
   "metadata": {
-    "title": "Atabat - Pilgrim Travel Management",
-    "description": "Manage your pilgrimage trips with ease"
+    "title": "Moj Zamzam - Smart Pilgrimage Booking Platform",
+    "description": "Book Karbala, Najaf, Kazemain and Samarra pilgrimage tours online with Moj Zamzam — transparent pricing, 24/7 support, and verified operators."
   },
   "common": {
     "loading": "Loading...",
@@ -41,22 +41,22 @@
   },
   "home": {
     "hero": {
-      "title": "Your Journey to the Holy Shrines",
-      "subtitle": "Book your pilgrimage trip to Iraq with confidence and ease",
-      "cta": "Find Trips"
+      "title": "Your Companion on the Path of Light — Moj Zamzam",
+      "subtitle": "Book Karbala, Najaf, Kazemain and Samarra pilgrimage tours online — verified operators, transparent pricing, and 24/7 support",
+      "cta": "Browse & Book Caravans"
     },
     "quickActions": {
-      "title": "Quick Actions",
-      "searchTrips": "Search Trips",
-      "searchTripsDesc": "Find available trips to holy shrines",
-      "myReservations": "My Reservations",
-      "myReservationsDesc": "View and manage your bookings",
+      "title": "Quick Access",
+      "searchTrips": "Search Pilgrimage Caravans",
+      "searchTripsDesc": "Browse and compare air and land tours to Iraq from top operators",
+      "myReservations": "Track My Reservations",
+      "myReservationsDesc": "Check registration status, payment and ticket delivery",
       "profile": "My Profile",
       "profileDesc": "Update your personal information"
     },
     "recentTrips": {
-      "title": "Available Trips",
-      "viewAll": "View All Trips"
+      "title": "Most Popular Upcoming Caravans",
+      "viewAll": "View Full Caravan List"
     }
   },
   "trips": {
@@ -224,7 +224,7 @@
     },
     "register": {
       "title": "Create Account",
-      "subtitle": "Join us to book your pilgrimage",
+      "subtitle": "Join Moj Zamzam to book your pilgrimage",
       "firstName": "First Name",
       "lastName": "Last Name",
       "phone": "Phone Number",
@@ -266,7 +266,7 @@
     "success": "Profile updated successfully"
   },
   "footer": {
-    "copyright": "© {year} Atabat. All rights reserved.",
+    "copyright": "© {year} Moj Zamzam Pilgrimage Platform (mz724.ir). All rights reserved.",
     "links": {
       "about": "About Us",
       "contact": "Contact",

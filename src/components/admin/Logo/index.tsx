@@ -11,7 +11,7 @@ const AdminLogo = () => {
     // eslint-disable-next-line @next/next/no-img-element
     <div className="admin-logo">
       <img
-        alt="Atabat Logo"
+        alt="Moj Zamzam Logo"
         src="/logo.png"
         style={{
           width: 'auto',
