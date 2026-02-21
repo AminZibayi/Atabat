@@ -6,6 +6,7 @@ export interface TripData {
   dayOfWeek: string;
   departureDate: string;
   remainingCapacity: number;
+  minCapacity: number; // Min passengers required (from Atabat's maxRequestCount JS var)
   tripType: string;
   cost: number;
   departureLocation: string;
@@ -36,11 +37,19 @@ export interface PassengerInfo {
   phone: string;
 }
 
+export interface AddPassengerResult {
+  success: boolean;
+  message?: string;
+  nationalId: string; // The national ID of the passenger that was added (or failed)
+}
+
 export interface ReservationResult {
   success: boolean;
   message?: string;
   reservationId?: string; // The GUID from URL
   warning?: string;
+  passengerResults?: AddPassengerResult[]; // Per-passenger results for multi-passenger flow
+  minCapacity?: number; // Number of passengers required by the trip
 }
 
 export interface ReceiptData {

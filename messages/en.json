@@ -195,12 +195,17 @@
     "new": {
       "title": "Complete Your Reservation",
       "subtitle": "Please confirm your details to reserve this trip",
-      "pilgrimInfo": "Pilgrim Information",
+      "pilgrimInfo": "Passenger Information",
       "tripSummary": "Trip Summary",
       "terms": "Terms & Conditions",
       "termsAccept": "I accept the terms and conditions",
       "confirmReservation": "Confirm Reservation",
       "processing": "Processing...",
+      "passengerLabel": "Passenger {index}",
+      "addPassenger": "Add Passenger",
+      "removePassenger": "Remove Passenger",
+      "minCapacityInfo": "This trip requires at least {count} passengers",
+      "remainingCapacity": "Remaining capacity: {count} seats",
       "success": {
         "title": "Reservation Successful!",
         "message": "Your reservation has been confirmed.",

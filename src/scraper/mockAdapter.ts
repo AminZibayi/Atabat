@@ -5,6 +5,7 @@ import type {
   TripSearchParams,
   PassengerInfo,
   ReservationResult,
+  AddPassengerResult,
   ReceiptData,
   ItineraryItem,
   PassengerReceiptItem,
@@ -16,8 +17,10 @@ import type {
  */
 export class MockAdapter implements IAtabatAdapter {
   private authenticated = false;
-  private reservations: Map<string, { trip: TripData; passenger: PassengerInfo; createdAt: Date }> =
-    new Map();
+  private reservations: Map<
+    string,
+    { trip: TripData; passengers: PassengerInfo[]; createdAt: Date }
+  > = new Map();
 
   // Sample trip data for testing
   private sampleTrips: TripData[] = [
@@ -27,6 +30,7 @@ export class MockAdapter implements IAtabatAdapter {
       dayOfWeek: 'جمعه',
       departureDate: '1404/10/05',
       remainingCapacity: 5,
+      minCapacity: 1,
       tripType: 'هوایی 7 شب',
       cost: 34136479,
       departureLocation: 'تهران',
@@ -47,6 +51,7 @@ export class MockAdapter implements IAtabatAdapter {
       dayOfWeek: 'پنجشنبه',
       departureDate: '1404/10/10',
       remainingCapacity: 3,
+      minCapacity: 3,
       tripType: 'زمینی 5 شب',
       cost: 15000000,
       departureLocation: 'اصفهان',
@@ -67,6 +72,7 @@ export class MockAdapter implements IAtabatAdapter {
       dayOfWeek: 'شنبه',
       departureDate: '1404/10/15',
       remainingCapacity: 8,
+      minCapacity: 2,
       tripType: 'هوایی 5 شب',
       cost: 28500000,
       departureLocation: 'مشهد',
@@ -87,6 +93,7 @@ export class MockAdapter implements IAtabatAdapter {
       dayOfWeek: 'دوشنبه',
       departureDate: '1404/10/20',
       remainingCapacity: 20,
+      minCapacity: 4,
       tripType: 'زمینی 7 شب',
       cost: 12000000,
       departureLocation: 'قم',
@@ -107,6 +114,7 @@ export class MockAdapter implements IAtabatAdapter {
       dayOfWeek: 'چهارشنبه',
       departureDate: '1404/10/25',
       remainingCapacity: 2,
+      minCapacity: 1,
       tripType: 'هوایی 4 شب',
       cost: 31000000,
       departureLocation: 'شیراز',
@@ -191,38 +199,81 @@ export class MockAdapter implements IAtabatAdapter {
 
   async createReservation(
     tripData: TripData,
-    passenger: PassengerInfo
+    passengers: PassengerInfo[]
   ): Promise<ReservationResult> {
     await this.delay(300);
 
-    // Validate passenger data
-    if (!passenger.nationalId || passenger.nationalId.length !== 10) {
-      return {
-        success: false,
-        message: 'کد ملی باید ۱۰ رقم باشد',
-      };
-    }
+    const minCapacity = tripData.minCapacity || 1;
 
-    if (!passenger.birthdate || !/^\d{4}\/\d{2}\/\d{2}$/.test(passenger.birthdate)) {
+    // Check that enough passengers were provided
+    if (passengers.length < minCapacity) {
       return {
         success: false,
-        message: 'تاریخ تولد معتبر نیست',
-      };
-    }
-
-    if (!passenger.phone || !/^09\d{9}$/.test(passenger.phone)) {
-      return {
-        success: false,
-        message: 'شماره تلفن معتبر نیست',
+        message: `این سفر حداقل ${minCapacity} نفر نیاز دارد، اما ${passengers.length} نفر ارسال شده است.`,
+        minCapacity,
       };
     }
 
     // Check capacity
-    if (tripData.remainingCapacity < 1) {
+    if (tripData.remainingCapacity < passengers.length) {
       return {
         success: false,
-        message: 'ظرفیت سفر تکمیل شده است',
+        message: 'ظرفیت سفر کافی نیست',
       };
+    }
+
+    // Validate and add each passenger
+    const passengerResults: AddPassengerResult[] = [];
+
+    for (const passenger of passengers) {
+      await this.delay(100); // Simulate per-passenger delay
+
+      if (!passenger.nationalId || passenger.nationalId.length !== 10) {
+        passengerResults.push({
+          success: false,
+          message: 'کد ملی باید ۱۰ رقم باشد',
+          nationalId: passenger.nationalId,
+        });
+        return {
+          success: false,
+          message: `خطا در ثبت مسافر با کد ملی ${passenger.nationalId}: کد ملی باید ۱۰ رقم باشد`,
+          passengerResults,
+          minCapacity,
+        };
+      }
+
+      if (!passenger.birthdate || !/^\d{4}\/\d{2}\/\d{2}$/.test(passenger.birthdate)) {
+        passengerResults.push({
+          success: false,
+          message: 'تاریخ تولد معتبر نیست',
+          nationalId: passenger.nationalId,
+        });
+        return {
+          success: false,
+          message: `خطا در ثبت مسافر با کد ملی ${passenger.nationalId}: تاریخ تولد معتبر نیست`,
+          passengerResults,
+          minCapacity,
+        };
+      }
+
+      if (!passenger.phone || !/^09\d{9}$/.test(passenger.phone)) {
+        passengerResults.push({
+          success: false,
+          message: 'شماره تلفن معتبر نیست',
+          nationalId: passenger.nationalId,
+        });
+        return {
+          success: false,
+          message: `خطا در ثبت مسافر با کد ملی ${passenger.nationalId}: شماره تلفن معتبر نیست`,
+          passengerResults,
+          minCapacity,
+        };
+      }
+
+      passengerResults.push({
+        success: true,
+        nationalId: passenger.nationalId,
+      });
     }
 
     // Generate reservation ID
@@ -231,7 +282,7 @@ export class MockAdapter implements IAtabatAdapter {
     // Store reservation
     this.reservations.set(resId, {
       trip: tripData,
-      passenger,
+      passengers,
       createdAt: new Date(),
     });
 
@@ -239,6 +290,8 @@ export class MockAdapter implements IAtabatAdapter {
       success: true,
       reservationId: resId,
       warning: 'توجه: امکان لغو رزرو تا ۲۴ ساعت وجود ندارد',
+      passengerResults,
+      minCapacity,
     };
   }
 
@@ -324,9 +377,9 @@ export class MockAdapter implements IAtabatAdapter {
 
   private generateReceiptFromReservation(
     resId: string,
-    reservation: { trip: TripData; passenger: PassengerInfo; createdAt: Date }
+    reservation: { trip: TripData; passengers: PassengerInfo[]; createdAt: Date }
   ): ReceiptData {
-    const { trip, passenger } = reservation;
+    const { trip, passengers } = reservation;
 
     return {
       resId,
@@ -348,16 +401,14 @@ export class MockAdapter implements IAtabatAdapter {
         },
         { row: 2, entryDate: '', city: 'کربلا', hotel: trip.karbalaHotel, exitDate: '' },
       ],
-      passengers: [
-        {
-          id: Math.floor(Math.random() * 100000000).toString(),
-          nationalId: passenger.nationalId,
-          firstName: 'زائر',
-          lastName: 'محترم',
-          birthdate: passenger.birthdate,
-          cost: trip.cost,
-        },
-      ],
+      passengers: passengers.map((p, index) => ({
+        id: Math.floor(Math.random() * 100000000).toString(),
+        nationalId: p.nationalId,
+        firstName: `زائر${index + 1}`,
+        lastName: 'محترم',
+        birthdate: p.birthdate,
+        cost: trip.cost,
+      })),
       paymentUrl: `https://atabatorg.haj.ir/epay/home/IndexEpay?resID=${resId}`,
     };
   }

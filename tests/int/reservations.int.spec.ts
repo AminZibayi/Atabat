@@ -72,7 +72,10 @@ describe('Reservation API Integration', () => {
 
       const req = new Request('http://localhost:3000/api/reservations', {
         method: 'POST',
-        body: JSON.stringify({ tripSnapshot }),
+        body: JSON.stringify({
+          tripSnapshot,
+          passengers: [{ nationalId: '1234567890', birthdate: '1370/01/01', phone: pilgrim.phone }],
+        }),
       });
       (req as any).payload = payload;
 
@@ -108,7 +111,10 @@ describe('Reservation API Integration', () => {
       const { createReservationHandler } = await import('../../src/endpoints/reservations');
       const req = new Request('http://localhost:3000/api/reservations', {
         method: 'POST',
-        body: JSON.stringify({ tripSnapshot }),
+        body: JSON.stringify({
+          tripSnapshot,
+          passengers: [{ nationalId: '1234567890', birthdate: '1370/01/01', phone: pilgrim.phone }],
+        }),
       });
       (req as any).payload = payload;
       (req as any).user = { ...pilgrim, collection: 'pilgrims' };
@@ -138,7 +144,10 @@ describe('Reservation API Integration', () => {
       const { createReservationHandler } = await import('../../src/endpoints/reservations');
       const req = new Request('http://localhost:3000/api/reservations', {
         method: 'POST',
-        body: JSON.stringify({ tripSnapshot }),
+        body: JSON.stringify({
+          tripSnapshot,
+          passengers: [{ nationalId: '1234567890', birthdate: '1370/01/01', phone: pilgrim.phone }],
+        }),
       });
       (req as any).payload = payload;
       (req as any).user = { ...pilgrim, collection: 'pilgrims' };
@@ -147,7 +156,7 @@ describe('Reservation API Integration', () => {
       const data = await response.json();
 
       expect(response.status).toBe(403);
-      expect(data.code).toBe('ACTIVE_RESERVATION_EXISTS');
+      expect(data.code).toBe('RESERVATION_ACTIVE_EXISTS');
     });
 
     it('should enforce 24-hour rule for cancelled reservations', async () => {
@@ -186,7 +195,10 @@ describe('Reservation API Integration', () => {
       const { createReservationHandler } = await import('../../src/endpoints/reservations');
       const req = new Request('http://localhost:3000/api/reservations', {
         method: 'POST',
-        body: JSON.stringify({ tripSnapshot }),
+        body: JSON.stringify({
+          tripSnapshot,
+          passengers: [{ nationalId: '1234567890', birthdate: '1370/01/01', phone: pilgrim.phone }],
+        }),
       });
       (req as any).payload = payload;
       (req as any).user = { ...pilgrim, collection: 'pilgrims' };
@@ -195,7 +207,7 @@ describe('Reservation API Integration', () => {
       const data = await response.json();
 
       expect(response.status).toBe(403);
-      expect(data.code).toBe('CANCELLATION_24H_RULE');
+      expect(data.code).toBe('RESERVATION_CANCELLATION_COOLDOWN');
     });
   });
 

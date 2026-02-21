@@ -3,7 +3,7 @@
 // In the Name of God, the Creative, the Originator
 import { useTranslations } from 'next-intl';
 import { useSearchParams } from 'next/navigation';
-import React, { useState, useEffect, Suspense } from 'react';
+import React, { useState, useEffect, useCallback, Suspense } from 'react';
 import toast from 'react-hot-toast';
 
 import { useAuth } from '@/hooks/useAuth';
@@ -20,6 +20,7 @@ interface TripData {
   dayOfWeek: string;
   departureDate: string;
   remainingCapacity: number;
+  minCapacity: number;
   tripType: string;
   cost: number;
   departureLocation: string;
@@ -32,6 +33,12 @@ interface TripData {
   kazemainHotel: string;
   address: string;
   selectButtonScript?: string;
+}
+
+interface PassengerForm {
+  nationalId: string;
+  birthdate: string;
+  phone: string;
 }
 
 function NewReservationContent() {
@@ -53,10 +60,13 @@ function NewReservationContent() {
 
   const bgImage = useRandomHeroBackground();
 
-  // Form fields
-  const [nationalId, setNationalId] = useState('');
-  const [birthdate, setBirthdate] = useState('');
-  const [phone, setPhone] = useState('');
+  // Multi-passenger form state
+  const [passengers, setPassengers] = useState<PassengerForm[]>([
+    { nationalId: '', birthdate: '', phone: '' },
+  ]);
+
+  const minCapacity = trip?.minCapacity || 1;
+  const maxPassengers = minCapacity; // Atabat requires exactly minCapacity passengers
 
   // Redirect to login if not authenticated
   useEffect(() => {
@@ -67,23 +77,28 @@ function NewReservationContent() {
     }
   }, [isAuthLoading, isAuthenticated, router, tripIdentifier]);
 
-  // Pre-fill user data if available
+  // Pre-fill first passenger with user data
   useEffect(() => {
     if (user) {
-      if (user.nationalId) setNationalId(user.nationalId);
-      if (user.birthdate) setBirthdate(user.birthdate);
-      if (user.phone) setPhone(user.phone);
+      setPassengers(prev => {
+        const updated = [...prev];
+        updated[0] = {
+          nationalId: user.nationalId || '',
+          birthdate: user.birthdate || '',
+          phone: user.phone || '',
+        };
+        return updated;
+      });
     }
   }, [user]);
 
-  // Fetch trip data from sessionStorage
+  // Fetch trip data from sessionStorage and initialize passenger slots
   useEffect(() => {
     if (tripIdentifier) {
       const storedTrip = sessionStorage.getItem('selectedTrip');
       if (storedTrip) {
         try {
           const parsed = JSON.parse(storedTrip) as TripData;
-          // Verify it's the same trip
           if (parsed.tripIdentifier === tripIdentifier) {
             setTrip(parsed);
           }
@@ -99,6 +114,32 @@ function NewReservationContent() {
     return new Intl.NumberFormat('fa-IR').format(amount) + ' ریال';
   };
 
+  const updatePassenger = useCallback(
+    (index: number, field: keyof PassengerForm, value: string) => {
+      setPassengers(prev => {
+        const updated = [...prev];
+        updated[index] = { ...updated[index], [field]: value };
+        return updated;
+      });
+    },
+    []
+  );
+
+  const addPassenger = useCallback(() => {
+    if (passengers.length < maxPassengers) {
+      setPassengers(prev => [...prev, { nationalId: '', birthdate: '', phone: '' }]);
+    }
+  }, [passengers.length, maxPassengers]);
+
+  const removePassenger = useCallback(
+    (index: number) => {
+      if (passengers.length > 1) {
+        setPassengers(prev => prev.filter((_, i) => i !== index));
+      }
+    },
+    [passengers.length]
+  );
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -112,6 +153,20 @@ function NewReservationContent() {
       return;
     }
 
+    if (passengers.length !== minCapacity) {
+      toast.error(`باید ${minCapacity} نفر مسافر اضافه کنید (${passengers.length} نفر اضافه شده)`);
+      return;
+    }
+
+    // Validate all passengers have required fields
+    for (let i = 0; i < passengers.length; i++) {
+      const p = passengers[i];
+      if (!p.nationalId || !p.birthdate || !p.phone) {
+        toast.error(`لطفا اطلاعات مسافر ${i + 1} را کامل کنید`);
+        return;
+      }
+    }
+
     setIsSubmitting(true);
 
     try {
@@ -121,12 +176,12 @@ function NewReservationContent() {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          tripSnapshot: trip, // Send full trip data including selectButtonScript
-          passengerOverrides: {
-            nationalId,
-            birthdate,
-            phone,
-          },
+          tripSnapshot: trip,
+          passengers: passengers.map(p => ({
+            nationalId: p.nationalId,
+            birthdate: p.birthdate,
+            phone: p.phone,
+          })),
         }),
       });
 
@@ -233,9 +288,17 @@ function NewReservationContent() {
               </div>
 
               <div className={styles.totalCost}>
-                <span>هزینه کل</span>
+                <span>هزینه هر نفر</span>
                 <span className={styles.costValue}>{formatCurrency(trip.cost)}</span>
               </div>
+              {passengers.length > 1 && (
+                <div className={styles.totalCost}>
+                  <span>هزینه کل ({passengers.length} نفر)</span>
+                  <span className={styles.costValue}>
+                    {formatCurrency(trip.cost * passengers.length)}
+                  </span>
+                </div>
+              )}
             </div>
           </Card>
 
@@ -244,37 +307,66 @@ function NewReservationContent() {
             <h2 className={styles.sectionTitle}>{t('pilgrimInfo')}</h2>
 
             <form onSubmit={handleSubmit} className={styles.form}>
-              <Input
-                label={tAuth('nationalId')}
-                type="text"
-                value={nationalId}
-                onChange={e => setNationalId(e.target.value)}
-                placeholder="0123456789"
-                maxLength={10}
-                required
-                fullWidth
-              />
+              {passengers.map((passenger, index) => (
+                <div key={index} className={styles.passengerBlock}>
+                  <div className={styles.passengerHeader}>
+                    <h3 className={styles.passengerTitle}>
+                      {t('passengerLabel', { index: index + 1 })}
+                    </h3>
+                    {index > 0 && (
+                      <button
+                        type="button"
+                        className={styles.removeBtn}
+                        onClick={() => removePassenger(index)}
+                        title={t('removePassenger')}>
+                        ✕
+                      </button>
+                    )}
+                  </div>
 
-              <Input
-                label={tAuth('birthdate')}
-                type="text"
-                value={birthdate}
-                onChange={e => setBirthdate(e.target.value)}
-                placeholder="1370/01/15"
-                required
-                fullWidth
-              />
+                  <Input
+                    label={tAuth('nationalId')}
+                    type="text"
+                    value={passenger.nationalId}
+                    onChange={e => updatePassenger(index, 'nationalId', e.target.value)}
+                    placeholder="0123456789"
+                    maxLength={10}
+                    required
+                    fullWidth
+                  />
 
-              <Input
-                label={tAuth('phone')}
-                type="tel"
-                value={phone}
-                onChange={e => setPhone(e.target.value)}
-                placeholder="09123456789"
-                maxLength={11}
-                required
-                fullWidth
-              />
+                  <Input
+                    label={tAuth('birthdate')}
+                    type="text"
+                    value={passenger.birthdate}
+                    onChange={e => updatePassenger(index, 'birthdate', e.target.value)}
+                    placeholder="1370/01/15"
+                    required
+                    fullWidth
+                  />
+
+                  <Input
+                    label={tAuth('phone')}
+                    type="tel"
+                    value={passenger.phone}
+                    onChange={e => updatePassenger(index, 'phone', e.target.value)}
+                    placeholder="09123456789"
+                    maxLength={11}
+                    required
+                    fullWidth
+                  />
+                </div>
+              ))}
+
+              {passengers.length < maxPassengers && (
+                <button
+                  type="button"
+                  className={styles.addPassengerBtn}
+                  onClick={addPassenger}
+                  disabled={passengers.length >= maxPassengers}>
+                  + {t('addPassenger')}
+                </button>
+              )}
 
               <div className={styles.termsSection}>
                 <label className={styles.checkbox}>

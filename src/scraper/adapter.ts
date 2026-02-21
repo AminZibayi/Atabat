@@ -18,9 +18,10 @@ export interface IAtabatAdapter {
   searchTrips(params: TripSearchParams): Promise<TripData[]>;
 
   /**
-   * Select a trip and create a reservation for a passenger
+   * Select a trip and create a reservation for one or more passengers.
+   * The Atabat system requires at least `tripData.minCapacity` passengers.
    */
-  createReservation(tripData: TripData, passenger: PassengerInfo): Promise<ReservationResult>;
+  createReservation(tripData: TripData, passengers: PassengerInfo[]): Promise<ReservationResult>;
 
   /**
    * Get receipt data for a reservation

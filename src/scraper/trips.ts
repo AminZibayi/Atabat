@@ -142,6 +142,7 @@ async function parseTripsTable(page: Page): Promise<TripData[]> {
         dayOfWeek: txt(0),
         departureDate,
         remainingCapacity: parseInt(txt(2)) || 0,
+        minCapacity: 1, // Default; actual value is read from reservation page JS (maxRequestCount)
         tripType: txt(3),
         cost: parseInt(txt(4).replace(/,/g, '')) || 0,
         departureLocation: txt(5),

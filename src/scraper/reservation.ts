@@ -1,6 +1,12 @@
 // In the Name of God, the Creative, the Originator
 import { Page, Dialog } from 'playwright';
-import { PassengerInfo, ReservationResult, TripData, TripSearchParams } from './types';
+import {
+  PassengerInfo,
+  ReservationResult,
+  AddPassengerResult,
+  TripData,
+  TripSearchParams,
+} from './types';
 import { getContext } from './browser';
 import { searchTripsOnPage, selectTrip } from './trips';
 import { addDaysToJalali } from '@/utils/jalaliDate';
@@ -76,12 +82,44 @@ async function waitForTextContent(page: Page, selector: string, timeout: number)
 }
 
 /**
- * Complete reservation flow: re-search for trip, select it, and fill passenger form.
+ * Read the maxRequestCount variable from the reservation page.
+ * This is set by Atabat's JS and determines how many passengers must be registered.
+ */
+async function readMaxRequestCount(page: Page): Promise<number> {
+  try {
+    const count = await page.evaluate(() => {
+      // maxRequestCount is a global JS variable set in the page
+      return (window as unknown as { maxRequestCount?: number }).maxRequestCount ?? 1;
+    });
+    console.log(`[Scraper] maxRequestCount (minCapacity) = ${count}`);
+    return count;
+  } catch {
+    console.warn('[Scraper] Could not read maxRequestCount, defaulting to 1');
+    return 1;
+  }
+}
+
+/**
+ * Check if the passenger form (مشخصات زائر) is still visible.
+ * When enough passengers are added, Atabat hides the form.
+ */
+async function isPassengerFormVisible(page: Page): Promise<boolean> {
+  try {
+    const visible = await page.isVisible(SELECTORS.PASSENGER_TABLE);
+    return visible;
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * Complete reservation flow: re-search for trip, select it, and fill passenger forms.
  * This is the main entry point for reservation creation.
+ * Accepts an array of passengers and adds them one by one.
  */
 export async function createReservationWithTrip(
   tripData: TripData,
-  passenger: PassengerInfo
+  passengers: PassengerInfo[]
 ): Promise<ReservationResult> {
   const context = await getContext();
   const page = await context.newPage();
@@ -93,6 +131,7 @@ export async function createReservationWithTrip(
       dateFrom: tripData.departureDate,
       dateTo: nextDay,
       provinceCode: tripData.provinceCode,
+      adultCount: passengers.length,
       borderType: tripData.tripType?.includes('هوایی')
         ? '2'
         : tripData.tripType?.includes('زمینی')
@@ -115,6 +154,9 @@ export async function createReservationWithTrip(
       };
     }
 
+    // Carry over minCapacity from the original trip data (re-search defaults to 1)
+    matchingTrip.minCapacity = tripData.minCapacity || matchingTrip.minCapacity || 1;
+
     if (!matchingTrip.selectButtonScript) {
       return {
         success: false,
@@ -127,8 +169,22 @@ export async function createReservationWithTrip(
     // Select the trip using the fresh script from current page
     await selectTrip(page, matchingTrip.selectButtonScript);
 
-    // Fill the reservation form with passenger info
-    return await fillReservationForm(page, passenger);
+    // Read how many passengers are required by the Atabat system
+    const maxRequestCount = await readMaxRequestCount(page);
+    console.log(
+      `[Scraper] Trip requires ${maxRequestCount} passengers, provided ${passengers.length}`
+    );
+
+    if (passengers.length < maxRequestCount) {
+      return {
+        success: false,
+        message: `این سفر حداقل ${maxRequestCount} نفر نیاز دارد، اما ${passengers.length} نفر ارسال شده است.`,
+        minCapacity: maxRequestCount,
+      };
+    }
+
+    // Add passengers one by one
+    return await addPassengersAndConfirm(page, passengers, maxRequestCount);
   } finally {
     // Keep page open for debugging in dev, close in prod
     if (process.env.NODE_ENV === 'production') {
@@ -138,26 +194,107 @@ export async function createReservationWithTrip(
 }
 
 /**
- * Fill the reservation form after trip is selected.
- * Uses AJAX interception for reliable success/failure detection.
+ * Add all passengers to the Atabat form one by one, then confirm.
+ * Handles per-passenger errors (e.g., national ID mismatch).
  */
-async function fillReservationForm(
+async function addPassengersAndConfirm(
   page: Page,
-  passenger: PassengerInfo
+  passengers: PassengerInfo[],
+  requiredCount: number
 ): Promise<ReservationResult> {
-  console.log('[Scraper] Filling reservation form...');
+  const passengerResults: AddPassengerResult[] = [];
 
-  // Setup dialog handler BEFORE any interaction
+  for (let i = 0; i < passengers.length; i++) {
+    const passenger = passengers[i];
+    console.log(
+      `[Scraper] Adding passenger ${i + 1}/${passengers.length}: ${passenger.nationalId}`
+    );
+
+    // Check if the form is still visible (Atabat hides it when enough people are added)
+    const formVisible = await isPassengerFormVisible(page);
+    if (!formVisible) {
+      console.log(`[Scraper] Form hidden after ${i} passengers (expected ${requiredCount})`);
+      // If we've added enough, that's fine — move to confirm
+      if (i >= requiredCount) break;
+      // Otherwise something went wrong
+      return {
+        success: false,
+        message: `فرم ثبت نام پس از ثبت ${i} نفر مخفی شد. حداقل ${requiredCount} نفر لازم است.`,
+        passengerResults,
+        minCapacity: requiredCount,
+      };
+    }
+
+    const result = await addSinglePassenger(page, passenger, i);
+    passengerResults.push(result);
+
+    if (!result.success) {
+      console.error(`[Scraper] Failed to add passenger ${i + 1}: ${result.message}`);
+      return {
+        success: false,
+        message: result.message || `خطا در ثبت مسافر ${i + 1}`,
+        passengerResults,
+        minCapacity: requiredCount,
+      };
+    }
+
+    console.log(`[Scraper] Passenger ${i + 1} added successfully`);
+  }
+
+  // Verify enough passengers were added by checking the person list
+  const rowCount = await page.$$eval(SELECTORS.PERSON_ROW, rows => rows.length).catch(() => 0);
+
+  console.log(`[Scraper] Total rows in person table: ${rowCount}, required: ${requiredCount}`);
+
+  if (rowCount < requiredCount) {
+    return {
+      success: false,
+      message: `تنها ${rowCount} نفر ثبت شده ولی ${requiredCount} نفر لازم است.`,
+      passengerResults,
+      minCapacity: requiredCount,
+    };
+  }
+
+  // Check if confirm button is visible (Atabat shows it when enough passengers are added)
+  const confirmVisible = await page.isVisible(SELECTORS.CONFIRM_BTN).catch(() => false);
+  if (!confirmVisible) {
+    // Wait briefly for it to appear
+    await page
+      .waitForSelector(SELECTORS.CONFIRM_BTN, {
+        state: 'visible',
+        timeout: TIMEOUT.MEDIUM,
+      })
+      .catch(() => null);
+  }
+
+  // Confirm the reservation
+  console.log('[Scraper] All passengers added, confirming reservation...');
+  const confirmResult = await confirmReservation(page);
+  confirmResult.passengerResults = passengerResults;
+  confirmResult.minCapacity = requiredCount;
+  return confirmResult;
+}
+
+/**
+ * Add a single passenger to the Atabat form.
+ * Fills the form fields, clicks save, and waits for result.
+ */
+async function addSinglePassenger(
+  page: Page,
+  passenger: PassengerInfo,
+  passengerIndex: number
+): Promise<AddPassengerResult> {
+  // Setup dialog handler
   let dialogMessage = '';
   const dialogHandler = async (dialog: Dialog) => {
     dialogMessage = dialog.message();
-    console.log('[Scraper] Dialog received:', dialogMessage);
+    console.log(`[Scraper] Dialog for passenger ${passengerIndex + 1}:`, dialogMessage);
     await dialog.accept();
   };
   page.on('dialog', dialogHandler);
 
   try {
-    // Wait for form to be visible (it may start hidden)
+    // Wait for form to be visible
     await page.waitForSelector(SELECTORS.PASSENGER_TABLE, {
       state: 'visible',
       timeout: TIMEOUT.MEDIUM,
@@ -166,20 +303,22 @@ async function fillReservationForm(
     // Wait for input fields
     await page.waitForSelector(SELECTORS.NATIONAL_ID, { timeout: TIMEOUT.SHORT });
 
-    // Fill Form
-    console.log('[Scraper] Filling passenger data...');
+    // Clear and fill form fields
+    console.log(`[Scraper] Filling data for passenger: ${passenger.nationalId}`);
+    await page.fill(SELECTORS.NATIONAL_ID, '');
     await page.fill(SELECTORS.NATIONAL_ID, passenger.nationalId);
+    await page.fill(SELECTORS.BIRTHDATE, '');
     await page.fill(SELECTORS.BIRTHDATE, passenger.birthdate);
+    await page.fill(SELECTORS.PHONE, '');
     await page.fill(SELECTORS.PHONE, passenger.phone);
 
-    // Get initial row count in person list (to detect new additions)
+    // Get initial row count
     const initialRowCount = await page
       .$$eval(SELECTORS.PERSON_ROW, rows => rows.length)
       .catch(() => 0);
-    console.log(`[Scraper] Initial person rows: ${initialRowCount}`);
+    console.log(`[Scraper] Current person rows before add: ${initialRowCount}`);
 
-    // Setup AJAX response listener BEFORE clicking save
-    // The "ثبت" button triggers callAjaxRegister() which POSTs to Sabteahval_Validate
+    // Setup AJAX response listener
     const ajaxResponsePromise = page
       .waitForResponse(
         resp => resp.url().includes('Sabteahval_Validate') || resp.url().includes('IsOmrehFishOk'),
@@ -193,92 +332,97 @@ async function fillReservationForm(
 
     // Wait for AJAX response OR DOM changes OR dialog
     const result = await Promise.race([
-      // Option 1: AJAX response (fastest)
+      // Option 1: AJAX response
       ajaxResponsePromise.then(async resp => {
         if (!resp) return null;
         try {
           const json = await resp.json();
           console.log('[Scraper] AJAX response:', json);
-          return { type: 'ajax', data: json };
+          return { type: 'ajax' as const, data: json };
         } catch {
-          return { type: 'ajax', data: null };
+          return { type: 'ajax' as const, data: null };
         }
       }),
 
-      // Option 2: New row appears in person list (success indicator)
+      // Option 2: New row appears
       waitForRowCount(page, SELECTORS.PERSON_ROW, initialRowCount, TIMEOUT.LONG)
-        .then(() => ({ type: 'newRow' }))
+        .then(() => ({ type: 'newRow' as const }))
         .catch(() => null),
 
-      // Option 3: Error message appears in #lblmessage or #ctl00_cp1_lblmsg
+      // Option 3: Error message appears
       waitForTextContent(page, SELECTORS.MSG_LABEL, TIMEOUT.LONG)
-        .then(() => ({ type: 'error' }))
+        .then(() => ({ type: 'error' as const }))
         .catch(() => null),
 
-      // Option 4: Global error message appears (e.g., duplicate registration)
+      // Option 4: Global error message
       waitForTextContent(page, SELECTORS.GLOBAL_MSG_LABEL, TIMEOUT.LONG)
-        .then(() => ({ type: 'globalError' }))
+        .then(() => ({ type: 'globalError' as const }))
         .catch(() => null),
 
       // Option 5: Timeout fallback
-      new Promise(resolve => setTimeout(() => resolve({ type: 'timeout' }), TIMEOUT.LONG)),
+      new Promise(resolve => setTimeout(() => resolve({ type: 'timeout' as const }), TIMEOUT.LONG)),
     ]);
 
     console.log('[Scraper] Wait result:', result);
 
-    // Brief pause to let DOM settle after AJAX
+    // Brief pause for DOM to settle
     await page.waitForTimeout(500);
 
-    // Check for error message first (inline message)
+    // Check for inline error message
     const errorMsg = await page
       .$eval(SELECTORS.MSG_LABEL, el => el.textContent?.trim() || '')
       .catch(() => '');
 
     if (errorMsg && errorMsg.length > 5) {
       console.log('[Scraper] Error from lblmessage:', errorMsg);
-      return { success: false, message: errorMsg };
+      return { success: false, message: errorMsg, nationalId: passenger.nationalId };
     }
 
-    // Check for global error message (e.g., "زائري با کد ملي ... قبلا ثبت شده است")
+    // Check for global error message
     const globalErrorMsg = await page
       .$eval(SELECTORS.GLOBAL_MSG_LABEL, el => el.textContent?.trim() || '')
       .catch(() => '');
 
     if (globalErrorMsg && globalErrorMsg.length > 5) {
       console.log('[Scraper] Error from global lblmsg:', globalErrorMsg);
-      return { success: false, message: globalErrorMsg };
+      return { success: false, message: globalErrorMsg, nationalId: passenger.nationalId };
     }
 
-    // Check if new row was added (success case)
+    // Check dialog message for errors
+    if (
+      dialogMessage &&
+      (dialogMessage.includes('خطا') ||
+        dialogMessage.includes('مطابقت') ||
+        dialogMessage.includes('نامعتبر') ||
+        dialogMessage.includes('اشتباه') ||
+        dialogMessage.includes('قبلا'))
+    ) {
+      return { success: false, message: dialogMessage, nationalId: passenger.nationalId };
+    }
+
+    // Verify row was added
     const currentRowCount = await page
       .$$eval(SELECTORS.PERSON_ROW, rows => rows.length)
       .catch(() => 0);
 
-    console.log(`[Scraper] Current person rows: ${currentRowCount}`);
+    console.log(`[Scraper] Person rows after add: ${currentRowCount}`);
 
     if (currentRowCount > initialRowCount) {
-      console.log('[Scraper] Person added successfully, confirming reservation...');
-      return await confirmReservation(page);
-    }
-
-    // Check if confirm button is visible (alternative success indicator)
-    const confirmVisible = await page.isVisible(SELECTORS.CONFIRM_BTN);
-    if (confirmVisible) {
-      console.log('[Scraper] Confirm button visible, confirming reservation...');
-      return await confirmReservation(page);
+      return { success: true, nationalId: passenger.nationalId };
     }
 
     // Fallback: unknown state
-    console.error('[Scraper] Unknown state after form submission');
     return {
       success: false,
-      message: dialogMessage || 'وضعیت نامشخص پس از ارسال فرم. لطفا مجددا تلاش کنید.',
+      message: dialogMessage || 'وضعیت نامشخص پس از ثبت مسافر. لطفا مجددا تلاش کنید.',
+      nationalId: passenger.nationalId,
     };
   } catch (error) {
-    console.error('[Scraper] Reservation creation failed:', error);
+    console.error(`[Scraper] Failed to add passenger ${passengerIndex + 1}:`, error);
     return {
       success: false,
-      message: dialogMessage || 'خطای سیستمی در ایجاد رزرو. لطفا مجددا تلاش کنید.',
+      message: dialogMessage || 'خطای سیستمی در ثبت مسافر.',
+      nationalId: passenger.nationalId,
     };
   } finally {
     page.off('dialog', dialogHandler);
@@ -373,5 +517,5 @@ export async function createReservation(
   page: Page,
   passenger: PassengerInfo
 ): Promise<ReservationResult> {
-  return fillReservationForm(page, passenger);
+  return addSinglePassenger(page, passenger, 0);
 }

@@ -85,7 +85,7 @@ describe('MockAdapter', () => {
         phone: '09123456789',
       };
 
-      const result = await adapter.createReservation(sampleTrip, passenger);
+      const result = await adapter.createReservation(sampleTrip, [passenger]);
 
       expect(result.success).toBe(true);
       expect(result.reservationId).toBeDefined();
@@ -99,7 +99,7 @@ describe('MockAdapter', () => {
         phone: '09123456789',
       };
 
-      const result = await adapter.createReservation(sampleTrip, passenger);
+      const result = await adapter.createReservation(sampleTrip, [passenger]);
 
       expect(result.success).toBe(false);
       expect(result.message).toContain('کد ملی');
@@ -112,7 +112,7 @@ describe('MockAdapter', () => {
         phone: '09123456789',
       };
 
-      const result = await adapter.createReservation(sampleTrip, passenger);
+      const result = await adapter.createReservation(sampleTrip, [passenger]);
 
       expect(result.success).toBe(false);
       expect(result.message).toContain('تاریخ');
@@ -125,7 +125,7 @@ describe('MockAdapter', () => {
         phone: '1234567890', // Doesn't start with 09
       };
 
-      const result = await adapter.createReservation(sampleTrip, passenger);
+      const result = await adapter.createReservation(sampleTrip, [passenger]);
 
       expect(result.success).toBe(false);
       expect(result.message).toContain('تلفن');
@@ -138,7 +138,7 @@ describe('MockAdapter', () => {
         phone: '09123456789',
       };
 
-      const result = await adapter.createReservation(sampleTrip, passenger);
+      const result = await adapter.createReservation(sampleTrip, [passenger]);
 
       expect(result.warning).toBeDefined();
       expect(result.warning).toContain('ساعت'); // Check for Persian word 'hour'

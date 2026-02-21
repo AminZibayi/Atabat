@@ -1,5 +1,5 @@
 // In the Name of God, the Creative, the Originator
-import { describe, it, expect, vi, beforeAll, afterEach } from 'vitest';
+import { describe, it, expect, vi, afterEach } from 'vitest';
 import { createReservationHandler } from '@/endpoints/reservations';
 
 // Mock Payload Request
@@ -13,6 +13,9 @@ const mockUser = {
   id: 1,
   collection: 'pilgrims',
   email: 'test@example.com',
+  nationalId: '0123456789',
+  birthdate: '1370/01/01',
+  phone: '09121234567',
 };
 
 const createMockReq = (body: any, user: any = mockUser) =>
@@ -30,13 +33,28 @@ describe('Reservation Endpoint Integration', () => {
   it('should reject unauthorized users', async () => {
     const req = createMockReq({}, { id: 1, collection: 'users' }); // Wrong collection
     const res = await createReservationHandler(req);
-    // Response object in test env might need mocking or handling if it returns standard Response
-    // In actual Payload environment it matches standard Request/Response
     expect(res.status).toBe(401);
   });
 
   it('should validate request body', async () => {
     const req = createMockReq({}); // Missing fields
+    const res = await createReservationHandler(req);
+    expect(res.status).toBe(400);
+  });
+
+  it('should validate passengers array is required', async () => {
+    const req = createMockReq({
+      tripSnapshot: {
+        rowIndex: '0',
+        tripIdentifier: 'test',
+        departureDate: '1404/01/01',
+        groupCode: '123',
+        agentName: 'Test',
+        cost: 1000,
+        selectButtonScript: 'test',
+      },
+      // Missing passengers array
+    });
     const res = await createReservationHandler(req);
     expect(res.status).toBe(400);
   });
@@ -52,12 +70,23 @@ describe('Reservation Endpoint Integration', () => {
       ],
     });
 
-    const req = createMockReq({ tripId: 'test-trip', passengerCount: 1 });
+    const req = createMockReq({
+      tripSnapshot: {
+        rowIndex: '0',
+        tripIdentifier: 'test',
+        departureDate: '1404/01/01',
+        groupCode: '123',
+        agentName: 'Test',
+        cost: 1000,
+        selectButtonScript: 'test',
+      },
+      passengers: [{ nationalId: '0123456789', birthdate: '1370/01/01', phone: '09121234567' }],
+    });
     const res = await createReservationHandler(req);
     const json = await res.json();
 
     expect(res.status).toBe(403);
-    expect(json.error).toContain('24 hours');
+    expect(json.code).toContain('CANCELLATION');
   });
 
   it('should allow booking if no active/recent cancelled reservation', async () => {
@@ -67,11 +96,22 @@ describe('Reservation Endpoint Integration', () => {
     process.env.MOCK_SCRAPER = 'true';
     mockPayload.create.mockResolvedValueOnce({ id: 999, status: 'pending' });
 
-    const req = createMockReq({ tripId: 'test-trip', passengerCount: 1 });
+    const req = createMockReq({
+      tripSnapshot: {
+        rowIndex: '0',
+        tripIdentifier: 'test',
+        departureDate: '1404/01/01',
+        groupCode: '123',
+        agentName: 'Test',
+        cost: 1000,
+        selectButtonScript: 'test',
+      },
+      passengers: [{ nationalId: '0123456789', birthdate: '1370/01/01', phone: '09121234567' }],
+    });
     const res = await createReservationHandler(req);
     const json = await res.json();
 
-    expect(res.status).toBe(200); // Or 200 depending on implementation
-    expect(json.reservation).toBeDefined();
+    expect(res.status).toBe(200);
+    expect(json.data.reservation).toBeDefined();
   });
 });

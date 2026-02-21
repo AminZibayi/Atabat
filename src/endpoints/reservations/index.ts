@@ -27,7 +27,7 @@ export const createReservationHandler: PayloadHandler = async req => {
       return errorResponse(validation.error);
     }
 
-    const { tripSnapshot, passengerOverrides } = validation.data;
+    const { tripSnapshot, passengers: passengersInput } = validation.data;
 
     // Validate tripSnapshot has required selectButtonScript
     if (!tripSnapshot.selectButtonScript) {
@@ -69,19 +69,17 @@ export const createReservationHandler: PayloadHandler = async req => {
     const { getAdapter } = await import('@/scraper');
     const adapter = getAdapter();
 
-    // Passenger info: use form overrides if provided, otherwise fall back to profile
-    const passenger = {
-      firstName: pilgrim.firstName || '',
-      lastName: pilgrim.lastName || '',
-      nationalId: passengerOverrides?.nationalId || pilgrim.nationalId || '',
-      phone: passengerOverrides?.phone || pilgrim.phone,
-      birthdate: passengerOverrides?.birthdate || pilgrim.birthdate || '',
-    };
+    // Build passengers array: use form data, fall back to profile for first passenger
+    const passengers = passengersInput.map((p, index) => ({
+      nationalId: p.nationalId || (index === 0 ? pilgrim.nationalId || '' : ''),
+      phone: p.phone || (index === 0 ? pilgrim.phone : ''),
+      birthdate: p.birthdate || (index === 0 ? pilgrim.birthdate || '' : ''),
+    }));
 
     try {
       const reservationResult = await adapter.createReservation(
         tripSnapshot as unknown as TripData,
-        passenger
+        passengers
       );
 
       if (!reservationResult.success) {

@@ -176,8 +176,14 @@ export default function TripsPage() {
   const handleTripDetails = (trip: Trip) => {
     // Store full trip data in sessionStorage for the reservation page
     // Include provinceCode from current search filters for re-search
-    const tripWithProvince = { ...trip, provinceCode: filters.province };
-    sessionStorage.setItem('selectedTrip', JSON.stringify(tripWithProvince));
+    // Include minCapacity from search filters (determines required passenger count)
+    const searchMinCapacity = parseInt(filters.minCapacity, 10) || 1;
+    const tripWithExtras = {
+      ...trip,
+      provinceCode: filters.province,
+      minCapacity: searchMinCapacity,
+    };
+    sessionStorage.setItem('selectedTrip', JSON.stringify(tripWithExtras));
     // Navigate to reservation page with tripIdentifier in URL
     router.push(`/reservations/new?trip=${encodeURIComponent(trip.tripIdentifier)}`);
   };

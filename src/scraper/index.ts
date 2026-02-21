@@ -38,11 +38,11 @@ class RealAdapter implements IAtabatAdapter {
 
   async createReservation(
     tripData: TripData,
-    passenger: PassengerInfo
+    passengers: PassengerInfo[]
   ): Promise<ReservationResult> {
-    // Delegates to reservation.ts which handles the full flow:
-    // re-search for trip, match, select, fill form
-    return createReservationWithTrip(tripData, passenger);
+    // Delegates to reservation.ts which handles the full multi-passenger flow:
+    // re-search for trip, match, select, fill forms for each passenger, confirm
+    return createReservationWithTrip(tripData, passengers);
   }
 
   async getReceipt(resId: string): Promise<ReceiptData> {

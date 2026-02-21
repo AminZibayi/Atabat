@@ -195,12 +195,17 @@
     "new": {
       "title": "تکمیل رزرو",
       "subtitle": "لطفا اطلاعات خود را برای رزرو این سفر تایید کنید",
-      "pilgrimInfo": "اطلاعات زائر",
+      "pilgrimInfo": "اطلاعات زائرین",
       "tripSummary": "خلاصه سفر",
       "terms": "شرایط و قوانین",
       "termsAccept": "شرایط و قوانین را می‌پذیرم",
       "confirmReservation": "تایید رزرو",
       "processing": "در حال پردازش...",
+      "passengerLabel": "مسافر {index}",
+      "addPassenger": "افزودن مسافر",
+      "removePassenger": "حذف مسافر",
+      "minCapacityInfo": "این سفر حداقل {count} نفر نیاز دارد",
+      "remainingCapacity": "ظرفیت باقیمانده: {count} نفر",
       "success": {
         "title": "رزرو با موفقیت انجام شد!",
         "message": "رزرو شما تایید شده است.",
