@@ -85,9 +85,12 @@
 .heroSearchCard {
   width: 100%;
   max-width: 900px;
-  background: #ffffff;
+  background-color: #ffffff;
+  background-image: linear-gradient(90deg, var(--color-accent) 0%, var(--color-secondary) 100%);
+  background-size: 100% 5px;
+  background-repeat: no-repeat;
+  background-position: top;
   border-radius: var(--radius-2xl);
-  overflow: hidden;
   box-shadow:
     0 20px 60px rgba(0, 0, 0, 0.3),
     0 4px 16px rgba(0, 0, 0, 0.15);
@@ -95,7 +98,6 @@
 
 .heroSearchCardBar {
   height: 5px;
-  background: linear-gradient(90deg, var(--color-accent) 0%, var(--color-secondary) 100%);
 }
 
 .heroForm {
