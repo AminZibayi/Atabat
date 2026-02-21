@@ -47,7 +47,7 @@ interface Trip {
 export default function TripsPage() {
   const t = useTranslations('trips');
   const tApiErrors = useTranslations('api.result.error');
-  const _tCommon = useTranslations('common');
+  const tCommon = useTranslations('common');
 
   // Calculate default dates (today and today+14)
   const defaultDates = useMemo(
@@ -247,7 +247,21 @@ export default function TripsPage() {
           <div className={styles.container}>
             <h2 className={styles.resultsTitle}>{t('results.title')}</h2>
 
-            {trips.length > 0 ? (
+            {isLoading ? (
+              <div className={styles.noResults}>
+                <svg
+                  className={`${styles.noResultsIcon} ${styles.spin}`}
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round">
+                  <path d="M21 12a9 9 0 1 1-6.219-8.56" />
+                </svg>
+                <h3>{tCommon('loading')}</h3>
+              </div>
+            ) : trips.length > 0 ? (
               <>
                 <p className={styles.resultsCount}>{t('results.count', { count: trips.length })}</p>
 
