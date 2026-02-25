@@ -6,45 +6,58 @@ import fs from 'fs/promises';
 import { getPayload } from 'payload';
 import config from '@payload-config';
 
-let browserInstance: Browser | null = null;
-let contextInstance: BrowserContext | null = null;
+let browserPromise: Promise<Browser> | null = null;
+let contextPromise: Promise<BrowserContext> | null = null;
 
 const COOKIES_PATH = path.resolve(process.cwd(), 'data/cookies.json');
 const HEADLESS = process.env.PLAYWRIGHT_HEADLESS === 'true';
 
 export async function getBrowser(): Promise<Browser> {
-  if (!browserInstance) {
-    browserInstance = await chromium.launch({
+  if (!browserPromise) {
+    browserPromise = chromium.launch({
       headless: HEADLESS,
       args: ['--no-sandbox', '--disable-setuid-sandbox'],
     });
   }
-  return browserInstance;
+  return browserPromise;
 }
 
 export async function getContext(): Promise<BrowserContext> {
-  if (!contextInstance) {
-    const browser = await getBrowser();
-    contextInstance = await browser.newContext({
-      userAgent:
-        'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-      viewport: { width: 1280, height: 720 },
-    });
+  if (!contextPromise) {
+    contextPromise = (async () => {
+      const browser = await getBrowser();
+      const context = await browser.newContext({
+        userAgent:
+          'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+        viewport: { width: 1280, height: 720 },
+      });
 
-    // Load cookies if they exist
-    await loadCookies(contextInstance);
+      // Load cookies if they exist
+      await loadCookies(context);
+      return context;
+    })();
   }
-  return contextInstance;
+  return contextPromise;
 }
 
 export async function closeBrowser() {
-  if (contextInstance) {
-    await contextInstance.close();
-    contextInstance = null;
+  if (contextPromise) {
+    try {
+      const context = await contextPromise;
+      await context.close();
+    } catch (e) {
+      console.warn('Error closing context:', e);
+    }
+    contextPromise = null;
   }
-  if (browserInstance) {
-    await browserInstance.close();
-    browserInstance = null;
+  if (browserPromise) {
+    try {
+      const browser = await browserPromise;
+      await browser.close();
+    } catch (e) {
+      console.warn('Error closing browser:', e);
+    }
+    browserPromise = null;
   }
 }
 

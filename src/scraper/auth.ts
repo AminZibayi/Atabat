@@ -307,6 +307,8 @@ export async function handleOTPVerification(
   return false;
 }
 
+let authPromise: Promise<boolean> | null = null;
+
 /**
  * Main authentication function
  * Handles the two-step login process:
@@ -314,6 +316,19 @@ export async function handleOTPVerification(
  * 2. OTP verification (auto-refreshes from Bale if expired)
  */
 export async function authenticate(): Promise<boolean> {
+  if (authPromise) {
+    console.log('[Auth] Authentication already in progress, waiting for existing promise...');
+    return authPromise;
+  }
+
+  authPromise = doAuthenticate().finally(() => {
+    authPromise = null;
+  });
+
+  return authPromise;
+}
+
+async function doAuthenticate(): Promise<boolean> {
   const context = await getContext();
   const page = await context.newPage();
 
