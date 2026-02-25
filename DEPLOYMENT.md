@@ -549,6 +549,8 @@ libncursesw5-dev xz-utils tk-dev libxml2-dev libxmlsec1-dev libffi-dev liblzma-d
 Setup Python 3.9 using pyenv:
 
 ```bash
+curl -fsSL https://pyenv.run | bash
+
 # Install Python 3.9.13
 pyenv install 3.9.13
 
@@ -588,7 +590,30 @@ Restart the Application:
 pm2 restart atabat-app
 ```
 
-Note on NNPACK Error: The "Unsupported hardware" message is a warning regarding CPU optimization. By using the +cpu specific wheels and the downgraded easyocr version above, the OCR will bypass the incompatible hardware checks and function normally.
+Note on NNPACK Error: The "Unsupported hardware" message is a warning regarding
+CPU optimization. By using the +cpu specific wheels and the downgraded easyocr
+version above, the OCR will bypass the incompatible hardware checks and function
+normally.
+
+## Issue: fatal: unable to access 'https://github.com/xxx/xxx/': SSL connection timeout
+
+Copy and paste this ENTIRE block into your terminal
+
+```
+sudo apt-get update && \
+sudo apt-get install -y build-essential autoconf libcurl4-openssl-dev \
+    tcl-dev gettext asciidoc libexpat1-dev libz-dev && \
+cd /tmp && \
+wget https://mirrors.edge.kernel.org/pub/software/scm/git/git-2.43.0.tar.gz && \
+tar -zxf git-2.43.0.tar.gz && \
+cd git-2.43.0 && \
+make configure && \
+./configure --with-openssl --with-curl --prefix=/usr && \
+make -j$(nproc) && \
+sudo make install && \
+cd ~ && \
+echo "SUCCESS: Git is now using OpenSSL!"
+```
 
 ---
 
