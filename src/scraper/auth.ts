@@ -307,7 +307,23 @@ export async function handleOTPVerification(
   return false;
 }
 
-let authPromise: Promise<boolean> | null = null;
+const AUTH_PROMISE_KEY = Symbol.for('atabat_auth_promise');
+
+function getAuthPromise(): Promise<boolean> | null {
+  return (global as any)[AUTH_PROMISE_KEY] || null;
+}
+
+function setAuthPromise(p: Promise<boolean> | null) {
+  (global as any)[AUTH_PROMISE_KEY] = p;
+}
+
+export async function waitForAuth(): Promise<void> {
+  const p = getAuthPromise();
+  if (p) {
+    console.log('[Auth] Scraper paused: waiting for ongoing authentication to finish...');
+    await p;
+  }
+}
 
 /**
  * Main authentication function
@@ -316,16 +332,18 @@ let authPromise: Promise<boolean> | null = null;
  * 2. OTP verification (auto-refreshes from Bale if expired)
  */
 export async function authenticate(): Promise<boolean> {
-  if (authPromise) {
+  const existing = getAuthPromise();
+  if (existing) {
     console.log('[Auth] Authentication already in progress, waiting for existing promise...');
-    return authPromise;
+    return existing;
   }
 
-  authPromise = doAuthenticate().finally(() => {
-    authPromise = null;
+  const promise = doAuthenticate().finally(() => {
+    setAuthPromise(null);
   });
 
-  return authPromise;
+  setAuthPromise(promise);
+  return promise;
 }
 
 async function doAuthenticate(): Promise<boolean> {

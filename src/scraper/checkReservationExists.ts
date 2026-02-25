@@ -1,6 +1,6 @@
 // In the Name of God, the Creative, the Originator
 import { getContext, isSessionValid } from './browser';
-import { authenticate } from './auth';
+import { authenticate, waitForAuth } from './auth';
 
 const BASE_URL = 'https://atabatorg.haj.ir/Kargozar/Reservation_cs.aspx';
 
@@ -10,6 +10,7 @@ const BASE_URL = 'https://atabatorg.haj.ir/Kargozar/Reservation_cs.aspx';
  * Returns false if the page shows an error or the reservation doesn't exist.
  */
 export async function checkReservationExists(resId: string): Promise<boolean> {
+  await waitForAuth();
   const url = `${BASE_URL}?resid=${resId}`;
   const context = await getContext();
   const page = await context.newPage();

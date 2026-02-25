@@ -2,7 +2,7 @@
 import { Page } from 'playwright';
 import { TripData, TripSearchParams } from './types';
 import { getContext, isSessionValid } from './browser';
-import { authenticate } from './auth';
+import { authenticate, waitForAuth } from './auth';
 
 const TRIPS_URL = 'https://atabatorg.haj.ir/Kargozar/KargroupResLock.aspx';
 
@@ -24,6 +24,7 @@ interface WindowWithPostBack extends Window {
 }
 
 export async function searchTrips(params: TripSearchParams): Promise<TripData[]> {
+  await waitForAuth();
   const context = await getContext();
   const page = await context.newPage();
 

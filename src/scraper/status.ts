@@ -1,6 +1,6 @@
 // In the Name of God, the Creative, the Originator
 import { getContext, isSessionValid } from './browser';
-import { authenticate } from './auth';
+import { authenticate, waitForAuth } from './auth';
 
 const STATUS_URL = 'https://atabatorg.haj.ir/Kargozar/KargroupReslockStatus.aspx';
 
@@ -12,6 +12,7 @@ interface StatusResult {
 }
 
 export async function searchStatus(dateFrom?: string, dateTo?: string) {
+  await waitForAuth();
   const context = await getContext();
   const page = await context.newPage();
 

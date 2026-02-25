@@ -1,11 +1,12 @@
 // In the Name of God, the Creative, the Originator
 import type { ReceiptData, ItineraryItem, PassengerReceiptItem } from './types';
 import { getContext, isSessionValid } from './browser';
-import { authenticate } from './auth';
+import { authenticate, waitForAuth } from './auth';
 
 const RECEIPT_URL_BASE = 'https://atabatorg.haj.ir/Kargozar/Receipt.aspx?resID=';
 
 export async function scrapeReceipt(resId: string): Promise<ReceiptData> {
+  await waitForAuth();
   const context = await getContext();
   const page = await context.newPage();
   const targetUrl = `${RECEIPT_URL_BASE}${resId}`;
