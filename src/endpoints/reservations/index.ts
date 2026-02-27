@@ -2,7 +2,7 @@
 import type { PayloadHandler } from 'payload';
 import { tripSelectionSchema } from '@/validations/trip';
 import { TripData } from '@/scraper/types';
-import { Pilgrim, Reservation } from '@/payload-types';
+import { Pilgrim } from '@/payload-types';
 import { AppError, ErrorCodes, type ErrorCode } from '@/utils/AppError';
 import { successResponse, errorResponse } from '@/utils/apiResponse';
 
@@ -36,35 +36,6 @@ export const createReservationHandler: PayloadHandler = async req => {
       );
     }
 
-    // 24-Hour Rule Check
-    const lastReservations = await req.payload.find({
-      collection: 'reservations',
-      where: {
-        pilgrim: { equals: pilgrim.id },
-      },
-      sort: '-bookedAt',
-      limit: 1,
-    });
-
-    if (lastReservations.docs.length > 0) {
-      const lastRes = lastReservations.docs[0] as Reservation;
-      if (lastRes.bookedAt) {
-        const timeDiff = Date.now() - new Date(lastRes.bookedAt).getTime();
-        const hoursDiff = timeDiff / (1000 * 60 * 60);
-
-        if (lastRes.status === 'cancelled' && hoursDiff < 24) {
-          return errorResponse(
-            new AppError('Cancellation 24h rule', ErrorCodes.RESERVATION_CANCELLATION_COOLDOWN, 403)
-          );
-        }
-        if (['pending', 'confirmed', 'paid'].includes(lastRes.status)) {
-          return errorResponse(
-            new AppError('Active reservation exists', ErrorCodes.RESERVATION_ACTIVE_EXISTS, 403)
-          );
-        }
-      }
-    }
-
     // Use Adapter with tripSnapshot (contains selectButtonScript from original search)
     const { getAdapter } = await import('@/scraper');
     const adapter = getAdapter();
@@ -88,8 +59,11 @@ export const createReservationHandler: PayloadHandler = async req => {
         let errorCode: ErrorCode = ErrorCodes.RESERVATION_CREATE_FAILED;
 
         // Check for duplicate registration (e.g., "زائري با کد ملي ... قبلا ثبت شده است")
+        let duplicateNationalId: string | undefined;
         if (errorMessage.includes('قبلا ثبت شده است') || errorMessage.includes('قبلا ثبت شده')) {
           errorCode = ErrorCodes.RESERVATION_PASSENGER_DUPLICATE;
+          const match = errorMessage.match(/کد ملي\s+(\d+)/);
+          if (match) duplicateNationalId = match[1];
         }
         // Check for invalid passenger data
         else if (
@@ -100,7 +74,14 @@ export const createReservationHandler: PayloadHandler = async req => {
           errorCode = ErrorCodes.RESERVATION_PASSENGER_INVALID;
         }
 
-        return errorResponse(new AppError(errorMessage, errorCode, 400));
+        return errorResponse(
+          new AppError(
+            errorMessage,
+            errorCode,
+            400,
+            duplicateNationalId ? { nationalId: duplicateNationalId } : undefined
+          )
+        );
       }
 
       // Scrape receipt data after successful reservation

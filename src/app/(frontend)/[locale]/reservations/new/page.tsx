@@ -238,7 +238,10 @@ function NewReservationContent() {
         toast.success(t('success.message'));
         router.push(`/reservations/${result.data?.reservation?.id || ''}`);
       } else if (!result.success) {
-        const errorMsg = result.code ? tApiErrors(result.code) : result.message || tCommon('error');
+        let errorMsg = result.code ? tApiErrors(result.code) : result.message || tCommon('error');
+        if (result.code === 'RESERVATION_PASSENGER_DUPLICATE' && result.details?.nationalId) {
+          errorMsg = `${errorMsg} (کد ملی: ${result.details.nationalId})`;
+        }
         toast.error(errorMsg);
       }
     } catch (error) {

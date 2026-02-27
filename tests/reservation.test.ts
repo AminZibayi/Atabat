@@ -59,39 +59,7 @@ describe('Reservation Endpoint Integration', () => {
     expect(res.status).toBe(400);
   });
 
-  it('should enforce 24h rule for cancelled reservations', async () => {
-    mockPayload.find.mockResolvedValueOnce({
-      docs: [
-        {
-          id: 123,
-          status: 'cancelled',
-          bookedAt: new Date(Date.now() - 1000 * 60 * 60 * 12).toISOString(), // 12 hours ago
-        },
-      ],
-    });
-
-    const req = createMockReq({
-      tripSnapshot: {
-        rowIndex: '0',
-        tripIdentifier: 'test',
-        departureDate: '1404/01/01',
-        groupCode: '123',
-        agentName: 'Test',
-        cost: 1000,
-        selectButtonScript: 'test',
-      },
-      passengers: [{ nationalId: '0123456789', birthdate: '1370/01/01', phone: '09121234567' }],
-    });
-    const res = await createReservationHandler(req);
-    const json = await res.json();
-
-    expect(res.status).toBe(403);
-    expect(json.code).toContain('CANCELLATION');
-  });
-
-  it('should allow booking if no active/recent cancelled reservation', async () => {
-    mockPayload.find.mockResolvedValueOnce({ docs: [] }); // No previous res
-
+  it('should allow booking when adapter succeeds', async () => {
     // Enable MOCK
     process.env.MOCK_SCRAPER = 'true';
     mockPayload.create.mockResolvedValueOnce({ id: 999, status: 'pending' });

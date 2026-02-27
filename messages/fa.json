@@ -348,10 +348,8 @@
         "RESERVATION_CREATE_FAILED": "ثبت رزرو با خطا مواجه شد. لطفا مجدد تلاش کنید.",
         "RESERVATION_CANCEL_FAILED": "لغو رزرو با خطا مواجه شد.",
         "RESERVATION_ALREADY_EXISTS": "شما قبلا برای این سفر رزرو انجام داده‌اید.",
-        "RESERVATION_PASSENGER_DUPLICATE": "این کد ملی قبلا در این سفر ثبت شده است.",
+        "RESERVATION_PASSENGER_DUPLICATE": "این زائر قبلاً در سامانه رزرو فعال دارد.",
         "RESERVATION_PASSENGER_INVALID": "اطلاعات یکی از مسافران نامعتبر است.",
-        "RESERVATION_CANCELLATION_COOLDOWN": "تا ۲۴ ساعت پس از لغو رزرو، امکان ثبت رزرو جدید وجود ندارد.",
-        "RESERVATION_ACTIVE_EXISTS": "شما در حال حاضر یک رزرو فعال دارید.",
         "PAYMENT_INIT_FAILED": "شروع فرایند پرداخت با خطا مواجه شد. لطفا مجدد تلاش کنید."
       }
     }

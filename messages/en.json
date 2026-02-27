@@ -348,10 +348,8 @@
         "RESERVATION_CREATE_FAILED": "Failed to create reservation. Please try again.",
         "RESERVATION_CANCEL_FAILED": "Failed to cancel reservation.",
         "RESERVATION_ALREADY_EXISTS": "You have already made a reservation for this trip.",
-        "RESERVATION_PASSENGER_DUPLICATE": "This National ID is already registered for this trip.",
+        "RESERVATION_PASSENGER_DUPLICATE": "This passenger already has an active reservation in the system.",
         "RESERVATION_PASSENGER_INVALID": "Information for one of the passengers is invalid.",
-        "RESERVATION_CANCELLATION_COOLDOWN": "You cannot book a new trip within 24 hours of a cancellation.",
-        "RESERVATION_ACTIVE_EXISTS": "You currently have an active reservation.",
         "PAYMENT_INIT_FAILED": "Failed to initialize payment. Please try again."
       }
     }
