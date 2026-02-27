@@ -2,8 +2,8 @@
 
 // In the Name of God, the Creative, the Originator
 import { useTranslations } from 'next-intl';
-import { useRouter } from 'next/navigation';
-import React, { useState, useMemo } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
+import React, { useState, useMemo, useEffect, useRef, Suspense } from 'react';
 import toast from 'react-hot-toast';
 
 import { Button } from '@/components/ui/Button';
@@ -44,7 +44,7 @@ interface Trip {
   selectButtonScript?: string;
 }
 
-export default function TripsPage() {
+function TripsPageContent() {
   const t = useTranslations('trips');
   const tApiErrors = useTranslations('api.result.error');
   const tCommon = useTranslations('common');
@@ -58,18 +58,57 @@ export default function TripsPage() {
     []
   );
 
+  const searchParams = useSearchParams();
+  const autoSearchTriggered = useRef(false);
+
+  const getInitialFilters = (): SearchFilters => ({
+    departureFrom: searchParams.get('departureFrom') || defaultDates.from,
+    departureTo: searchParams.get('departureTo') || defaultDates.to,
+    province: searchParams.get('province') || '-1',
+    minCapacity: searchParams.get('minCapacity') || '1',
+    tripType: searchParams.get('tripType') || '',
+  });
+
   const [isLoading, setIsLoading] = useState(false);
   const [trips, setTrips] = useState<Trip[]>([]);
   const [hasSearched, setHasSearched] = useState(false);
-  const [filters, setFilters] = useState<SearchFilters>({
-    departureFrom: defaultDates.from,
-    departureTo: defaultDates.to,
-    province: '-1',
-    minCapacity: '1',
-    tripType: '',
-  });
+  const [filters, setFilters] = useState<SearchFilters>(getInitialFilters);
 
   const bgImage = useRandomHeroBackground();
+
+  // Auto-trigger search when arriving from landing page with URL params
+  useEffect(() => {
+    if (autoSearchTriggered.current) return;
+    // Arriving via "Update capacity" toast action — user needs to change capacity first, skip auto-search
+    if (searchParams.get('focus') === 'minCapacity') return;
+    const hasParams =
+      searchParams.get('departureFrom') ||
+      searchParams.get('departureTo') ||
+      searchParams.get('province') ||
+      searchParams.get('minCapacity') ||
+      searchParams.get('tripType');
+    if (hasParams) {
+      autoSearchTriggered.current = true;
+      // Submit the form programmatically
+      const form = document.querySelector<HTMLFormElement>('form');
+      if (form) form.requestSubmit();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    if (searchParams.get('focus') !== 'minCapacity') return;
+
+    const timer = window.setTimeout(() => {
+      const input = document.getElementById('trip-search-min-capacity') as HTMLInputElement | null;
+      if (input) {
+        input.focus();
+        input.select();
+      }
+    }, 0);
+
+    return () => window.clearTimeout(timer);
+  }, [searchParams]);
 
   // All provinces from the functional spec
   const provinces = [
@@ -182,6 +221,14 @@ export default function TripsPage() {
       ...trip,
       provinceCode: filters.province,
       minCapacity: searchMinCapacity,
+      // Persist all search filters so the reservation page can reconstruct the search URL
+      searchFilters: {
+        departureFrom: filters.departureFrom,
+        departureTo: filters.departureTo,
+        province: filters.province,
+        minCapacity: filters.minCapacity,
+        tripType: filters.tripType,
+      },
     };
     sessionStorage.setItem('selectedTrip', JSON.stringify(tripWithExtras));
     // Navigate to reservation page with tripIdentifier in URL
@@ -223,6 +270,7 @@ export default function TripsPage() {
                 fullWidth
               />
               <Input
+                id="trip-search-min-capacity"
                 label={t('search.minCapacity')}
                 type="number"
                 min="1"
@@ -288,8 +336,8 @@ export default function TripsPage() {
                       </tr>
                     </thead>
                     <tbody>
-                      {trips.map(trip => (
-                        <tr key={trip.tripIdentifier}>
+                      {trips.map((trip, index) => (
+                        <tr key={`${trip.tripIdentifier}-${trip.rowIndex}-${index}`}>
                           <td>{trip.dayOfWeek}</td>
                           <td>{trip.departureDate}</td>
                           <td>
@@ -319,8 +367,10 @@ export default function TripsPage() {
 
                 {/* Results Cards - Mobile */}
                 <div className={styles.cardsWrapper}>
-                  {trips.map(trip => (
-                    <div key={trip.tripIdentifier} className={styles.tripCard}>
+                  {trips.map((trip, index) => (
+                    <div
+                      key={`${trip.tripIdentifier}-${trip.rowIndex}-${index}`}
+                      className={styles.tripCard}>
                       <div className={styles.cardHeader}>
                         <span className={styles.cardDate}>{trip.departureDate}</span>
                         <span className={styles.cardCapacity}>
@@ -373,5 +423,13 @@ export default function TripsPage() {
         </section>
       )}
     </div>
+  );
+}
+
+export default function TripsPage() {
+  return (
+    <Suspense>
+      <TripsPageContent />
+    </Suspense>
   );
 }

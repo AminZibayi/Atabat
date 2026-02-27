@@ -67,7 +67,7 @@
       "departureTo": "Departure To",
       "province": "Province",
       "allProvinces": "All Provinces",
-      "minCapacity": "Min. Capacity",
+      "minCapacity": "Requested Capacity",
       "tripType": "Trip Type",
       "allTypes": "All Types",
       "searchBtn": "Search Trips"
@@ -204,6 +204,8 @@
       "passengerLabel": "Passenger {index}",
       "addPassenger": "Add Passenger",
       "removePassenger": "Remove Passenger",
+      "capacityExceedToast": "You searched with capacity = {count}. To add more passengers, increase the capacity and search again.",
+      "updateCapacity": "Update Capacity",
       "minCapacityInfo": "This trip requires at least {count} passengers",
       "remainingCapacity": "Remaining capacity: {count} seats",
       "success": {

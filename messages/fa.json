@@ -67,7 +67,7 @@
       "departureTo": "تاریخ پایان",
       "province": "استان",
       "allProvinces": "همه استان‌ها",
-      "minCapacity": "حداقل ظرفیت",
+      "minCapacity": "ظرفیت درخواستی",
       "tripType": "نوع سفر",
       "allTypes": "همه انواع",
       "searchBtn": "جستجوی سفر"
@@ -204,6 +204,8 @@
       "passengerLabel": "مسافر {index}",
       "addPassenger": "افزودن مسافر",
       "removePassenger": "حذف مسافر",
+      "capacityExceedToast": "جستجو با ظرفیت {count} نفر انجام شده. برای افزودن مسافر بیشتر، ظرفیت را افزایش داده و دوباره جستجو کنید.",
+      "updateCapacity": "تغییر ظرفیت",
       "minCapacityInfo": "این سفر حداقل {count} نفر نیاز دارد",
       "remainingCapacity": "ظرفیت باقیمانده: {count} نفر",
       "success": {

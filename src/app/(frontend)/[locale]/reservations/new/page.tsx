@@ -33,6 +33,13 @@ interface TripData {
   kazemainHotel: string;
   address: string;
   selectButtonScript?: string;
+  searchFilters?: {
+    departureFrom: string;
+    departureTo: string;
+    province: string;
+    minCapacity: string;
+    tripType: string;
+  };
 }
 
 interface PassengerForm {
@@ -128,8 +135,48 @@ function NewReservationContent() {
   const addPassenger = useCallback(() => {
     if (passengers.length < maxPassengers) {
       setPassengers(prev => [...prev, { nationalId: '', birthdate: '', phone: '' }]);
+      return;
     }
-  }, [passengers.length, maxPassengers]);
+
+    // Build the trips search URL restoring all previous search filters
+    const sf = trip?.searchFilters;
+    const params = new URLSearchParams();
+    if (sf?.departureFrom) params.set('departureFrom', sf.departureFrom);
+    if (sf?.departureTo) params.set('departureTo', sf.departureTo);
+    if (sf?.province) params.set('province', sf.province);
+    params.set('minCapacity', String(maxPassengers));
+    if (sf?.tripType) params.set('tripType', sf.tripType);
+    params.set('focus', 'minCapacity');
+    const tripsUrl = `/trips?${params.toString()}`;
+
+    toast(
+      toastInstance => (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+          <span>{t('capacityExceedToast', { count: maxPassengers })}</span>
+          <button
+            type="button"
+            onClick={() => {
+              toast.dismiss(toastInstance.id);
+              router.push(tripsUrl);
+            }}
+            style={{
+              alignSelf: 'flex-start',
+              padding: '6px 14px',
+              borderRadius: 'var(--radius-md, 8px)',
+              border: '1.5px solid var(--color-accent, #3b82f6)',
+              background: 'transparent',
+              color: 'var(--color-accent, #3b82f6)',
+              fontWeight: 600,
+              fontSize: '0.85rem',
+              cursor: 'pointer',
+            }}>
+            {t('updateCapacity')}
+          </button>
+        </div>
+      ),
+      { duration: 8000, icon: '⚠️' }
+    );
+  }, [passengers.length, maxPassengers, trip?.searchFilters, router, t]);
 
   const removePassenger = useCallback(
     (index: number) => {
@@ -358,15 +405,9 @@ function NewReservationContent() {
                 </div>
               ))}
 
-              {passengers.length < maxPassengers && (
-                <button
-                  type="button"
-                  className={styles.addPassengerBtn}
-                  onClick={addPassenger}
-                  disabled={passengers.length >= maxPassengers}>
-                  + {t('addPassenger')}
-                </button>
-              )}
+              <button type="button" className={styles.addPassengerBtn} onClick={addPassenger}>
+                + {t('addPassenger')}
+              </button>
 
               <div className={styles.termsSection}>
                 <label className={styles.checkbox}>
