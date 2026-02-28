@@ -2,6 +2,7 @@
 
 // In the Name of God, the Creative, the Originator
 import { useTranslations } from 'next-intl';
+import Image from 'next/image';
 import React from 'react';
 
 import { Link } from '@/i18n/navigation';
@@ -19,6 +20,17 @@ export function Footer() {
           <div className={styles.brand}>
             <Logo size="sm" />
             <p className={styles.copyright}>{t('copyright', { year: currentYear })}</p>
+          </div>
+
+          <div className={styles.officialBrand}>
+            <Image
+              src="/mz_wide.jpg"
+              alt="MojeZamZam"
+              width={120}
+              height={36}
+              className={styles.officialBrandImage}
+              priority={false}
+            />
           </div>
 
           <nav className={styles.links}>

@@ -1,6 +1,7 @@
 // In the Name of God, the Creative, the Originator
 'use client';
 
+import Image from 'next/image';
 import React from 'react';
 
 import { RichText } from '@/components/ui/RichText';
@@ -36,6 +37,16 @@ export function AboutPageClient({ title, content, locale }: AboutPageClientProps
                 <p>{locale === 'fa' ? 'محتوایی وجود ندارد' : 'No content available'}</p>
               </div>
             )}
+            <div className={styles.brandStamp}>
+              <Image
+                src="/mz_wide.jpg"
+                alt="MojeZamZam official logo"
+                width={200}
+                height={60}
+                className={styles.brandStampImage}
+                priority={false}
+              />
+            </div>
           </div>
         </div>
       </div>

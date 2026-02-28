@@ -5,17 +5,15 @@ export const metadata = {
   description: 'Moj Zamzam - Smart Pilgrimage Booking Platform',
   title: 'Moj Zamzam',
   icons: [
-    {
-      rel: 'icon',
-      type: 'image/png',
-      url: '/favicon.png',
-    },
-    {
-      rel: 'apple-touch-icon',
-      type: 'image/png',
-      url: '/apple-touch-icon.png',
-    },
+    { rel: 'icon', type: 'image/png', url: '/favicon-96x96.png', sizes: '96x96' },
+    { rel: 'icon', type: 'image/svg+xml', url: '/favicon.svg' },
+    { rel: 'shortcut icon', url: '/favicon.ico' },
+    { rel: 'apple-touch-icon', sizes: '180x180', url: '/apple-touch-icon.png' },
   ],
+  manifest: '/site.webmanifest',
+  appleWebApp: {
+    title: 'MojeZamZam',
+  },
 };
 
 export default function RootLayout(props: { children: React.ReactNode }) {

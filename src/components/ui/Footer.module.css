@@ -84,3 +84,28 @@
 .link:hover {
   color: var(--color-accent);
 }
+
+.officialBrand {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.officialBrandImage {
+  display: block;
+  height: 20px !important;
+  width: auto !important;
+  max-width: 120px;
+  object-fit: contain;
+  opacity: 0.22;
+  filter: grayscale(100%) brightness(0.9);
+  transition:
+    opacity 0.25s ease,
+    filter 0.25s ease;
+}
+
+.officialBrandImage:hover {
+  opacity: 0.5;
+  filter: grayscale(40%) brightness(1);
+}

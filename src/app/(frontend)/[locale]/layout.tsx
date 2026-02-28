@@ -22,9 +22,15 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
     title: messages.metadata.title,
     description: messages.metadata.description,
     icons: [
-      { rel: 'icon', type: 'image/png', url: '/favicon.png' },
-      { rel: 'apple-touch-icon', type: 'image/png', url: '/apple-touch-icon.png' },
+      { rel: 'icon', type: 'image/png', url: '/favicon-96x96.png', sizes: '96x96' },
+      { rel: 'icon', type: 'image/svg+xml', url: '/favicon.svg' },
+      { rel: 'shortcut icon', url: '/favicon.ico' },
+      { rel: 'apple-touch-icon', sizes: '180x180', url: '/apple-touch-icon.png' },
     ],
+    manifest: '/site.webmanifest',
+    appleWebApp: {
+      title: 'MojeZamZam',
+    },
   };
 }
 
