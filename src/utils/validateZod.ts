@@ -1,3 +1,4 @@
+// In the Name of God, the Creative, the Originator
 import { z } from 'zod';
 import type { Validate } from 'payload';
 

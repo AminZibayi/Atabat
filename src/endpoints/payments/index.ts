@@ -3,6 +3,7 @@ import type { PayloadHandler } from 'payload';
 import { Pilgrim } from '@/payload-types';
 import { AppError, ErrorCodes } from '@/utils/AppError';
 import { successResponse, errorResponse } from '@/utils/apiResponse';
+import { getAdapter } from '@/scraper';
 
 export const initiatePaymentHandler: PayloadHandler = async req => {
   if (!req.user || req.user.collection !== 'pilgrims') {
@@ -46,7 +47,6 @@ export const initiatePaymentHandler: PayloadHandler = async req => {
       return errorResponse(new AppError('Forbidden', ErrorCodes.FORBIDDEN, 403));
     }
 
-    const { getAdapter } = await import('@/scraper');
     const adapter = getAdapter();
 
     // Use externalResId for the scraper

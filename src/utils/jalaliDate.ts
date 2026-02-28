@@ -2,6 +2,7 @@
 import DateObject from 'react-date-object';
 import persian from 'react-date-object/calendars/persian';
 import persian_fa from 'react-date-object/locales/persian_fa';
+import { convertToEnglishDigits } from './digits';
 
 /**
  * Get today's date in Jalali format (YYYY/MM/DD)
@@ -51,22 +52,7 @@ export function dateObjectToJalaliString(date: DateObject | null): string {
 export function addDaysToJalali(jalaliDate: string, days: number): string {
   try {
     // Convert any Persian/Arabic digits to English first
-    const persianToEnglish: Record<string, string> = {
-      '۰': '0',
-      '۱': '1',
-      '۲': '2',
-      '۳': '3',
-      '۴': '4',
-      '۵': '5',
-      '۶': '6',
-      '۷': '7',
-      '۸': '8',
-      '۹': '9',
-    };
-    let normalized = '';
-    for (const char of jalaliDate) {
-      normalized += persianToEnglish[char] || char;
-    }
+    const normalized = convertToEnglishDigits(jalaliDate);
 
     const date = new DateObject({
       date: normalized,

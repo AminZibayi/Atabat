@@ -512,7 +512,8 @@ async function confirmReservation(page: Page): Promise<ReservationResult> {
   }
 }
 
-// Keep old function for backwards compatibility - deprecated
+// Keep old function for backwards compatibility
+/** @deprecated Use {@link createReservationWithTrip} instead */
 export async function createReservation(
   page: Page,
   passenger: PassengerInfo

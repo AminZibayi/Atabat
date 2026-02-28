@@ -5,6 +5,7 @@ import { TripData } from '@/scraper/types';
 import { Pilgrim, Reservation } from '@/payload-types';
 import { AppError, ErrorCodes, type ErrorCode } from '@/utils/AppError';
 import { successResponse, errorResponse } from '@/utils/apiResponse';
+import { getAdapter } from '@/scraper';
 
 export const createReservationHandler: PayloadHandler = async req => {
   // Check authentication
@@ -37,7 +38,6 @@ export const createReservationHandler: PayloadHandler = async req => {
     }
 
     // Use Adapter with tripSnapshot (contains selectButtonScript from original search)
-    const { getAdapter } = await import('@/scraper');
     const adapter = getAdapter();
 
     // Build passengers array: use form data, fall back to profile for first passenger
