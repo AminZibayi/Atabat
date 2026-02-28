@@ -30,14 +30,7 @@ export const beforeReadReservation: CollectionBeforeReadHook<Reservation> = asyn
     return doc;
   }
 
-  // Skip if reservation was created within the last 30 minutes
-  // const createdAt = doc.createdAt ? new Date(doc.createdAt).getTime() : 0;
   const now = Date.now();
-  // if (now - createdAt < VALIDATION_BUFFER_MS) {
-  //   console.log(`[beforeReadReservation] Skipping validation for ${doc.id} - created within 30min`);
-  //   return doc;
-  // }
-
   // Check if we're within the 30-minute buffer
   const lastValidated = doc.lastValidatedAt ? new Date(doc.lastValidatedAt).getTime() : 0;
 
