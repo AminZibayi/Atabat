@@ -2,7 +2,7 @@
 import type { PayloadHandler } from 'payload';
 import { tripSelectionSchema } from '@/validations/trip';
 import { TripData } from '@/scraper/types';
-import { Pilgrim } from '@/payload-types';
+import { Pilgrim, Reservation } from '@/payload-types';
 import { AppError, ErrorCodes, type ErrorCode } from '@/utils/AppError';
 import { successResponse, errorResponse } from '@/utils/apiResponse';
 
